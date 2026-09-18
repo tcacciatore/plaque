@@ -421,6 +421,11 @@ button.stat:hover{border-color:var(--accent)}
 .road__lane{position:absolute;inset:46% 0 0 0;background:rgba(236,232,216,.30)}
 .road__lane--l{clip-path:polygon(49.75% 0,50.05% 0,34.6% 100%,33.8% 100%)}
 .road__lane--r{clip-path:polygon(49.95% 0,50.25% 0,66.2% 100%,65.4% 100%)}
+/* deux voies : une seule séparation, au centre, et des voitures plus larges */
+.road--two .road__lane--l,.road--two .road__lane--r{clip-path:polygon(49.8% 0,50.2% 0,50.6% 100%,49.4% 100%)}
+.road--two .car{width:min(calc(var(--roadH) * var(--w,.74)), 46%)}
+.road--two .plate--car .plate__body{font-size:clamp(11.5px,3.7vw,18px)}
+.road--two .plate--car .plate__depnum{font-size:clamp(7px,2vw,9px)}
 
 /* le bloc « ride » : la voiture avance et recule doucement, avec un léger roulis */
 .car__ride{position:relative;transform-origin:50% 96%;animation:cruise var(--ride,3s) ease-in-out var(--ridePhase,0s) infinite alternate;will-change:transform}

@@ -22,12 +22,15 @@ var CAR_BONUS = 2;                  // secondes rendues à la voiture visée par
 var SPAWN_GAP = 3500;               // écart minimal entre deux apparitions, toutes voies confondues, en ms
 var GAP_MIN   = 3500, GAP_MAX = 5000;// délai avant qu'une voie libre se réalimente, en ms
 var TIME_CAP  = 150;                // la partie ne dépasse jamais deux minutes et demie
-var LANES     = [-30, 0, 30];       // décalage de chaque voie, en % de la largeur de scène
+var LANES3    = [-30, 0, 30];       // décalage de chaque voie, en % de la largeur de scène
+var LANES2    = [-22, 22];          // sur petit écran : deux voies, plaques plus grandes
+var NARROW    = 560;                // largeur d'écran sous laquelle on passe à deux voies
+var LANES     = LANES3;
 var MULT_MAX  = 5;
 
 var T = {
   running: false, timeLeft: 0, score: 0, done: 0, seen: 0,
-  combo: 1, lanes: [null, null, null], timers: [null, null, null], lastSpawn: 0, target: null, tick: null, history: [],
+  combo: 1, lanes: [], timers: [], lastSpawn: 0, target: null, tick: null, history: [],
   t0: 0, feverUntil: 0, fevers: 0, rush: false
 };
 
@@ -394,11 +397,15 @@ function buildPosts() {
 function start() {
   P = window.PLAQUE;
   buildPosts();
+  // deux voies sur un petit écran : les plaques y restent lisibles
+  var two = window.innerWidth < NARROW;
+  LANES = two ? LANES2 : LANES3;
+  document.querySelector('.road').classList.toggle('road--two', two);
   T.running = true; T.timeLeft = GAME_TIME; T.score = 0;
-  T.done = 0; T.seen = 0; T.combo = 1; T.lanes = [null, null, null]; T.history = []; T.lastSpawn = 0; T.target = null;
+  T.done = 0; T.seen = 0; T.combo = 1; T.lanes = LANES.map(function () { return null; }); T.history = []; T.lastSpawn = 0; T.target = null;
   T.t0 = Date.now(); T.feverUntil = 0; T.fevers = 0; T.rush = false; T.feverArmed = true;
   document.querySelector('.road').classList.remove('rush', 'fever');
-  T.timers.forEach(clearTimeout); T.timers = [null, null, null];
+  T.timers.forEach(clearTimeout); T.timers = LANES.map(function () { return null; });
   $('tr-cars-layer').innerHTML = '';
   preloadCars();
   $('tr-input').value = '';
@@ -408,7 +415,7 @@ function start() {
   $('tr-input').focus();
   loop();
   // les trois voies s'amorcent à des instants différents
-  P.shuffle([0, 1, 2]).forEach(function (lane, i) { scheduleLane(lane, 300 + i * SPAWN_GAP); });
+  P.shuffle(LANES.map(function (_, k) { return k; })).forEach(function (lane, i) { scheduleLane(lane, 300 + i * SPAWN_GAP); });
 }
 
 function finish() {
@@ -427,7 +434,7 @@ function stop() {
   T.running = false;
   clearInterval(T.tick);
   T.timers.forEach(clearTimeout);
-  T.lanes = [null, null, null];
+  T.lanes = LANES.map(function () { return null; });
   $('tr-cars-layer').innerHTML = '';
   document.querySelector('.road').classList.remove('rush', 'fever');
 }
