@@ -10,18 +10,18 @@
 
 var P = null;                       // passerelle vers le moteur (window.PLAQUE)
 var GAME_TIME = 120;                // durée d'une partie, en secondes
-var CAR_TIME  = 18;                 // temps de présence d'une voiture au départ…
-var CAR_TIME_END = 12;              // …et en fin de partie (la rampe)
+var CAR_TIME  = 16;                 // temps de présence d'une voiture au départ…
+var CAR_TIME_END = 10;              // …et en fin de partie (la rampe)
 var RUSH      = 20;                 // les dernières secondes : tout compte double
 var FEVER     = 10;                 // durée de la fièvre déclenchée à ×5 : un mot suffit
 var GOLD_ODDS = 25, GOLD_MULT = 3;  // voiture dorée : une sur 25, ×3
 var TANK_ODDS = 14;                 // camion-citerne : un sur 14, explosion en chaîne
-var WORD_TIME = 3;                  // secondes de partie gagnées par mot valide
-var PLATE_TIME = 6;                 // secondes de partie gagnées en plus par plaque lue
+var WORD_TIME = 1;                  // secondes de partie gagnées par mot valide
+var PLATE_TIME = 3;                 // secondes de partie gagnées en plus par plaque lue
 var CAR_BONUS = 2;                  // secondes rendues à la voiture visée par mot valide
-var SPAWN_GAP = 2000;               // écart minimal entre deux apparitions, toutes voies confondues, en ms
-var GAP_MIN   = 2000, GAP_MAX = 3200;// délai avant qu'une voie libre se réalimente, en ms
-var TIME_CAP  = 180;                // la partie ne dépasse jamais trois minutes
+var SPAWN_GAP = 3500;               // écart minimal entre deux apparitions, toutes voies confondues, en ms
+var GAP_MIN   = 3500, GAP_MAX = 5000;// délai avant qu'une voie libre se réalimente, en ms
+var TIME_CAP  = 150;                // la partie ne dépasse jamais deux minutes et demie
 var LANES     = [-30, 0, 30];       // décalage de chaque voie, en % de la largeur de scène
 var MULT_MAX  = 5;
 

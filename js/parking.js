@@ -14,13 +14,13 @@ var P = null;
 var SPOTS = 9;
 var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 var LINE_BONUS = 300, DIAG_BONUS = 500;
-var GAME_TIME = 120, TIME_CAP = 180;
+var GAME_TIME = 120, TIME_CAP = 150;
 var RUSH = 20, FEVER = 10;             // rush final (×2) et fièvre à ×5 (un mot lit la plaque)
 var GOLD_ODDS = 25, GOLD_MULT = 3;     // voiture dorée : ×3, sa marque au sol est un joker
 var TANK_ODDS = 14;                    // camion-citerne : ses voisines explosent avec lui
-var WORD_TIME = 3, PLATE_TIME = 6;     // secondes gagnées par mot, et en plus par plaque lue
+var WORD_TIME = 1, PLATE_TIME = 3;     // secondes gagnées par mot, et en plus par plaque lue
 var TOW_PENALTY = 15;                  // secondes perdues en faisant remorquer une voiture
-var PARK_MIN = 1400, PARK_MAX = 2800;  // délai avant qu'une place libre soit réoccupée, en ms
+var PARK_MIN = 2500, PARK_MAX = 4500;  // délai avant qu'une place libre soit réoccupée, en ms
 var SHAPES = ['berline', 'suv', 'citadine', 'pickup', 'van', 'coupe'];
 var TANK = 'citerne';
 var SPORT = 'coupe', SPORT_BONUS = 1.5;
