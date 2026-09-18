@@ -24,7 +24,7 @@ var GAP_MIN   = 3500, GAP_MAX = 5000;// délai avant qu'une voie libre se réali
 var TIME_CAP  = 150;                // la partie ne dépasse jamais deux minutes et demie
 var LANES3    = [-30, 0, 30];       // décalage de chaque voie, en % de la largeur de scène
 var LANES2    = [-25, 25];          // sur petit écran : deux voies plus écartées, voitures plus grandes
-var NARROW    = 560;                // largeur d'écran sous laquelle on passe à deux voies
+var NARROW    = 700;                // largeur d'écran sous laquelle on passe à deux voies
 var LANES     = LANES3;
 var MULT_MAX  = 5;
 
