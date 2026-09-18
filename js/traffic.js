@@ -1,0 +1,448 @@
+/* ═══════════════════════════════════════════════════════════
+   PLAQUE — mode Trafic
+   Au volant sur trois voies : chaque voie a sa voiture, qui arrive
+   à son heure, reste devant vous un moment, puis s'éloigne ou
+   explose. Trois modèles toujours différents. Deux mots par plaque,
+   un par paire de lettres. La partie dure deux minutes.
+   ═══════════════════════════════════════════════════════════ */
+(function () {
+'use strict';
+
+var P = null;                       // passerelle vers le moteur (window.PLAQUE)
+var GAME_TIME = 120;                // durée d'une partie, en secondes
+var CAR_TIME  = 18;                 // temps de présence d'une voiture au départ…
+var CAR_TIME_END = 12;              // …et en fin de partie (la rampe)
+var RUSH      = 20;                 // les dernières secondes : tout compte double
+var FEVER     = 10;                 // durée de la fièvre déclenchée à ×5 : un mot suffit
+var GOLD_ODDS = 25, GOLD_MULT = 3;  // voiture dorée : une sur 25, ×3
+var TANK_ODDS = 14;                 // camion-citerne : un sur 14, explosion en chaîne
+var WORD_TIME = 3;                  // secondes de partie gagnées par mot valide
+var PLATE_TIME = 6;                 // secondes de partie gagnées en plus par plaque lue
+var CAR_BONUS = 2;                  // secondes rendues à la voiture visée par mot valide
+var SPAWN_GAP = 2000;               // écart minimal entre deux apparitions, toutes voies confondues, en ms
+var GAP_MIN   = 2000, GAP_MAX = 3200;// délai avant qu'une voie libre se réalimente, en ms
+var TIME_CAP  = 180;                // la partie ne dépasse jamais trois minutes
+var LANES     = [-30, 0, 30];       // décalage de chaque voie, en % de la largeur de scène
+var MULT_MAX  = 5;
+
+var T = {
+  running: false, timeLeft: 0, score: 0, done: 0, seen: 0,
+  combo: 1, lanes: [null, null, null], timers: [null, null, null], lastSpawn: 0, target: null, tick: null, history: [],
+  t0: 0, feverUntil: 0, fevers: 0, rush: false
+};
+
+var $ = function (id) { return document.getElementById(id); };
+
+/* ─────────── la scène ─────────── */
+/* Sprites rendus hors ligne par build/render_cars.py : une seule <img> par
+   voiture, sans filtre ni fusion au runtime — c'est moins coûteux à animer
+   qu'un SVG, que le navigateur devait re-rastériser à chaque échelle.       */
+var SHAPES = ['berline', 'suv', 'citadine', 'pickup', 'van', 'coupe'];
+var TANK = 'citerne';
+// largeur affichée, en fraction de la hauteur de scène : c'est elle qui fixe
+// la distance apparente, indépendamment de la largeur de l'écran
+var SIZE = { berline: [.68, .74], suv: [.64, .70], citadine: [.60, .66],
+             pickup: [.66, .72], van: [.56, .62], coupe: [.72, .78], citerne: [.52, .56] };
+// position de l'emplacement de plaque, mesurée sur le rendu (build/render_cars.py)
+var PLATE_Y = { berline: 71.5, suv: 73.3, citadine: 69.5, pickup: 56.8, van: 70.5, coupe: 62.7, citerne: 75.5 };
+var PLATE_W = { berline: 47.3, suv: 45.0, citadine: 48.8, pickup: 43.6, van: 45.0, coupe: 43.0, citerne: 44.3 };
+var SPRITES = 'assets/cars/';
+// tirage pondéré : le coupé est rare, et ses mots valent plus
+var DRAW = ['berline', 'suv', 'citadine', 'pickup', 'van', 'berline', 'citadine', 'coupe'];
+var SPORT = 'coupe', SPORT_BONUS = 1.5;
+var preloaded = false;
+
+function preloadCars() {
+  if (preloaded) return;
+  preloaded = true;
+  SHAPES.concat([TANK]).forEach(function (s) {
+    P.colors().concat(['or']).forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '.webp'; });
+  });
+}
+
+function plateHTML(car) {
+  return '<div class="plate plate--car">' +
+      '<div class="plate__eu"><div class="plate__f">F</div></div>' +
+      '<div class="plate__body">' +
+        '<span class="plate__letters" data-pair="1">' + car.p1.p + '</span>' +
+        '<span class="plate__sep">·</span>' +
+        '<span class="plate__num">' + car.num + '</span>' +
+        '<span class="plate__sep">·</span>' +
+        '<span class="plate__letters" data-pair="2">' + car.p2.p + '</span>' +
+      '</div>' +
+      '<div class="plate__dep"><div class="plate__depnum">' + car.dep.num + '</div></div>' +
+    '</div>';
+}
+
+/* ─────────── cycle de vie d'une voiture ─────────── */
+function pickShape() {
+  // un modèle différent de ceux déjà en piste ; le coupé reste rare, le camion-citerne plus encore
+  var present = T.lanes.filter(Boolean).map(function (c) { return c.shape; });
+  var late = played() > 60;                       // en fin de partie, les coupés se multiplient
+  if (present.indexOf(TANK) === -1 && T.seen > 2 && P.rand(TANK_ODDS) === 0) return TANK;
+  if (present.indexOf(SPORT) === -1 && P.rand(late ? 4 : 8) === 0) return SPORT;
+  var pool = SHAPES.filter(function (s) { return s !== SPORT && present.indexOf(s) === -1; });
+  return P.pick(pool);
+}
+
+function spawnLane(lane) {
+  if (!T.running || T.lanes[lane]) return;
+  var since = Date.now() - T.lastSpawn;
+  if (since < SPAWN_GAP) { scheduleLane(lane, SPAWN_GAP - since + 30); return; }   // jamais deux arrivées rapprochées
+  T.lastSpawn = Date.now();
+  var plate = P.newPlate(T.seen === 0), shape = pickShape();
+  var gold = shape !== TANK && P.rand(GOLD_ODDS) === 0;
+  var car = {
+    p1: plate.p1, p2: plate.p2, dep: plate.dep, shape: shape, lane: lane,
+    value: plate.value, num: String(plate.value).padStart(3, '0'),
+    gold: gold, tank: shape === TANK,
+    got1: null, got2: null, words: 0, pts: 0, gone: false,
+    born: Date.now(), extra: 0
+  };
+  var el = document.createElement('div');
+  el.className = 'car car--in' + (shape === SPORT ? ' car--sport' : '') + (gold ? ' car--gold' : '') + (car.tank ? ' car--tank' : '');
+  var sz = SIZE[shape];
+  el.style.setProperty('--w', (sz[0] + Math.random() * (sz[1] - sz[0])).toFixed(3));
+  el.style.setProperty('--lane', LANES[lane] + '%');
+  el.style.setProperty('--plateY', PLATE_Y[shape] + '%');
+  el.style.setProperty('--plateW', PLATE_W[shape] + '%');
+  el.style.setProperty('--ride', (3.4 + Math.random() * 2.2).toFixed(2) + 's');
+  el.style.setProperty('--ridePhase', (-Math.random() * 5).toFixed(2) + 's');
+  el.innerHTML = '<div class="car__ride">' +
+                   (gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' : car.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' : '') +
+                   '<img class="car__body" alt="" draggable="false" src="' +
+                   SPRITES + shape + '-' + (gold ? 'or' : P.pick(P.colors())) + '.webp">' +
+                   '<div class="car__shadow"></div>' + plateHTML(car) +
+                   '<div class="car__timer"><i></i></div>' +
+                 '</div>' +
+                 '<div class="car__fx"></div><div class="car__pop"></div>';
+  car.el = el;
+  el.addEventListener('pointerdown', function () {
+    if (!car.gone) { setTarget(car); $('tr-input').focus(); }
+  });
+  $('tr-cars-layer').appendChild(el);
+  T.lanes[lane] = car;
+  T.seen++;
+  renderPairs();
+  renderHud();
+}
+
+function setTarget(car) {
+  T.target = car;
+  T.lanes.forEach(function (c) { if (c) c.el.classList.toggle('car--target', c === car); });
+  renderPairs();
+}
+
+function scheduleLane(lane, delay) {
+  clearTimeout(T.timers[lane]);
+  T.timers[lane] = setTimeout(function () { T.timers[lane] = null; spawnLane(lane); }, delay);
+}
+
+function leaveCar(car, success) {
+  if (car.gone) return;
+  car.gone = true;
+  var el = car.el;
+  el.classList.remove('car--in');
+  if (success) {
+    el.classList.add('car--boom');
+    P.explode(el.querySelector('.car__fx'), document.querySelector('.road'));
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1500);
+  } else {
+    el.classList.add('car--away');
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 2100);
+  }
+
+  T.history.push({
+    p1: car.p1.p, p2: car.p2.p, dep: car.dep.num,
+    words: car.words, pts: car.pts, reached: success
+  });
+  T.lanes[car.lane] = null;
+  if (T.target === car) T.target = null;
+  renderPairs();
+  if (T.running) scheduleLane(car.lane, GAP_MIN + Math.random() * (GAP_MAX - GAP_MIN));
+}
+
+function played() { return (Date.now() - T.t0) / 1000; }
+function carTime() {                             // la rampe : de 18 s à 12 s sur deux minutes de jeu
+  var k = Math.min(1, played() / 120);
+  return CAR_TIME + (CAR_TIME_END - CAR_TIME) * k;
+}
+function multiplier() {                          // rush ×2, dorée ×3, coupé ×1,5
+  return T.rush ? 2 : 1;
+}
+function startFever() {
+  T.feverUntil = Date.now() + FEVER * 1000;
+  T.fevers++;
+  document.querySelector('.road').classList.add('fever');
+  P.toast('🔥 <b>FIÈVRE</b> — pendant ' + FEVER + ' s, un seul mot suffit à lire une plaque');
+  P.sfx.win();
+}
+function inFever() { return Date.now() < T.feverUntil; }
+
+function gainTime(sec) {
+  T.timeLeft = Math.min(TIME_CAP, T.timeLeft + sec);
+  var g = $('tr-gain');
+  g.textContent = '+' + sec + ' s';
+  g.classList.remove('go');
+  void g.offsetWidth;
+  g.classList.add('go');
+  P.sfx.time();
+}
+
+/* ─────────── affichage ─────────── */
+function fmt(s) {
+  var m = Math.floor(s / 60), r = Math.floor(s % 60);
+  return m + ':' + (r < 10 ? '0' : '') + r;
+}
+function renderHud() {
+  $('tr-time').textContent = fmt(Math.max(0, T.timeLeft));
+  $('tr-score').textContent = T.score;
+  $('tr-cars').textContent = T.done + (T.combo > 1 ? ' <i>×' + T.combo + '</i>' : '');
+  $('tr-cars').innerHTML = T.done + (T.combo > 1 ? ' <i>×' + T.combo + '</i>' : '');
+  $('tr-timebox').classList.toggle('low', T.timeLeft <= 15);
+}
+function renderPairs() {
+  var alive = T.lanes.filter(function (c) { return c && !c.gone; });
+  var box = $('tr-pairs');
+  if (!alive.length) { box.innerHTML = '<span class="tok tok--wait">…</span>'; return; }
+  box.innerHTML = alive.map(function (c) {
+    var sp = c.shape === SPORT ? ' tok--sport' : '';
+    var tg = c === T.target ? ' tok--target' : '';
+    return '<span class="tokgroup' + tg + '" data-lane="' + c.lane + '">' +
+           '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + (c.got1 ? '✓' : c.p1.p) + '</span>' +
+           '<span class="tok' + sp + (c.got2 ? ' tok--on' : '') + '">' + (c.got2 ? '✓' : c.p2.p) + '</span>' +
+           '</span>';
+  }).join('');
+}
+function pop(car, txt, cls) {
+  var p = car.el.querySelector('.car__pop');
+  p.textContent = txt;
+  p.className = 'car__pop ' + (cls || '');
+  void p.offsetWidth;
+  p.classList.add('go');
+}
+function flashPair(car, which) {
+  var el = car.el.querySelector('[data-pair="' + which + '"]');
+  if (!el) return;
+  el.classList.add('hit');
+  setTimeout(function () { el.classList.remove('hit'); }, 500);
+}
+function feedback(msg, cls) {
+  var f = $('tr-feedback');
+  f.innerHTML = msg;
+  f.className = 'feedback ' + (cls || '');
+}
+
+/* ─────────── saisie ─────────── */
+function submit(e) {
+  e.preventDefault();
+  if (!T.running) return;
+  var inp = $('tr-input'), w = P.norm(inp.value.trim());
+  inp.value = '';
+  if (!w) return;
+  var alive = T.lanes.filter(function (c) { return c && !c.gone; });
+  if (!alive.length) { feedback('Attendez la prochaine voiture…', 'ko'); return; }
+  if (T.combo < MULT_MAX) T.feverArmed = true;
+
+  function reject(msg) {
+    feedback(msg, 'ko');
+    T.combo = 1;
+    P.sfx.ko();
+    inp.classList.add('shake');
+    setTimeout(function () { inp.classList.remove('shake'); }, 320);
+    renderHud();
+  }
+  if (w.length < 3) return reject('Trop court — 3 lettres minimum.');
+
+  var best = null, used = false;
+  alive.forEach(function (c) {
+    if (w === c.got1 || w === c.got2) { used = true; return; }
+    var h1 = c.got1 ? null : P.matchPair(w, c.p1.p);
+    var h2 = c.got2 ? null : P.matchPair(w, c.p2.p);
+    if (!h1 && !h2) return;
+    var rank = (c === T.target ? 8 : 0) +                    // la voiture que le joueur a désignée
+               (((h1 && h2) || (h1 && c.got2) || (h2 && c.got1)) ? 4 : 0) +   // le mot l'achève
+               ((c.got1 || c.got2) ? 2 : 0);                // elle est déjà entamée
+    if (!best || rank > best.rank) best = { c: c, h1: h1, h2: h2, rank: rank };
+  });
+  if (!best) {
+    return reject(used ? '<b>' + w.toUpperCase() + '</b> — déjà joué sur une de ces voitures.'
+                       : '<b>' + w.toUpperCase() + '</b> ne va sur aucune des trois plaques.');
+  }
+  if (!P.isWord(w)) return reject('<b>' + w.toUpperCase() + '</b> — inconnu du dictionnaire.');
+
+  var car = best.c, hit = best.h1 || best.h2;
+  var base = 10 + 5 * Math.max(0, w.length - 3);
+  var spread = Math.min(15, Math.max(0, hit[1] - hit[0] - 2) * 3);
+  var tier = P.rarity(w);
+  var rare = w.length >= 6 ? (tier === 2 ? 35 : tier === 1 ? 15 : 0) : 0;
+  var sport = car.shape === SPORT;
+  var pts = Math.round((base + spread + rare) * T.combo * (sport ? SPORT_BONUS : 1) * (car.gold ? GOLD_MULT : 1) * multiplier());
+
+  var both = best.h1 && best.h2;                 // les deux paires dans le même mot
+  if (both) pts *= 2;
+  if (best.h1) { car.got1 = w; flashPair(car, 1); }
+  if (best.h2) { car.got2 = w; flashPair(car, 2); }
+  if (inFever() && !(car.got1 && car.got2)) {    // la fièvre : un mot lit la plaque entière
+    if (!car.got1) { car.got1 = '🔥'; flashPair(car, 1); } else { car.got2 = '🔥'; flashPair(car, 2); }
+  }
+  car.words += both ? 2 : 1; car.pts += pts;
+  T.score += pts;
+  gainTime(WORD_TIME);
+  car.extra += CAR_BONUS;
+  P.track.word(w, pts, tier, T.combo);
+  pop(car, '+' + pts, rare && tier === 2 ? 'rare' : '');
+  tier === 2 && rare ? P.sfx.rare() : P.sfx.ok(T.combo);
+  var who = '<b class="mono">' + car.p1.p + '·' + car.num + '·' + car.p2.p + '</b>';
+  feedback('+' + pts + ' sur ' + who +
+           (both ? ' — <b>les deux paires d\'un coup</b> ×2' : '') +
+           (rare ? ' — ' + (tier === 2 ? '💎 mot rare' : 'mot peu courant') + ' +' + rare : '') +
+           (sport ? ' · 🏎️ <b>coupé ×' + String(SPORT_BONUS).replace('.', ',') + '</b>' : '') +
+           (T.combo > 1 ? ' · série <b>×' + T.combo + '</b>' : '') +
+           (car.got1 && car.got2 ? '' : ' · il manque <b>' + (car.got1 ? car.p2.p : car.p1.p) + '</b>'), 'ok');
+  if (!(car.got1 && car.got2)) setTarget(car);   // le mot suivant ira d'abord sur cette voiture
+  renderPairs();
+
+  if (car.got1 && car.got2) readPlate(car, who, sport);
+  else if (T.combo >= MULT_MAX && !inFever() && T.feverArmed) { T.feverArmed = false; startFever(); }
+  renderHud();
+}
+
+/* la plaque est lue : la cote tombe, la voiture explose — la citerne emporte ses voisines */
+function readPlate(car, who, sport) {
+  var bonus = Math.round(car.value * (sport ? SPORT_BONUS : 1) * (car.gold ? GOLD_MULT : 1) * multiplier());
+  car.pts += bonus; T.score += bonus; T.done++;
+  gainTime(PLATE_TIME);
+  if (T.combo < MULT_MAX) { T.combo++; if (T.combo === MULT_MAX) T.feverArmed = true; }
+  P.track.plate(car.p1.p + '·' + car.num + '·' + car.p2.p, car.pts, { sport: sport, gold: car.gold, dep: car.dep.num, depName: car.dep.nom });
+  pop(car, 'COTE +' + bonus, 'win');
+  feedback('💥 <b>Plaque lue !</b> ' + who + ' — cote <b>+' + bonus + '</b>' +
+           (sport ? ' (🏎️ coupé ×1,5)' : '') + (car.gold ? ' (✨ dorée ×3)' : '') + (T.rush ? ' (rush ×2)' : '') +
+           ' — ' + car.dep.num + ' ' + car.dep.nom, 'ok');
+  leaveCar(car, true);
+  if (car.tank) {
+    setTimeout(function () {
+      var hit = 0;
+      T.lanes.forEach(function (c) {
+        if (!c || c.gone) return;
+        var b = Math.round(c.value * 0.5 * multiplier());
+        c.pts += b; T.score += b; T.done++; hit++;
+        P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, b, { dep: c.dep.num, depName: c.dep.nom });
+        pop(c, 'SOUFFLÉE +' + b, 'win');
+        leaveCar(c, true);
+      });
+      if (hit) { P.toast('🛢️ <b>Explosion en chaîne</b> — ' + hit + ' voiture' + (hit > 1 ? 's' : '') + ' soufflée' + (hit > 1 ? 's' : '')); renderHud(); }
+    }, 350);
+  }
+}
+
+/* ─────────── boucle ─────────── */
+function loop() {
+  var last = Date.now();
+  clearInterval(T.tick);
+  T.tick = setInterval(function () {
+    var now = Date.now();
+    T.timeLeft -= (now - last) / 1000;
+    last = now;
+    var ct = carTime();
+    T.lanes.forEach(function (c, lane) {
+      if (!c || c.gone) return;
+      var left = ct + c.extra - (now - c.born) / 1000;
+      var bar = c.el.querySelector('.car__timer i');
+      if (bar) bar.style.transform = 'scaleX(' + Math.max(0, Math.min(1, left / ct)).toFixed(3) + ')';
+      if (left <= 0) {
+        if (!c.words) T.combo = 1;              // une voiture partie sans un mot casse la série
+        P.sfx.over();
+        pop(c, 'trop tard', 'miss');
+        leaveCar(c, false);
+      }
+    });
+    // filet de sécurité : une voie vide sans relais programmé se réalimente
+    T.lanes.forEach(function (c, lane) { if (!c && !T.timers[lane]) scheduleLane(lane, SPAWN_GAP); });
+    // rush final : ciel rouge, tout compte double
+    var rush = T.timeLeft <= RUSH;
+    if (rush !== T.rush) {
+      T.rush = rush;
+      document.querySelector('.road').classList.toggle('rush', rush);
+      if (rush) { P.toast('🚨 <b>RUSH</b> — dernières secondes, tout compte double'); P.sfx.over(); }
+    }
+    if (T.feverUntil && !inFever()) {
+      T.feverUntil = 0;
+      document.querySelector('.road').classList.remove('fever');
+      T.combo = 3;                                // on redescend pour pouvoir remonter
+    }
+    P.ghostSample(played(), T.score);
+    P.paintGhost($('tr-ghost'), played(), T.score);
+    if (T.timeLeft <= 0) { T.timeLeft = 0; renderHud(); finish(); return; }
+    renderHud();
+  }, 100);
+}
+
+/* balises de bord de route : six par côté, décalées dans le temps, elles défilent
+   sur la même projection que les voitures — c'est elles qui donnent la vitesse */
+function buildPosts() {
+  var html = '';
+  for (var side = -1; side <= 1; side += 2) {
+    for (var i = 0; i < 6; i++) {
+      html += '<i class="post' + (side < 0 ? ' post--l' : ' post--r') +
+              '" style="animation-delay:' + (-i * 0.22).toFixed(2) + 's"></i>';
+    }
+  }
+  $('tr-posts').innerHTML = html;
+}
+
+function start() {
+  P = window.PLAQUE;
+  buildPosts();
+  T.running = true; T.timeLeft = GAME_TIME; T.score = 0;
+  T.done = 0; T.seen = 0; T.combo = 1; T.lanes = [null, null, null]; T.history = []; T.lastSpawn = 0; T.target = null;
+  T.t0 = Date.now(); T.feverUntil = 0; T.fevers = 0; T.rush = false; T.feverArmed = true;
+  document.querySelector('.road').classList.remove('rush', 'fever');
+  T.timers.forEach(clearTimeout); T.timers = [null, null, null];
+  $('tr-cars-layer').innerHTML = '';
+  preloadCars();
+  $('tr-input').value = '';
+  feedback('&nbsp;', '');
+  renderHud(); renderPairs();
+  P.screen('screen-traffic');
+  $('tr-input').focus();
+  loop();
+  // les trois voies s'amorcent à des instants différents
+  P.shuffle([0, 1, 2]).forEach(function (lane, i) { scheduleLane(lane, 300 + i * SPAWN_GAP); });
+}
+
+function finish() {
+  T.running = false;
+  clearInterval(T.tick);
+  T.timers.forEach(clearTimeout);
+  T.lanes.forEach(function (c) { if (c && !c.gone) leaveCar(c, false); });
+  P.state.history = T.history;
+  P.finishGame(
+    P.row('Voitures croisées', T.seen) +
+    P.row('Plaques entièrement lues', T.done + ' / ' + T.seen, T.done === 0),
+    T.score);
+}
+
+function stop() {
+  T.running = false;
+  clearInterval(T.tick);
+  T.timers.forEach(clearTimeout);
+  T.lanes = [null, null, null];
+  $('tr-cars-layer').innerHTML = '';
+  document.querySelector('.road').classList.remove('rush', 'fever');
+}
+
+window.TRAFFIC = { start: start, stop: stop, submit: submit };
+
+document.addEventListener('DOMContentLoaded', function () {
+  $('tr-form').addEventListener('submit', submit);
+  $('tr-pairs').addEventListener('pointerdown', function (e) {
+    var g = e.target.closest('.tokgroup');
+    if (!g) return;
+    var car = T.lanes[+g.dataset.lane];
+    if (car && !car.gone) { setTarget(car); $('tr-input').focus(); }
+  });
+  $('tr-quit').addEventListener('click', function () { stop(); finish(); });
+});
+
+})();

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plaque — le jeu des mots d'immatriculation</title>
+<link rel="stylesheet" href="css/style.css?v=49">
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+<button id="btn-sound" class="soundbtn" title="Son" aria-label="Activer ou couper le son">🔊</button>
+
+<div id="app">
+
+  <!-- ══════════ ACCUEIL ══════════ -->
+  <section id="screen-home" class="screen active">
+    <h1 class="logo">PLAQUE</h1>
+    <p class="tagline">Le jeu de mots des plaques d'immatriculation</p>
+
+    <div class="plate plate--demo" aria-hidden="true">
+      <div class="plate__eu"><div class="plate__stars">★★★<br>★&nbsp;&nbsp;★<br>★★★</div><div class="plate__f">F</div></div>
+      <div class="plate__body">
+        <span class="plate__letters">PL</span><span class="plate__sep">·</span><span class="plate__num">123</span><span class="plate__sep">·</span><span class="plate__letters">MT</span>
+      </div>
+      <div class="plate__dep">
+        <div class="plate__logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 1.6l2.1 5.3 5.6.4-4.3 3.7 1.4 5.5L12 13.6 7.2 16.5l1.4-5.5L4.3 7.3l5.6-.4z" fill="#d0021b"/><circle cx="12" cy="19.5" r="2.2" fill="#fff" opacity=".9"/></svg></div>
+        <div class="plate__depnum">34</div>
+      </div>
+    </div>
+
+    <p class="ruleline">Les deux lettres d'une paire, <b>dans l'ordre</b>, où que ce soit dans le mot :
+      <em><b>P</b>o<b>L</b>ogne</em> · <em><b>M</b>a<b>T</b>raque</em></p>
+
+    <div class="modes" id="opt-mode" role="radiogroup" aria-label="Mode de jeu">
+      <button data-v="trafic" class="on" role="radio">
+        <b>Trafic</b><em>au volant — trois voies, deux mots par voiture, 2 minutes</em>
+      </button>
+      <button data-v="parking" role="radio">
+        <b>Parking</b><em>neuf places, les voitures se relaient — alignez les couleurs</em>
+      </button>
+    </div>
+
+    <div class="settings">
+      <div class="setting">
+        <span class="setting__label">Difficulté</span>
+        <div class="segmented" id="opt-diff" role="radiogroup" aria-label="Difficulté">
+          <button data-v="facile" role="radio">Facile<em>paires riches</em></button>
+          <button data-v="normal" class="on" role="radio">Normal<em>paires courantes</em></button>
+          <button data-v="expert" role="radio">Expert<em>paires rares</em></button>
+        </div>
+      </div>
+    </div>
+
+    <button id="btn-play" class="btn btn--big" disabled>Chargement du dictionnaire…</button>
+
+    <button class="rank" id="btn-career" type="button" title="Voir tous les rangs">
+      <img class="rank__img" id="rank-img" src="assets/cars/citadine-bronze.webp" alt="">
+      <div class="rank__body">
+        <div class="rank__head"><span class="rank__k">Votre rang</span><b id="stat-rank">Citadine bronze</b></div>
+        <div class="rank__bar"><div class="rank__fill" id="rank-bar"></div></div>
+        <div class="rank__foot"><i id="rank-xp">0 pts</i><i id="rank-next">Prochain : Citadine argent</i></div>
+      </div>
+    </button>
+    <div class="missions">
+      <h3>Missions du jour</h3>
+      <ul id="missions"></ul>
+    </div>
+
+    <div class="homestats">
+      <button class="stat" id="btn-collection">
+        <span class="stat__v" id="stat-collec">0/101</span><span class="stat__k">Départements</span>
+      </button>
+      <div class="stat"><span class="stat__v" id="stat-best">0</span><span class="stat__k">Record</span></div>
+    </div>
+
+    <details class="rules">
+      <summary>Comment on joue</summary>
+      <ol>
+        <li>Chaque plaque porte <strong>deux paires de lettres</strong>. Tapez des mots qui contiennent les deux lettres d'une paire, <strong>dans l'ordre</strong>, où que ce soit dans le mot.<br>
+        <span class="ex"><b>PL</b>·123·<b>MT</b> → <b>P</b>o<b>L</b>ogne, <b>M</b>a<b>T</b>raque, <b>PL</b>ongeon, <b>P</b>a<b>L</b>udisme, ex<b>pL</b>oser</span></li>
+        <li>Une plaque est <strong>lue</strong> quand ses deux paires ont chacune leur mot — et la voiture explose.</li>
+        <li>En <strong>Trafic</strong>, vous êtes au volant : les voitures vous doublent sur trois voies, chacune à son heure, toujours de modèles différents, et restent 18 s devant vous. Chaque mot trouvé rallonge la partie de 3 s et la voiture visée de 2 s ; une plaque lue ajoute 6 s de plus.</li>
+        <li>En <strong>Parking</strong>, neuf voitures sont garées sur trois rangées ; chaque voiture pulvérisée est remplacée. Chaque place <strong>garde la couleur</strong> de la dernière voiture qu'on y a fait sauter : trois places alignées de la même couleur — ligne, colonne ou diagonale — rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge.</li>
+        <li>Dans les deux modes, n'importe quel mot va sur n'importe quelle plaque affichée : le jeu trouve la cible et vous dit laquelle. <strong>Touchez une voiture</strong> (ou ses jetons) pour la désigner : vos mots iront à elle en priorité. Un mot qui porte les deux paires lit la plaque d'un coup, en double. Les <strong>coupés</strong> valent ×1,5.</li>
+        <li>Les <strong>trois chiffres</strong> d'une plaque sont sa <strong>cote</strong> : ce qu'elle rapporte une fois lue. Paires rares, cote élevée.</li>
+        <li>Trois mots d'affilée sans faute font monter le <strong>multiplicateur</strong> — une erreur le remet à ×1. À <strong>×5</strong>, dix secondes de <strong>fièvre</strong> : un seul mot suffit à lire une plaque. Les <strong>mots rares</strong> rapportent un bonus.</li>
+        <li>Les <strong>vingt dernières secondes</strong>, tout compte double. Les voitures <strong>dorées</strong> valent ×3 (et leur marque au sol est un joker de couleur). Le <strong>camion-citerne</strong> souffle ses voisines quand il explose.</li>
+        <li>Chaque point marqué compte pour votre <strong>carrière</strong> : neuf véhicules, chacun en bronze, argent puis or — de la citadine bronze au coupé or. Certains rangs débloquent une teinte de carrosserie. Trois <strong>missions</strong> par jour, les mêmes pour tout le monde.</li>
+        <li>Chaque plaque entièrement lue ajoute son <strong>département</strong> à votre collection — les 101 sont à découvrir.</li>
+      </ol>
+    </details>
+
+    <p class="credit">113 558 mots — dictionnaire construit à partir de <a href="http://www.lexique.org" target="_blank" rel="noopener">Lexique 3.83</a></p>
+  </section>
+
+  <!-- ══════════ FIN DE PARTIE ══════════ -->
+  <section id="screen-end" class="screen">
+    <h2 id="end-title">Fin de partie</h2>
+    <p class="final-score" id="end-score">0</p>
+    <p class="best" id="end-best"></p>
+    <div class="recap" id="end-recap"></div>
+    <button id="btn-share" class="btn btn--big btn--share">Copier mon résultat</button>
+    <button id="btn-again" class="btn btn--big">Rejouer</button>
+    <button id="btn-home" class="linkbtn">Retour à l'accueil</button>
+  </section>
+
+  <!-- ══════════ MODE PARKING ══════════ -->
+  <section id="screen-parking" class="screen">
+    <header class="hud">
+      <div class="hud__item" id="pk-timebox"><span class="hud__k">Temps</span><span class="hud__v" id="pk-time">2:00</span><span class="hud__gain" id="pk-gain"></span></div>
+      <div class="hud__item hud__item--goal"><span class="hud__k">Score</span><span class="hud__v" id="pk-score">0</span><span class="ghost" id="pk-ghost"></span></div>
+      <div class="hud__item hud__item--mult"><span class="hud__k">Pulvérisées</span><span class="hud__v" id="pk-left">0</span></div>
+    </header>
+
+    <div class="lot" id="pk-lot"></div>
+    <div class="tr-pairs pk-tokens" id="pk-tokens"></div>
+
+    <form id="pk-form" autocomplete="off">
+      <input id="pk-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
+             autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot…" aria-label="Votre mot">
+      <button class="btn" type="submit">OK</button>
+    </form>
+    <p class="feedback" id="pk-feedback">&nbsp;</p>
+    <p class="hint-line"><button class="linkbtn" id="pk-skip">Faire remorquer la plus coriace (−15 s)</button> · <button class="linkbtn linkbtn--exit" data-exit>Quitter</button></p>
+  </section>
+
+  <!-- ══════════ CARRIÈRE ══════════ -->
+  <section id="screen-career" class="screen">
+    <h2>Carrière</h2>
+    <p class="collec__intro" id="career-intro"></p>
+    <div id="career-list"></div>
+    <button id="btn-career-back" class="btn btn--big">Retour</button>
+  </section>
+
+  <!-- ══════════ COLLECTION ══════════ -->
+  <section id="screen-collection" class="screen">
+    <h2>Collection</h2>
+    <p class="collec__intro" id="collec-intro">0 département sur 101</p>
+    <div class="collec__bar"><div class="collec__fill" id="collec-fill"></div></div>
+    <div id="collec-grid"></div>
+    <button id="btn-collection-back" class="btn btn--big">Retour</button>
+  </section>
+
+  <!-- ══════════ MODE TRAFIC ══════════ -->
+  <section id="screen-traffic" class="screen">
+    <header class="hud">
+      <div class="hud__item" id="tr-timebox"><span class="hud__k">Temps</span><span class="hud__v" id="tr-time">2:00</span><span class="hud__gain" id="tr-gain"></span></div>
+      <div class="hud__item hud__item--goal"><span class="hud__k">Score</span><span class="hud__v" id="tr-score">0</span><span class="ghost" id="tr-ghost"></span></div>
+      <div class="hud__item hud__item--mult"><span class="hud__k">Plaques lues</span><span class="hud__v" id="tr-cars">0</span></div>
+    </header>
+
+    <div class="road">
+      <div class="road__sky"></div>
+      <div class="road__sun"></div>
+      <div class="road__ground"></div>
+      <div class="road__tarmac"></div>
+      <div class="road__edge road__edge--l"></div>
+      <div class="road__edge road__edge--r"></div>
+      <div class="road__lane road__lane--l"></div>
+      <div class="road__lane road__lane--r"></div>
+      <div class="road__posts" id="tr-posts"></div>
+      <div class="road__cars" id="tr-cars-layer"></div>
+      <div class="road__glass"></div>
+    </div>
+
+    <div class="tr-pairs" id="tr-pairs"></div>
+
+    <form id="tr-form" autocomplete="off">
+      <input id="tr-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
+             autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot par paire…" aria-label="Votre mot">
+      <button class="btn" type="submit">OK</button>
+    </form>
+    <p class="feedback" id="tr-feedback">&nbsp;</p>
+    <p class="hint-line"><button class="linkbtn" id="tr-quit">Se garer</button> · <button class="linkbtn linkbtn--exit" data-exit>Quitter</button></p>
+  </section>
+
+</div>
+
+<script src="js/pairs.js?v=49"></script>
+<script src="js/departements.js?v=49"></script>
+<script src="js/dict.js?v=49"></script>
+<script src="js/game.js?v=49"></script>
+<script src="js/traffic.js?v=49"></script>
+<script src="js/parking.js?v=49"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+# Plaque — le jeu de mots des plaques d'immatriculation
+
+Jeu web en HTML/CSS/JS pur, sans dépendance ni build : ouvrez `index.html`
+(ou servez le dossier) et jouez.
+
+## Règle commune
+
+Chaque plaque française au format SIV — `PL-123-MT (34)` — porte **deux paires
+de lettres**. Il faut taper des mots contenant les deux lettres d'une paire,
+**dans l'ordre**, où que ce soit dans le mot :
+
+`PL` → **P**o**L**ogne, **PL**ongeon, **P**a**L**udisme, ex**pL**oser
+`MT` → **M**a**T**raque, **M**on**T**agne, i**M**por**T**ant
+
+Les trois chiffres du milieu sont la **cote** de la plaque, ce qu'elle rapporte une
+fois lue. Le **numéro de département** rejoint votre collection à chaque plaque lue.
+
+## Les deux modes
+
+| Mode | Boucle |
+|---|---|
+| **Trafic** | Au volant sur trois voies : chaque voie a sa voiture, qui arrive à son heure et reste 18 s devant vous ; les trois modèles sont toujours différents. Deux mots par voiture, un par paire. Une plaque lue fait **exploser** la voiture ; une plaque ratée la laisse filer, et la voie se réalimente après un délai aléatoire. La partie dure 2 minutes, mais chaque mot rallonge la partie de 3 s et la voiture visée de 2 s, et une plaque lue ajoute 6 s de plus (plafond 3 min). |
+| **Parking** | Neuf places sur trois rangées, tous les modèles présents, trois couleurs par parking. Les deux mots d'une plaque et la voiture explose ; une autre vient se garer. Chaque place garde la couleur de la dernière voiture pulvérisée : trois places alignées de même couleur (ligne, colonne, diagonale) rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge de 3 s (+6 s par plaque lue et par alignement, plafond 3 min). |
+
+Dans les deux modes, n'importe quel mot va sur n'importe quelle plaque affichée.
+Le jeu choisit la cible dans cet ordre : la voiture que le joueur a **désignée**
+(un clic sur la voiture ou ses jetons), sinon une voiture que le mot achève, sinon
+une voiture déjà entamée, sinon la première qui convient — et il nomme la plaque
+touchée à chaque mot. Une voiture entamée devient la cible par défaut. Un mot qui
+porte les deux paires lit la plaque d'un coup et compte double. Une paire de lettres
+n'est jamais tirée deux fois dans la même partie.
+
+### Points
+
+| | |
+|---|---|
+| mot | 10 pts + 5 par lettre au-delà de 3, +3 par lettre entre les deux lettres de la paire (max +15) |
+| rareté | +15 (mot peu courant) ou +35 (mot rare), à partir de 6 lettres |
+| les deux paires dans un mot | ×2, et la plaque est lue d'un coup |
+| série | ×1 à ×5, +1 par mot — une erreur la remet à ×1 |
+| **cote** | les trois chiffres de la plaque : ce qu'elle rapporte une fois lue, de 100 (paires riches) à 900 (paires rares) |
+| coupé | ×1,5 sur ses mots et sa cote (une voiture sur huit) |
+| voiture dorée | ×3 (une sur vingt-cinq) ; en Parking sa marque au sol est un joker de couleur |
+| camion-citerne | (un sur quatorze) quand il explose, ses voisines explosent avec lui, pour la moitié de leur cote |
+| **fièvre** | à ×5, dix secondes pendant lesquelles un seul mot suffit à lire une plaque ; puis la série redescend à ×3 |
+| **rush** | les vingt dernières secondes, tout compte double, le ciel vire au rouge |
+
+En Trafic, les voitures restent 18 s au départ et 12 s en fin de partie (la rampe), et les
+coupés se multiplient passé la première minute. La première voiture (Trafic) et la première
+rangée (Parking) ont toujours des paires accessibles.
+
+### Carrière
+
+Chaque point marqué en partie s'ajoute à la **carrière** — les missions en rapportent 400,
+un nouveau département 100. Neuf véhicules, du moins au plus prestigieux (citadine,
+utilitaire, camping-car, berline, break, 4×4, pick-up, cabriolet, coupé sport), chacun en
+**bronze**, **argent** puis **or** : 27 rangs, de la citadine bronze au coupé or, avec des
+seuils qui croissent (1 200, 4 000, 8 200 … ≈ 360 000 points). Le véhicule du rang est
+affiché à l'accueil dans son métal, avec la progression vers le rang suivant ; la berline,
+le pick-up et le coupé débloquent chacun une teinte de carrosserie (violet, chrome, nacré).
+
+Trois **missions par jour**, tirées de la date donc identiques pour tout le monde, avec
+leur progression à l'accueil. Pendant la partie, le **fantôme du record** affiche l'écart au
+meilleur score *au même instant*. À la fin : meilleur mot, voiture la plus chère, plus longue
+série, missions accomplies, nouveau rang.
+
+### Collection
+
+Chaque plaque entièrement lue ajoute son département à la collection (101 au
+total, +100 points de carrière par nouveau). Les départements manquants sortent deux
+fois plus souvent sur les plaques, et la grille se consulte depuis l'accueil.
+
+## Structure
+
+```
+index.html            écrans (accueil / trafic / parking / fin / carrière / collection)
+css/style.css
+js/game.js            moteur : dictionnaire, règle, tirage, carrière, missions, collection, partage
+js/traffic.js         mode Trafic : la scène et sa boucle
+js/parking.js         mode Parking : la grille 3×3 en flux, les explosions, les marques de couleur
+js/dict.js            113 558 mots + rareté, gzip + base64 (395 Ko)
+js/pairs.js           344 paires jouables + exemples de mots
+js/departements.js    101 départements (nom, chef-lieu, région)
+assets/cars/          sprites pré-rendus : 7 silhouettes de jeu × 12 teintes, 9 véhicules de rang × 3 métaux + layout.json
+build/build_data.py   régénère dict.js et pairs.js
+build/render_cars.py  régénère les sprites de voitures
+```
+
+En Parking, `Faire remorquer` évacue la plaque la plus coriace contre 15 s de temps.
+
+### Les voitures des modes Trafic et Parking
+
+Ce sont des **sprites pré-rendus**, pas de la 3D temps réel : à l'exécution le jeu
+n'affiche qu'une balise `<img>`, sans filtre ni fusion, ce qui est moins coûteux à
+animer qu'un SVG (que le navigateur re-rastérise à chaque échelle). Mesuré à
+121 images/s pendant l'éloignement, pire image à 9 ms.
+
+`build/render_cars.py` les calcule par ray marching sur des surfaces implicites
+(SDF), avec éclairage GGX, ombres douces, occlusion ambiante et tone mapping ACES.
+Les carrosseries sont décrites dans le script : aucun modèle sous licence, aucune
+marque reproduite. La géométrie n'est rendue qu'une fois par silhouette ; les
+couleurs sont composées ensuite depuis les tampons d'éclairage, donc ajouter une
+teinte ne coûte pas un nouveau rendu.
+
+Sept silhouettes — berline, break, citadine, pick-up, utilitaire, coupé sport,
+camion-citerne — en douze teintes : huit de base, trois à débloquer par les rangs,
+et l'or des voitures dorées. Les sprites ne sont chargés qu'au lancement d'une partie.
+
+```bash
+arch -arm64 python3 build/render_cars.py assets/cars              # ~2 min 30, 48 sprites
+arch -arm64 python3 build/render_cars.py /tmp/essai coupe rouge   # une silhouette, une teinte
+```
+
+Le script écrit aussi `layout.json` : la position de l'emplacement de plaque,
+obtenue en projetant sa boîte avec la caméra du rendu. `js/traffic.js` s'en sert
+pour poser la plaque HTML au bon endroit — elle reste du texte, donc nette à
+toutes les tailles. Après un nouveau rendu, reporter les valeurs dans `PLATE_Y`
+et `PLATE_W` en tête de `traffic.js`.
+
+Les lettres suivent la contrainte SIV réelle : ni I, ni O, ni U.
+Tout est stocké en local (`localStorage`) : records, collection, réglages.
+
+### Régénérer les données
+
+Le dictionnaire est construit à partir de [Lexique 3.83](http://www.lexique.org)
+(formes fléchées + fréquences films/livres), accents et traits d'union retirés,
+mots de 3 à 14 lettres. La rareté vient des mêmes fréquences : courant ≥ 3,
+peu courant ≥ 0,3, rare en dessous.
+
+```bash
+curl -sLO http://www.lexique.org/databases/Lexique383/Lexique383.tsv
+python3 build/build_data.py Lexique383.tsv js
+```
+
+Le dictionnaire est décompressé au chargement via `DecompressionStream('gzip')`,
+ce qui fonctionne aussi en `file://` — aucun serveur n'est nécessaire.
+
+> Les ressources sont référencées avec un `?v=N` dans `index.html` : incrémentez-le
+> après une modification de CSS/JS pour contourner le cache du navigateur.

@@ -1,0 +1,584 @@
+/* ───────── Plaque — feuille de style ───────── */
+:root{
+  --bg:#0e1116;
+  --bg2:#161b23;
+  --bg3:#1d242e;
+  --line:#2a323f;
+  --txt:#e8edf5;
+  --dim:#93a0b4;
+  --accent:#ffcf3f;
+  --ok:#3ddc84;
+  --ko:#ff6b6b;
+  --rare:#8ab6ff;
+  --plate-blue:#0b3ea8;
+  --plate-red:#d0021b;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 80% at 50% -10%,#1b2431 0%,var(--bg) 60%) fixed;
+  color:var(--txt);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding:max(16px,env(safe-area-inset-top)) 16px 40px;
+}
+#app{max-width:720px;margin:0 auto}
+.screen{display:none;animation:fade .25s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.mono{letter-spacing:.08em}
+
+.soundbtn{
+  position:fixed;bottom:max(12px,env(safe-area-inset-bottom));right:12px;z-index:20;
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  width:38px;height:34px;font-size:15px;cursor:pointer;line-height:1;
+}
+.soundbtn:hover{border-color:#41506a}
+
+/* ───────── plaque ───────── */
+.plate{
+  display:flex;align-items:stretch;
+  background:linear-gradient(180deg,#fff 0%,#eceff3 55%,#dfe4ea 100%);
+  border:3px solid #0b0d10;border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.35);
+  overflow:hidden;margin:18px 0;user-select:none;
+}
+.plate--demo{max-width:420px;margin:22px auto}
+.plate__eu,.plate__dep{
+  flex:0 0 auto;width:11%;min-width:44px;
+  background:var(--plate-blue);color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  padding:6px 2px;
+}
+.plate__stars{font-size:7px;line-height:.9;color:var(--accent);letter-spacing:1px;text-align:center}
+.plate__f{font-weight:800;font-size:clamp(13px,3.2vw,19px);letter-spacing:.5px}
+.plate__logo{width:72%;max-width:26px;padding-top:2px;border-bottom:2px solid var(--plate-red);padding-bottom:3px}
+.plate__logo svg{display:block;width:100%;height:auto}
+.plate__depnum{font-weight:800;font-size:clamp(13px,3.2vw,19px);padding-bottom:2px}
+.plate__body{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:.14em;
+  color:#111;padding:10px 4px;
+  font-family:"Arial Narrow","Helvetica Neue Condensed",Impact,Haettenschweiler,sans-serif;
+  font-weight:800;font-size:clamp(30px,9.2vw,62px);line-height:1;letter-spacing:.02em;
+  text-shadow:0 1px 0 rgba(255,255,255,.7);
+}
+.plate__sep{opacity:.75;font-size:.7em;transform:translateY(-.08em)}
+.plate__letters{transition:color .2s,text-shadow .2s}
+.plate__letters.hit{color:var(--plate-blue);text-shadow:0 0 14px rgba(11,62,168,.45)}
+
+/* ───────── accueil ───────── */
+.logo{
+  font-family:"Arial Narrow",Impact,sans-serif;font-size:clamp(40px,12vw,74px);
+  letter-spacing:.14em;text-align:center;font-weight:800;
+  background:linear-gradient(180deg,#fff,#9fb0c8);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.tagline{text-align:center;color:var(--dim);margin-top:-4px;font-size:14px}
+
+.ruleline{text-align:center;color:var(--dim);font-size:13.5px;margin:2px 0 4px;line-height:1.7}
+.ruleline b{color:var(--txt)}
+.ruleline em{font-style:normal;background:var(--bg2);border:1px solid var(--line);border-radius:7px;
+  padding:2px 8px;margin:0 2px;color:var(--txt);white-space:nowrap}
+.ruleline em b{color:var(--accent)}
+.modes{display:grid;gap:8px;margin:16px 0 18px}
+.modes button{
+  display:block;width:100%;text-align:left;cursor:pointer;transition:.15s;
+  background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--txt);
+}
+.modes button b{display:block;font-size:16px}
+.modes button em{display:block;font-style:normal;font-size:12.5px;color:var(--dim);margin-top:1px}
+.modes button:hover{border-color:#41506a}
+.modes button.on{background:linear-gradient(180deg,#2a2411,#1e1c14);border-color:var(--accent)}
+.modes button.on b{color:var(--accent)}
+
+.settings{display:grid;gap:14px;margin:0 0 18px}
+.setting__label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:6px}
+.segmented{display:flex;gap:6px}
+.segmented button{
+  flex:1;background:var(--bg2);border:1px solid var(--line);color:var(--txt);
+  border-radius:10px;padding:9px 4px;cursor:pointer;font-size:14px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:2px;transition:.15s;
+}
+.segmented button em{font-style:normal;font-size:11px;color:var(--dim);font-weight:400}
+.segmented button:hover{border-color:#41506a}
+.segmented button.on{background:var(--accent);color:#14181f;border-color:var(--accent)}
+.segmented button.on em{color:#4a4127}
+
+.btn{
+  background:var(--accent);color:#14181f;border:0;border-radius:10px;
+  font-weight:700;font-size:16px;padding:13px 20px;cursor:pointer;transition:.15s;
+}
+.btn:hover:not(:disabled){filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn--big{display:block;width:100%;font-size:18px;padding:16px}
+.btn--share{background:var(--bg3);color:var(--txt);border:1px solid var(--line);margin-bottom:10px}
+.btn--share:hover{border-color:var(--accent)}
+.linkbtn{background:none;border:0;color:var(--dim);text-decoration:underline;cursor:pointer;font-size:14px;padding:8px}
+.linkbtn:hover{color:var(--txt)}
+.hint-line{color:var(--dim)}
+.linkbtn--armed{color:var(--ko);text-decoration:none;font-weight:700}
+.best{text-align:center;color:var(--dim);font-size:13px;margin-top:10px;min-height:19px}
+.credit{text-align:center;color:#5c6879;font-size:11.5px;margin-top:16px}
+.credit a{color:#7d8ba0}
+
+.homestats{display:flex;gap:8px;margin:14px 0}
+.stat{
+  flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:11px;
+  padding:9px 6px;text-align:center;color:var(--txt);
+}
+button.stat{cursor:pointer;transition:.15s}
+button.stat:hover{border-color:var(--accent)}
+.stat__v{display:block;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat__k{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin-top:1px}
+
+.rules{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:12px 16px;margin-top:16px}
+.rules summary{cursor:pointer;font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700}
+.rules ol{padding-left:20px;display:grid;gap:9px;font-size:14.5px;margin-top:12px}
+.rules .ex{display:block;color:var(--dim);font-size:13px;margin-top:3px}
+.rules .ex b{color:var(--accent);font-weight:700}
+
+/* ───────── HUD ───────── */
+.hud{display:flex;gap:8px;justify-content:space-between;align-items:stretch}
+.hud__item{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:7px 10px;flex:1;text-align:center;transition:.2s}
+.hud__item--goal{flex:1.4}
+.hud__item--mult{flex:.8}
+.hud__k{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);white-space:nowrap}
+.hud__v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.hud__v i{font-style:normal;color:var(--dim);font-size:13.5px}
+
+/* ───────── retour de saisie (Trafic, Parking) ───────── */
+.hint-line{text-align:center;margin-top:14px}
+.feedback{min-height:24px;font-size:14px;margin:8px 2px 6px;transition:.15s}
+.feedback.ok{color:var(--ok)}
+.feedback.ko{color:var(--ko)}
+.feedback b{font-weight:700}
+@keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(4px)}50%{transform:translateX(-4px)}}
+.shake{animation:shake .3s}
+
+/* ───────── fin de manche ───────── */
+#screen-round h2,#screen-end h2,#screen-collection h2{font-size:22px;text-align:center;margin:8px 0 14px}
+.recap{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px}
+.recap__row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:14.5px;border-bottom:1px dashed #232b36}
+.recap__row:last-child{border:0}
+.recap__row.total{font-weight:700;font-size:17px;color:var(--accent);padding-top:10px}
+.recap__row span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+.recap__row.dim{color:var(--dim)}
+
+.quiz{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.quiz__q{font-size:16px;margin-bottom:12px;text-align:center}
+.quiz__q b{color:var(--accent);font-size:20px}
+.quiz__timer{height:5px;background:#0e1116;border-radius:99px;overflow:hidden;margin-bottom:12px}
+.quiz__bar{height:100%;width:100%;background:var(--accent);transition:width .1s linear}
+.quiz__opts{display:grid;gap:8px}
+.quiz__opts button{
+  background:var(--bg3);border:1px solid var(--line);color:var(--txt);border-radius:10px;
+  padding:12px;font-size:15px;cursor:pointer;text-align:left;transition:.15s;
+}
+.quiz__opts button:hover:not(:disabled){border-color:#41506a}
+.quiz__opts button.good{background:rgba(61,220,132,.16);border-color:var(--ok);color:#bff7d6}
+.quiz__opts button.bad{background:rgba(255,107,107,.14);border-color:var(--ko);color:#ffc9c9}
+.quiz__opts button:disabled{cursor:default}
+.quiz__hint{text-align:center;color:var(--dim);font-size:12px;margin-top:10px}
+.quiz-result{text-align:center;font-size:15px;margin:14px 0;padding:12px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
+.quiz-result b{color:var(--accent)}
+.newdep{color:var(--ok);font-size:13.5px}
+
+.final-score{text-align:center;font-size:56px;font-weight:800;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+#btn-home{display:block;margin:10px auto 0}
+
+/* ───────── collection ───────── */
+.collec__intro{text-align:center;color:var(--dim);font-size:14px}
+.collec__intro b{color:var(--txt);font-size:17px}
+.collec__bar{height:8px;background:var(--bg2);border:1px solid var(--line);border-radius:99px;margin:10px 0 20px;overflow:hidden}
+.collec__fill{height:100%;background:linear-gradient(90deg,var(--ok),var(--accent));transition:width .4s}
+.collec__reg{margin-bottom:14px}
+.collec__reg h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin-bottom:6px;display:flex;justify-content:space-between}
+.collec__reg h3 i{font-style:normal;color:#5c6879}
+.collec__row{display:flex;flex-wrap:wrap;gap:5px}
+.dep{
+  width:38px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;background:var(--bg2);border:1px solid var(--line);color:#4a5666;
+  font-variant-numeric:tabular-nums;transition:.15s;
+}
+.dep--on{
+  background:var(--plate-blue);border-color:#1e5fd8;color:#fff;
+  box-shadow:0 0 10px rgba(11,62,168,.5),inset 0 -8px 10px -8px rgba(255,255,255,.5);
+}
+#btn-collection-back{margin-top:8px}
+
+/* ───────── mode Trafic : la route ─────────
+   Perspective unique : point de fuite (50 %, 46 %), sol y = 46 + K/z,
+   écart latéral x = 50 ± 38/z, taille = 1/z. Bandes et voitures partagent
+   cette projection, sinon rien ne s'aligne.                              */
+.road{
+  --roadH:clamp(240px,46vh,380px);
+  position:relative;height:var(--roadH);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  margin:12px 0 8px;background:#0b1016;
+}
+.road__sky{position:absolute;inset:0 0 54% 0;
+  background:linear-gradient(180deg,#0c1526 0%,#1d2f45 46%,#4d4a4c 78%,#8a6a4f 96%,#a67c52 100%)}
+.road__sun{position:absolute;left:50%;top:26%;width:82px;height:82px;margin-left:-41px;border-radius:50%;
+  background:radial-gradient(circle,#ffc97e 0%,#ff8f45 46%,rgba(255,143,69,0) 72%);opacity:.8}
+.road__ground{position:absolute;inset:46% 0 0 0;
+  background:linear-gradient(180deg,#3a3b2c 0%,#252c1e 12%,#1a2118 40%,#111610 100%);
+  box-shadow:inset 0 7px 16px -7px rgba(196,160,124,.5)}
+.road__tarmac{position:absolute;inset:46% 0 0 0;
+  background:linear-gradient(180deg,#3d444e 0%,#282e35 48%,#1c2027 100%);
+  clip-path:polygon(46.2% 0,53.8% 0,150% 100%,-50% 100%)}
+.road__edge{position:absolute;inset:46% 0 0 0;background:rgba(236,232,216,.62)}
+.road__edge--r{clip-path:polygon(53.3% 0,54% 0,150% 100%,143% 100%)}
+.road__edge--l{clip-path:polygon(46% 0,46.7% 0,-43% 100%,-50% 100%)}
+
+.road__glass{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(112deg,rgba(255,255,255,.05) 0 24%,transparent 28% 100%),
+             radial-gradient(125% 92% at 50% 42%,transparent 52%,rgba(0,0,0,.6) 100%)}
+
+/* ───────── mode Trafic : les voitures ─────────
+   Au sol à 94 % ; en s'éloignant elle suit la même projection et
+   s'arrête à l'horizon (48,4 %) au lieu de décoller.                     */
+.road__cars{position:absolute;inset:0}
+.car{
+  position:absolute;left:calc(50% + var(--lane,0%));bottom:6%;
+  width:min(calc(var(--roadH) * var(--w,.74)), 30%);
+  transform:translate(-50%,0) scale(1);transform-origin:50% 100%;
+  will-change:transform,opacity;
+}
+.car__body{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+.car__shadow{
+  position:absolute;left:50%;bottom:1.5%;width:86%;height:7%;transform:translateX(-50%);
+  background:radial-gradient(50% 50% at 50% 50%,rgba(0,0,0,.62) 0%,rgba(0,0,0,.34) 55%,rgba(0,0,0,0) 100%);
+  pointer-events:none;
+}
+.car--in{animation:overtake .85s cubic-bezier(.2,.72,.3,1)}
+@keyframes overtake{
+  0%  {transform:translate(-50%,16%) scale(1.5);opacity:0}
+  30% {opacity:1}
+  100%{transform:translate(-50%,0) scale(1);opacity:1}
+}
+.car--away{animation:recede 2.1s linear forwards}
+@keyframes recede{
+  0%  {left:calc(50% + var(--lane,0%));        transform:translate(-50%,0) scale(1);opacity:1}
+  20% {left:calc(50% + var(--lane,0%) * .410); transform:translate(-50%,calc(var(--roadH) * -0.283)) scale(.410);opacity:1}
+  40% {left:calc(50% + var(--lane,0%) * .186); transform:translate(-50%,calc(var(--roadH) * -0.391)) scale(.186);opacity:1}
+  60% {left:calc(50% + var(--lane,0%) * .106); transform:translate(-50%,calc(var(--roadH) * -0.429)) scale(.106);opacity:.9}
+  80% {left:calc(50% + var(--lane,0%) * .070); transform:translate(-50%,calc(var(--roadH) * -0.446)) scale(.070);opacity:.5}
+  100%{left:calc(50% + var(--lane,0%) * .050); transform:translate(-50%,calc(var(--roadH) * -0.456)) scale(.050);opacity:0}
+}
+.car--done .car__body{filter:drop-shadow(0 0 16px rgba(61,220,132,.8))}
+
+.plate--car{
+  position:absolute;left:50%;top:var(--plateY,72%);width:calc(var(--plateW,46%) * 1.5);transform:translate(-50%,-50%);
+  margin:0;border-width:2px;border-radius:4px;z-index:2;
+  box-shadow:0 2px 7px rgba(0,0,0,.7);
+}
+.plate--car .plate__body{font-size:clamp(9px,2.6vw,17px);padding:2px 2px;gap:.08em}
+.plate--car .plate__eu{width:13%;min-width:0;padding:2px 0;justify-content:center}
+.plate--car .plate__dep{width:auto;min-width:15%;padding:2px 2px;justify-content:center}
+.plate--car .plate__f{font-size:clamp(6px,1.7vw,9px)}
+.plate--car .plate__depnum{font-size:clamp(5.5px,1.4vw,9px);letter-spacing:-.03em;white-space:nowrap}
+.plate--car .plate__sep{font-size:.55em}
+
+.car__timer{position:absolute;left:50%;top:calc(var(--plateY,72%) + 12%);width:calc(var(--plateW,46%) * 1.5);height:4px;transform:translateX(-50%);
+  background:rgba(0,0,0,.6);border-radius:9px;overflow:hidden;z-index:3}
+.car__timer i{display:block;height:100%;width:100%;transform-origin:left;
+  background:linear-gradient(90deg,#3ddc84,#ffcf3f);transition:transform .12s linear}
+
+.car__pop{
+  position:absolute;left:50%;top:-6%;transform:translateX(-50%);z-index:4;
+  font-weight:800;font-size:18px;color:var(--ok);opacity:0;white-space:nowrap;
+  text-shadow:0 2px 7px #000,0 0 3px #000;
+}
+.car__pop.go{animation:popup 1.2s ease-out}
+@keyframes popup{
+  0%  {opacity:0;transform:translate(-50%,12px) scale(.8)}
+  22% {opacity:1;transform:translate(-50%,0) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-32px) scale(1)}
+}
+.car__pop.rare{color:var(--rare)}
+.car__pop.miss{color:var(--ko)}
+.car__pop.win{color:var(--accent);font-size:20px}
+
+.tr-pairs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:2px 0 10px;min-height:34px}
+#tr-pairs .tok{font-size:13px;padding:4px 9px;letter-spacing:.1em}
+#tr-pairs .tok--on{font-size:12px}
+.tok{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:5px 14px;
+  font-weight:800;letter-spacing:.12em;font-size:16px;color:var(--txt);transition:.2s;
+}
+.tok--on{background:rgba(61,220,132,.14);border-color:var(--ok);color:var(--ok);letter-spacing:.02em;font-size:14px;font-weight:600}
+.tok--wait{opacity:.35;letter-spacing:.2em}
+#tr-timebox.low .hud__v{color:var(--ko)}
+#tr-timebox{position:relative}
+.hud__gain{position:absolute;right:8px;top:6px;font-size:12px;font-weight:800;color:var(--ok);opacity:0}
+.hud__gain.go{animation:rise 1s ease-out}
+@keyframes rise{0%{opacity:0;transform:translateY(4px)}25%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px)}}
+#tr-form{display:flex;gap:8px}
+#tr-input{
+  flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:10px;
+  color:var(--txt);font-size:20px;padding:13px 16px;letter-spacing:.06em;outline:none;text-transform:lowercase;
+}
+#tr-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,207,63,.12)}
+
+/* ───────── mode Parking ───────── */
+.lot{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+  background:
+    linear-gradient(180deg,#333a43 0%,#262c34 22%,#1d222a 100%);
+  border:1px solid var(--line);border-radius:14px;
+  padding:14px 12px 16px;margin:12px 0 10px;
+  box-shadow:inset 0 14px 22px -14px rgba(0,0,0,.8);
+}
+.lot--shake{animation:lotShake .42s}
+@keyframes lotShake{
+  10%,90%{transform:translate(-2px,1px)}30%,70%{transform:translate(3px,-2px)}
+  50%{transform:translate(-3px,2px)}
+}
+.spot{
+  position:relative;aspect-ratio:1/.8;display:flex;align-items:flex-end;justify-content:center;
+  border-left:2px solid rgba(236,232,216,.20);border-right:2px solid rgba(236,232,216,.20);
+  border-top:2px solid rgba(236,232,216,.13);border-radius:2px;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 46%);
+  transition:background .4s;
+}
+.spot--boom{background:radial-gradient(60% 45% at 50% 74%,rgba(0,0,0,.62),transparent 72%)}
+.spot__car{position:relative;width:97%;transform-origin:50% 92%}
+.spot--boom .spot__car{animation:boom .6s cubic-bezier(.2,.75,.4,1) forwards}
+@keyframes boom{
+  0%  {transform:none;filter:none}
+  8%  {transform:translateY(-7%) scale(1.12);filter:brightness(6) saturate(.25)}
+  22% {transform:translateY(-12%) scale(1.04) rotate(-3deg);filter:brightness(2.2)}
+  100%{transform:translateY(-34%) scale(.5) rotate(11deg);opacity:0;filter:brightness(.1)}
+}
+.plate--park{width:calc(var(--plateW,46%) * 1.6)}
+.plate--park .plate__body{font-size:clamp(8.5px,2.4vw,15px)}
+.plate--park .plate__body{font-size:clamp(10px,2.9vw,16px)}
+
+.spot__fx{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5}
+.flash{
+  position:absolute;left:50%;top:60%;width:10px;height:10px;transform:translate(-50%,-50%);
+  border-radius:50%;animation:flashOut .5s ease-out forwards;
+  background:radial-gradient(circle,#fff 0%,#ffdc9b 26%,#ff8a2a 52%,rgba(255,90,20,0) 74%);
+}
+@keyframes flashOut{
+  0%  {width:14px;height:14px;opacity:1}
+  22% {opacity:1}
+  100%{width:360px;height:360px;opacity:0}
+}
+.ring{
+  position:absolute;left:50%;top:60%;width:10px;height:10px;transform:translate(-50%,-50%);
+  border-radius:50%;border:3px solid rgba(255,214,150,.85);animation:ringOut .62s ease-out forwards;
+}
+@keyframes ringOut{
+  0%  {width:10px;height:10px;opacity:.95;border-width:5px}
+  100%{width:240px;height:150px;opacity:0;border-width:1px}
+}
+.frag{
+  position:absolute;left:50%;top:60%;width:7px;height:7px;border-radius:2px;background:#ffb257;
+  box-shadow:0 0 6px rgba(255,150,60,.8);animation:fragOut .95s cubic-bezier(.2,.7,.4,1) forwards;
+}
+@keyframes fragOut{
+  0%  {transform:translate(-50%,-50%) rotate(0);opacity:1}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--rot));opacity:0}
+}
+.smoke{
+  position:absolute;bottom:16%;width:46px;height:46px;border-radius:50%;
+  background:radial-gradient(circle,rgba(130,130,136,.5) 0%,rgba(90,90,96,0) 70%);
+  animation:smokeUp 1.35s ease-out forwards;
+}
+@keyframes smokeUp{
+  0%  {transform:translateY(0) scale(.35);opacity:.9}
+  100%{transform:translateY(-76px) scale(2);opacity:0}
+}
+.pk-tokens{flex-wrap:wrap;gap:6px}
+.pk-tokens .tok{font-size:13px;padding:4px 9px;letter-spacing:.1em}
+.pk-tokens .tok--on{font-size:12px}
+.tok__sep{width:1px;height:20px;background:var(--line);display:inline-block;margin:0 2px}
+#pk-timebox{position:relative}
+#pk-timebox.low .hud__v{color:var(--ko)}
+#pk-form{display:flex;gap:8px}
+#pk-input{
+  flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:10px;
+  color:var(--txt);font-size:20px;padding:13px 16px;letter-spacing:.06em;outline:none;text-transform:lowercase;
+}
+#pk-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,207,63,.12)}
+
+/* ───────── coupé sport : vaut plus ───────── */
+.tok--sport{border-color:var(--accent);box-shadow:0 0 10px rgba(255,207,63,.22)}
+.tok--tag{font-size:11px;letter-spacing:0;padding:4px 8px;color:var(--accent);border-color:transparent;background:none;font-weight:700}
+.car--sport .plate--car{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 2px rgba(255,207,63,.55)}
+.spot__car--sport .plate--car{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 2px rgba(255,207,63,.55)}
+.sport-tag{
+  position:absolute;left:50%;top:6%;transform:translateX(-50%);z-index:3;
+  background:rgba(20,24,31,.85);border:1px solid var(--accent);color:var(--accent);
+  font-size:11px;font-weight:700;border-radius:99px;padding:2px 8px;white-space:nowrap;
+}
+.spot__car{margin:0 auto}
+
+/* ───────── Trafic : trois voies qui roulent ───────── */
+/* séparations de voies : continues et discrètes, elles convergent vers le point de fuite
+   (voies à −30 / 0 / +30 % au premier plan → séparations à ±15 %) */
+.road__lane{position:absolute;inset:46% 0 0 0;background:rgba(236,232,216,.30)}
+.road__lane--l{clip-path:polygon(49.75% 0,50.05% 0,34.6% 100%,33.8% 100%)}
+.road__lane--r{clip-path:polygon(49.95% 0,50.25% 0,66.2% 100%,65.4% 100%)}
+
+/* le bloc « ride » : la voiture avance et recule doucement, avec un léger roulis */
+.car__ride{position:relative;transform-origin:50% 96%;animation:cruise var(--ride,3s) ease-in-out var(--ridePhase,0s) infinite alternate;will-change:transform}
+@keyframes cruise{
+  0%  {transform:translateY(0) scale(1) rotate(-.35deg)}
+  50% {transform:translateY(-1.2%) scale(.985) rotate(.2deg)}
+  100%{transform:translateY(-3.2%) scale(.962) rotate(.4deg)}
+}
+.car__fx{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:6}
+.car--boom .car__ride{animation:boom .6s cubic-bezier(.2,.75,.4,1) forwards}
+.car--boom .car__timer{display:none}
+.road{will-change:transform}
+
+/* ───────── Trafic : la route défile ─────────
+   Balises J6 sur l'accotement (hors chaussée), projetées comme les voitures :
+   x = 50 ± 106/z, y = 46 + 54/z, taille 1/z.                                  */
+.road__posts{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.post{
+  position:absolute;width:calc(var(--roadH) * .018);height:calc(var(--roadH) * .13);
+  border-radius:2px;background:linear-gradient(180deg,#d8322c 0 26%,#f3efe2 26% 100%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.25);
+  transform:translate(-50%,-100%) scale(.167);opacity:0;
+  animation:post-run 1.32s linear infinite;will-change:top,left,transform;
+}
+.post--l{animation-name:post-run-l}
+.post--r{animation-name:post-run-r}
+@keyframes post-run-l{
+  0%   {top:55%;   left:32.3%;transform:translate(-50%,-100%) scale(.167);opacity:0}
+  12%  {opacity:1}
+  37.9%{top:59.5%; left:23.5%;transform:translate(-50%,-100%) scale(.25)}
+  56.8%{top:64%;   left:14.7%;transform:translate(-50%,-100%) scale(.333)}
+  72%  {top:70.55%;left:1.8%; transform:translate(-50%,-100%) scale(.455)}
+  83.3%{top:79.75%;left:-16.3%;transform:translate(-50%,-100%) scale(.625)}
+  100% {top:91%;   left:-38.3%;transform:translate(-50%,-100%) scale(.833);opacity:1}
+}
+@keyframes post-run-r{
+  0%   {top:55%;   left:67.7%;transform:translate(-50%,-100%) scale(.167);opacity:0}
+  12%  {opacity:1}
+  37.9%{top:59.5%; left:76.5%;transform:translate(-50%,-100%) scale(.25)}
+  56.8%{top:64%;   left:85.3%;transform:translate(-50%,-100%) scale(.333)}
+  72%  {top:70.55%;left:98.2%;transform:translate(-50%,-100%) scale(.455)}
+  83.3%{top:79.75%;left:116.3%;transform:translate(-50%,-100%) scale(.625)}
+  100% {top:91%;   left:138.3%;transform:translate(-50%,-100%) scale(.833);opacity:1}
+}
+
+/* les voitures prennent et perdent du terrain de façon visible (z de 1 à 1,3),
+   avec une vibration de suspension */
+@keyframes cruise{
+  0%  {transform:translateY(0) scale(1) rotate(-.3deg)}
+  100%{transform:translateY(calc(var(--roadH) * -.11)) scale(.77) rotate(.3deg)}
+}
+.car__body{animation:rumble .16s ease-in-out infinite alternate}
+@keyframes rumble{from{transform:translateY(0)}to{transform:translateY(.9px)}}
+.car--boom .car__body{animation:none}
+
+/* ───────── cible désignée (clic sur une voiture ou ses jetons) ───────── */
+.tokgroup{display:inline-flex;gap:4px;padding:3px;border-radius:11px;border:1px solid transparent;margin:0 3px;cursor:pointer}
+.tokgroup.tok--target{border-color:var(--accent);background:rgba(255,207,63,.08)}
+.car{cursor:pointer}
+.car--target .plate--car{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
+.spot{cursor:pointer}
+.spot--target{background:linear-gradient(180deg,rgba(255,207,63,.14),transparent 55%);border-color:rgba(255,207,63,.55)}
+.spot--target .plate--car{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
+.feedback .mono{letter-spacing:.06em}
+
+/* alignement de couleur complété */
+.spot--line{animation:lineGlow 1.8s ease-out}
+@keyframes lineGlow{
+  0%,60%{box-shadow:inset 0 0 0 3px var(--accent),0 0 22px rgba(255,207,63,.7);background:rgba(255,207,63,.22)}
+  100%{box-shadow:none}
+}
+
+/* parking sur téléphone : trois colonnes serrées, la plaque va à l'essentiel */
+@media (max-width:520px){
+  .plate--park{width:calc(var(--plateW,46%) * 2.05)}
+  .plate--park .plate__eu,.plate--park .plate__dep{display:none}
+  .plate--park .plate__body{font-size:11.5px;padding:3px 4px}
+  .lot{gap:5px;padding:10px 8px 12px}
+  .sport-tag{font-size:9px;padding:1px 6px}
+}
+
+/* ───────── parking en flux : marques au sol, arrivées, remorquage ───────── */
+.spot__slot{position:relative;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.spot__mark{position:absolute;inset:0;pointer-events:none;border-radius:2px;
+  box-shadow:inset 0 0 0 0 var(--tint,transparent);transition:box-shadow .35s}
+.spot__mark--on{box-shadow:inset 0 0 0 4px var(--tint),inset 0 0 26px -6px var(--tint)}
+.spot__car--in{animation:parkIn .7s cubic-bezier(.2,.75,.3,1)}
+@keyframes parkIn{
+  0%  {transform:translateY(-22%) scale(.55);opacity:0}
+  35% {opacity:1}
+  100%{transform:none;opacity:1}
+}
+.spot__car--tow{animation:towOut .8s ease-in forwards}
+@keyframes towOut{to{transform:translateY(-40%) scale(.6);opacity:0}}
+.tokgroup--empty{opacity:.35;cursor:default}
+
+/* ───────── progression, missions, toast ───────── */
+.rank{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;color:var(--txt);
+  background:linear-gradient(180deg,#1b2029,#161b23);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0 0 10px;transition:.15s;
+}
+.rank:hover{border-color:var(--accent)}
+.rank__img{width:92px;height:auto;flex:0 0 auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))}
+.rank__img--bronze{filter:drop-shadow(0 0 10px rgba(205,127,50,.55))}
+.rank__img--argent{filter:drop-shadow(0 0 10px rgba(200,210,225,.6))}
+.rank__img--or{filter:drop-shadow(0 0 14px rgba(255,200,60,.75))}
+.rank__body{flex:1;min-width:0}
+.rank__head{display:flex;align-items:baseline;gap:10px;margin-bottom:7px}
+.rank__k{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim)}
+.rank__head b{font-size:17px;text-transform:capitalize}
+.rank__bar{height:6px;background:#0e1116;border-radius:99px;overflow:hidden}
+.rank__fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff9a3c);transition:width .5s}
+.rank__foot{display:flex;justify-content:space-between;margin-top:6px}
+.rank__foot i{font-style:normal;color:var(--dim);font-size:12px;font-variant-numeric:tabular-nums}
+.career__row{margin-bottom:14px}
+.career__row h3{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin-bottom:6px}
+.career__row h3 i{font-style:normal;text-transform:none;letter-spacing:0;color:var(--accent);margin-left:8px}
+.career__metals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.career__rank{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center;font-size:12px;color:var(--dim)}
+.career__rank img{width:72%;height:auto;display:block;margin:0 auto 4px}
+.career__rank span{display:block;text-transform:capitalize}
+.career__rank b{display:block;color:var(--txt);font-variant-numeric:tabular-nums}
+.career__rank--got{border-color:rgba(61,220,132,.5)}
+.career__rank--now{border-color:var(--accent);background:rgba(255,207,63,.08);color:var(--txt)}
+.career__rank--todo img{filter:grayscale(1) brightness(.45)}
+.career__rank--todo b{color:var(--dim)}
+.missions{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0 0 14px}
+.missions h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:6px}
+.missions ul{list-style:none;display:grid;gap:4px}
+.mission{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:4px 0;border-bottom:1px dashed #232b36}
+.mission:last-child{border:0}
+.mission b{color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mission--ok{color:var(--dim);text-decoration:line-through}
+.mission--ok b{color:var(--ok);text-decoration:none}
+.toast{
+  position:fixed;left:50%;top:max(14px,env(safe-area-inset-top));transform:translate(-50%,-30px);z-index:30;
+  background:rgba(20,24,31,.94);border:1px solid var(--accent);color:var(--txt);border-radius:12px;
+  padding:10px 16px;font-size:14px;opacity:0;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,.6);max-width:92vw;text-align:center;
+}
+.toast.go{animation:toastIn 3.2s ease-out}
+@keyframes toastIn{0%{opacity:0;transform:translate(-50%,-30px)}10%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-20px)}}
+
+/* fantôme du record */
+.ghost{display:block;font-size:11px;font-weight:700;margin-top:2px;min-height:14px;font-variant-numeric:tabular-nums}
+.ghost--up{color:var(--ok)}
+.ghost--down{color:var(--ko)}
+
+/* rush final */
+.road.rush .road__sky{background:linear-gradient(180deg,#2a0b10 0%,#6a1b1b 46%,#a8452a 84%,#d9782f 100%)}
+.road.rush .road__sun{background:radial-gradient(circle,#fff0c0 0%,#ff5a2a 46%,rgba(255,60,30,0) 72%)}
+.road.rush,.lot.rush{animation:rushPulse .9s ease-in-out infinite alternate}
+@keyframes rushPulse{from{box-shadow:0 0 0 0 rgba(255,80,60,0)}to{box-shadow:0 0 0 3px rgba(255,80,60,.55),0 0 28px rgba(255,80,60,.4)}}
+
+/* fièvre : plaques dorées qui pulsent */
+.road.fever .plate--car,.lot.fever .plate--car{animation:feverPulse .5s ease-in-out infinite alternate}
+@keyframes feverPulse{from{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 2px var(--accent)}to{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 5px var(--accent),0 0 22px rgba(255,207,63,.8)}}
+
+/* voiture dorée, camion-citerne */
+.sport-tag--gold{border-color:#ffd54a;color:#ffd54a;background:rgba(60,45,10,.9)}
+.sport-tag--tank{border-color:#ff8a3c;color:#ff8a3c;background:rgba(50,25,10,.9)}
+.car--gold .car__body,.spot__car--gold .car__body{filter:drop-shadow(0 0 12px rgba(255,213,74,.75))}
