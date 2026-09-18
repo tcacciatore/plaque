@@ -423,9 +423,9 @@ button.stat:hover{border-color:var(--accent)}
 .road__lane--r{clip-path:polygon(49.95% 0,50.25% 0,66.2% 100%,65.4% 100%)}
 /* deux voies : une seule séparation, au centre, et des voitures plus larges */
 .road--two .road__lane--l,.road--two .road__lane--r{clip-path:polygon(49.8% 0,50.2% 0,50.6% 100%,49.4% 100%)}
-.road--two .car{width:min(calc(var(--roadH) * var(--w,.74)), 46%)}
-.road--two .plate--car{width:calc(var(--plateW,46%) * 1.85)}
-.road--two .car__timer{width:calc(var(--plateW,46%) * 1.85)}
+.road--two .car{width:min(calc(var(--roadH) * var(--w,.74)), 48.5%)}
+.road--two .plate--car{width:calc(var(--plateW,46%) * 1.7)}
+.road--two .car__timer{width:calc(var(--plateW,46%) * 1.7)}
 .road--two .plate--car .plate__body{font-size:clamp(12.5px,4.1vw,19px)}
 .road--two .plate--car .plate__depnum{font-size:clamp(7px,2vw,9px)}
 

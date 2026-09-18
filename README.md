@@ -34,8 +34,8 @@ n'est jamais tirée deux fois dans la même partie.
 
 | | |
 |---|---|
-| mot | 10 pts + 5 par lettre au-delà de 3, +3 par lettre entre les deux lettres de la paire (max +15) |
-| rareté | +15 (mot peu courant) ou +35 (mot rare), à partir de 6 lettres |
+| mot | 10 pts + 5 par lettre de la 4e à la 7e, puis **+10 par lettre** au-delà ; +3 par lettre entre les deux lettres de la paire (max +15) |
+| rareté | **+25** (mot peu courant) ou **+70** (mot rare), à partir de 5 lettres ; un mot rare de 9 lettres ou plus est un *mot d'expert* : ×1,5 |
 | les deux paires dans un mot | ×2, et la plaque est lue d'un coup |
 | série | ×1 à ×5, +1 par mot — une erreur la remet à ×1 |
 | **cote** | les trois chiffres de la plaque : ce qu'elle rapporte une fois lue, de 100 (paires riches) à 900 (paires rares) |

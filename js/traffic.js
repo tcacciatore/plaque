@@ -23,7 +23,7 @@ var SPAWN_GAP = 3500;               // écart minimal entre deux apparitions, to
 var GAP_MIN   = 3500, GAP_MAX = 5000;// délai avant qu'une voie libre se réalimente, en ms
 var TIME_CAP  = 150;                // la partie ne dépasse jamais deux minutes et demie
 var LANES3    = [-30, 0, 30];       // décalage de chaque voie, en % de la largeur de scène
-var LANES2    = [-22, 22];          // sur petit écran : deux voies, plaques plus grandes
+var LANES2    = [-25, 25];          // sur petit écran : deux voies plus écartées, voitures plus grandes
 var NARROW    = 560;                // largeur d'écran sous laquelle on passe à deux voies
 var LANES     = LANES3;
 var MULT_MAX  = 5;
@@ -275,12 +275,9 @@ function submit(e) {
   if (!P.isWord(w)) return reject('<b>' + w.toUpperCase() + '</b> — inconnu du dictionnaire.');
 
   var car = best.c, hit = best.h1 || best.h2;
-  var base = 10 + 5 * Math.max(0, w.length - 3);
-  var spread = Math.min(15, Math.max(0, hit[1] - hit[0] - 2) * 3);
-  var tier = P.rarity(w);
-  var rare = w.length >= 6 ? (tier === 2 ? 35 : tier === 1 ? 15 : 0) : 0;
+  var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
   var sport = car.shape === SPORT;
-  var pts = Math.round((base + spread + rare) * T.combo * (sport ? SPORT_BONUS : 1) * (car.gold ? GOLD_MULT : 1) * multiplier());
+  var pts = Math.round(ws.pts * T.combo * (sport ? SPORT_BONUS : 1) * (car.gold ? GOLD_MULT : 1) * multiplier());
 
   var both = best.h1 && best.h2;                 // les deux paires dans le même mot
   if (both) pts *= 2;
@@ -299,7 +296,7 @@ function submit(e) {
   var who = '<b class="mono">' + car.p1.p + '·' + car.num + '·' + car.p2.p + '</b>';
   feedback('+' + pts + ' sur ' + who +
            (both ? ' — <b>les deux paires d\'un coup</b> ×2' : '') +
-           (rare ? ' — ' + (tier === 2 ? '💎 mot rare' : 'mot peu courant') + ' +' + rare : '') +
+           (ws.label ? ' — ' + ws.label : '') +
            (sport ? ' · 🏎️ <b>coupé ×' + String(SPORT_BONUS).replace('.', ',') + '</b>' : '') +
            (T.combo > 1 ? ' · série <b>×' + T.combo + '</b>' : '') +
            (car.got1 && car.got2 ? '' : ' · il manque <b>' + (car.got1 ? car.p2.p : car.p1.p) + '</b>'), 'ok');

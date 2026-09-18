@@ -262,7 +262,7 @@ function progress(type, n, absolute) {
 var session = {};
 function sessionStart() {
   session = { words: 0, bestWord: null, bestWordPts: 0, maxCombo: 1, bestPlate: null, bestPlatePts: 0,
-              plates: 0, sport: 0, rare: 0, gold: 0, lines: 0, newDeps: 0, newRank: null, missionsDone: [], t0: Date.now() };
+              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, lines: 0, newDeps: 0, newRank: null, missionsDone: [], t0: Date.now() };
 }
 var track = {
   word: function (w, pts, tier, combo) {
@@ -271,6 +271,7 @@ var track = {
     if (combo > session.maxCombo) session.maxCombo = combo;
     if (combo >= 5) progress('combo5', 1);
     if (tier === 2) { session.rare++; progress('rare', 1); }
+    if (tier === 2 && w.length >= 9) session.expert++;
     progress('long', w.length, true);
   },
   plate: function (label, pts, opts) {
@@ -324,6 +325,23 @@ function paintGhost(el, sec, score) {
   el.className = 'ghost ' + (d >= 0 ? 'ghost--up' : 'ghost--down');
 }
 
+/* ═══════════ valeur d'un mot : longueur, écartement, rareté ═══════════
+   Le vocabulaire paie : au-delà de 7 lettres chaque lettre vaut le double, un mot
+   peu courant rapporte +25, un mot rare +70, et un mot rare de 9 lettres ou plus
+   est un « mot d'expert » : ×1,5 sur le tout.                                     */
+function wordScore(w, hit) {
+  var len = w.length;
+  var base = 10 + 5 * Math.min(4, Math.max(0, len - 3)) + 10 * Math.max(0, len - 7);
+  var spread = Math.min(15, Math.max(0, hit[1] - hit[0] - 2) * 3);
+  var tier = RARITY ? (RARITY.get(w) || 0) : 0;
+  var rare = len >= 5 ? (tier === 2 ? 70 : tier === 1 ? 25 : 0) : 0;
+  var expert = tier === 2 && len >= 9;
+  var pts = Math.round((base + spread + rare) * (expert ? 1.5 : 1));
+  return { pts: pts, base: base, spread: spread, rare: rare, tier: tier, expert: expert,
+           label: expert ? '🎓 mot d\'expert ×1,5' : tier === 2 && rare ? '💎 mot rare +' + rare
+                : tier === 1 && rare ? 'mot peu courant +' + rare : '' };
+}
+
 /* ═══════════ cote d'une plaque : les trois chiffres disent ce qu'elle vaut ═══════════ */
 function plateValue(p1, p2) {
   var lo = Math.log(40), hi = Math.log(4200);
@@ -366,6 +384,8 @@ function endGame() {
   if (s.bestWord) html += row('Meilleur mot', '<b>' + s.bestWord.toUpperCase() + '</b> · ' + s.bestWordPts + ' pts');
   if (s.bestPlate) html += row('Voiture la plus chère', '<b class="mono">' + s.bestPlate + '</b> · ' + s.bestPlatePts + ' pts');
   html += row('Plus longue série', '×' + s.maxCombo);
+  if (s.rare) html += row('Vocabulaire', s.rare + ' mot' + (s.rare > 1 ? 's' : '') + ' rare' + (s.rare > 1 ? 's' : '') +
+                          (s.expert ? ' dont ' + s.expert + ' d\'expert 🎓' : ''));
   html += row('Mots · plaques', s.words + ' · ' + s.plates + (s.sport ? ' (dont ' + s.sport + ' coupé' + (s.sport > 1 ? 's' : '') + ')' : ''));
   if (s.lines) html += row('Alignements de couleur', s.lines);
   if (s.newDeps) html += row('🗺️ Nouveaux départements', s.newDeps + ' — collection ' + collection().length + '/101');
@@ -541,7 +561,7 @@ window.PLAQUE = {
   shuffle: shuffle, pick: pick, rand: rand, row: row, explode: explode,
   collection: collection, collect: collect, finishGame: finishGame,
   DIFF: DIFF, MODES: MODES, state: state, newPlate: newPlate, endGame: endGame,
-  track: track, colors: colors, plateValue: plateValue, toast: toast,
+  track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore,
   ghostSample: ghostSample, paintGhost: paintGhost,
   isWord:  function (w) { return DICT ? DICT.has(w) : false; },
   rarity:  function (w) { return RARITY ? (RARITY.get(w) || 0) : 0; },

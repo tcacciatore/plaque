@@ -281,12 +281,9 @@ function submit(e) {
   if (!P.isWord(w)) return reject('<b>' + w.toUpperCase() + '</b> — inconnu du dictionnaire.');
 
   var c = best.c, hit = best.h1 || best.h2;
-  var base = 10 + 5 * Math.max(0, w.length - 3);
-  var spread = Math.min(15, Math.max(0, hit[1] - hit[0] - 2) * 3);
-  var tier = P.rarity(w);
-  var rare = w.length >= 6 ? (tier === 2 ? 35 : tier === 1 ? 15 : 0) : 0;
+  var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
   var sport = c.shape === SPORT;
-  var pts = Math.round((base + spread + rare) * K.combo * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * multiplier());
+  var pts = Math.round(ws.pts * K.combo * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * multiplier());
   var both = best.h1 && best.h2;
   if (both) pts *= 2;
   if (best.h1) { c.got1 = w; flashPair(c, 1); }
@@ -318,7 +315,7 @@ function submit(e) {
     (tier === 2 && rare) ? P.sfx.rare() : P.sfx.ok(K.combo);
     feedback('+' + pts + ' sur ' + who +
              (both ? ' — <b>les deux paires d\'un coup</b> ×2' : '') +
-             (rare ? ' — ' + (tier === 2 ? '💎 mot rare' : 'mot peu courant') + ' +' + rare : '') +
+             (ws.label ? ' — ' + ws.label : '') +
              (sport ? ' · 🏎️ <b>coupé ×1,5</b>' : '') +
              ' · il manque <b>' + (c.got1 ? c.p2.p : c.p1.p) + '</b>', 'ok');
     setTarget(c);
