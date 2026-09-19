@@ -264,15 +264,21 @@ var ICONS = {
 function badgeMedal(b, ok, size, spin) {
   var s = size || 64;
   var slices = '';
-  for (var i = 1; i <= 7; i++) slices += '<i class="medal__slice" style="transform:translateZ(' + (-i * s * 0.012) + 'px)"></i>';
+  for (var i = 1; i <= 8; i++) slices += '<i class="medal__slice" style="transform:translateZ(' + (-i * s * 0.011) + 'px)"></i>';
+  var icon = ICONS[b.icon];
   return '<div class="medal medal--' + b.metal + (ok ? '' : ' medal--off') + (spin ? ' medal--spin' : '') +
          '" style="--size:' + s + 'px;--tint:' + b.tint + '" data-badge="' + b.id + '">' +
            '<div class="medal__body">' +
              slices +
              '<div class="medal__face medal__face--front">' +
-               '<div class="medal__ring"></div><div class="medal__dome"></div>' +
-               '<svg viewBox="0 0 24 24" class="medal__icon" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[b.icon] + '</svg>' +
+               '<div class="medal__rim"></div>' +
+               '<div class="medal__rivets"></div>' +
+               '<div class="medal__inner"></div>' +
+               '<div class="medal__dome"></div>' +
+               '<svg viewBox="0 0 24 24" class="medal__icon medal__icon--shadow" fill="none" stroke="#000" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + icon + '</svg>' +
+               '<svg viewBox="0 0 24 24" class="medal__icon" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' + icon + '</svg>' +
                '<div class="medal__glint"></div>' +
+               (ok ? '<i class="medal__spark s1"></i><i class="medal__spark s2"></i><i class="medal__spark s3"></i><i class="medal__spark s4"></i>' : '') +
              '</div>' +
              '<div class="medal__face medal__face--back"><span>PLAQUE</span><b>' + b.name + '</b></div>' +
            '</div>' +
@@ -291,7 +297,9 @@ function openMedal(b) {
     ? '<b>Obtenu</b>' + (got[b.id] > 1 ? ' — ' + new Date(got[b.id] * 86400000).toLocaleDateString('fr-FR') : '')
     : v + ' / ' + b.goal + ' — <u style="width:' + Math.round(v / b.goal * 100) + '%"></u>';
   $('medal-modal').hidden = false;
-  sfx.time();
+  $('medal-stage').style.setProperty('--tint', b.tint);
+  $('medal-stage').classList.toggle('medal-stage--off', !ok);
+  ok ? sfx.win() : sfx.time();
 }
 
 function stats() { return store.get('stats', {}); }

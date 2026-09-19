@@ -891,3 +891,72 @@ body.fitted .platefield__eu{flex-basis:32px}
 .modal[hidden]{display:none}
 .medal--off .medal__ring{filter:saturate(.3) brightness(.62)}
 .medal--off .medal__dome{opacity:.5}
+
+/* ───────── médailles : version bouclier ─────────
+   Un blason (pointe en bas, épaules arrondies) au lieu du disque. Le cadre
+   métallique et le cœur coloré sont deux couches de même forme, l'une réduite. */
+.medal{--shield:polygon(12% 4%,88% 4%,95% 9%,97% 20%,97% 50%,94% 63%,87% 75%,76% 86%,63% 94%,50% 98%,37% 94%,24% 86%,13% 75%,6% 63%,3% 50%,3% 20%,5% 9%);
+  filter:drop-shadow(0 calc(var(--size) * .08) calc(var(--size) * .16) rgba(0,0,0,.65))}
+.medal__slice,.medal__face{border-radius:0;clip-path:var(--shield)}
+.medal__slice{background:linear-gradient(180deg,var(--m2),var(--m3))}
+.medal__face--front{background:none;box-shadow:none;overflow:visible}
+.medal__rim{position:absolute;inset:0;clip-path:var(--shield);
+  background:
+    radial-gradient(circle at 30% 20%,rgba(255,255,255,.7) 0%,rgba(255,255,255,0) 28%),
+    conic-gradient(from 200deg,var(--m1) 0deg,var(--m2) 35deg,var(--m3) 80deg,var(--m1) 130deg,var(--m2) 190deg,var(--m3) 240deg,var(--m1) 300deg,var(--m2) 340deg,var(--m1) 360deg)}
+.medal__rivets{position:absolute;inset:0;clip-path:var(--shield);
+  background:
+    radial-gradient(circle at 15% 12%,#fff 0 .9%,rgba(0,0,0,.6) 1.4%,transparent 3.2%),
+    radial-gradient(circle at 85% 12%,#fff 0 .9%,rgba(0,0,0,.6) 1.4%,transparent 3.2%),
+    radial-gradient(circle at 9% 45%,#fff 0 .9%,rgba(0,0,0,.6) 1.4%,transparent 3.2%),
+    radial-gradient(circle at 91% 45%,#fff 0 .9%,rgba(0,0,0,.6) 1.4%,transparent 3.2%),
+    radial-gradient(circle at 30% 82%,#fff 0 .9%,rgba(0,0,0,.6) 1.4%,transparent 3.2%),
+    radial-gradient(circle at 70% 82%,#fff 0 .9%,rgba(0,0,0,.6) 1.4%,transparent 3.2%);
+  background-size:calc(var(--size) * 1.1) calc(var(--size) * 1.1);background-position:center}
+.medal__inner{position:absolute;inset:0;clip-path:var(--shield);transform:scale(.78);transform-origin:50% 50%;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 40%),
+    radial-gradient(circle at 50% 110%,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 55%),
+    linear-gradient(160deg,color-mix(in srgb,var(--tint) 75%,#fff) 0%,var(--tint) 45%,color-mix(in srgb,var(--tint) 55%,#000) 100%)}
+.medal__dome{inset:0;border-radius:0;clip-path:var(--shield);transform:scale(.78);
+  background:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 38%)}
+.medal__icon{inset:30% 30% 34%}
+.medal__icon--shadow{transform:translateY(calc(var(--size) * .022));opacity:.55;filter:blur(.6px)}
+.medal__glint{inset:0;clip-path:var(--shield)}
+.medal__spark{position:absolute;width:calc(var(--size) * .1);height:calc(var(--size) * .1);pointer-events:none;
+  background:radial-gradient(circle,#fff 0 20%,rgba(255,255,255,0) 60%),
+             conic-gradient(from 0deg,transparent 0 40deg,#fff 45deg,transparent 50deg 130deg,#fff 135deg,transparent 140deg 220deg,#fff 225deg,transparent 230deg 310deg,#fff 315deg,transparent 320deg);
+  animation:spark 2.6s ease-in-out infinite;opacity:0;filter:drop-shadow(0 0 4px #fff)}
+.medal__spark.s1{left:8%;top:6%;animation-delay:0s}
+.medal__spark.s2{right:6%;top:26%;animation-delay:.7s}
+.medal__spark.s3{left:14%;top:64%;animation-delay:1.3s}
+.medal__spark.s4{right:22%;top:80%;animation-delay:1.9s}
+@keyframes spark{0%,70%,100%{opacity:0;transform:scale(.3) rotate(0)}80%{opacity:1;transform:scale(1.2) rotate(40deg)}90%{opacity:.6;transform:scale(.8) rotate(80deg)}}
+.medal__face--back{background:linear-gradient(180deg,var(--m2),var(--m3));box-shadow:none}
+.medal__face--back::before{content:"";position:absolute;inset:0;clip-path:var(--shield);transform:scale(.8);background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.45))}
+.medal__face--back span,.medal__face--back b{position:relative}
+.medal--off .medal__inner{filter:saturate(.25) brightness(.55)}
+.medal--off .medal__rivets{opacity:.4}
+
+/* la scène de la médaille en grand : rayons tournants et halo de sa couleur */
+.medal-stage{position:relative;overflow:hidden;border-radius:16px;margin:-6px -8px 14px;padding:26px 0 30px;isolation:isolate}
+.medal-stage::before{content:"";position:absolute;inset:-60%;z-index:-1;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.09) 0deg 6deg,transparent 6deg 18deg);
+  animation:rays 22s linear infinite}
+.medal-stage::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(circle at 50% 55%,color-mix(in srgb,var(--tint,#ffcf3f) 45%,transparent) 0%,transparent 60%)}
+.medal-stage--off::before,.medal-stage--off::after{opacity:.25}
+@keyframes rays{to{transform:rotate(360deg)}}
+.modal__card h3{background:linear-gradient(180deg,#fff 30%,#ffd76a);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* dos gravé lisible, rotation théâtrale */
+.medal__face--back span{color:rgba(255,255,255,.55);text-shadow:0 -1px 0 rgba(0,0,0,.6);letter-spacing:.28em}
+.medal__face--back b{color:rgba(255,255,255,.85);text-shadow:0 -1px 0 rgba(0,0,0,.7),0 0 12px rgba(255,255,255,.25)}
+.medal__face--back::after{content:"";position:absolute;inset:0;clip-path:var(--shield);transform:scale(.62);
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 2px,transparent 2px 6px);opacity:.7}
+@keyframes medalSpin{
+  0%  {transform:rotateX(10deg) rotateY(-28deg)}
+  30% {transform:rotateX(10deg) rotateY(28deg)}
+  55% {transform:rotateX(10deg) rotateY(-28deg)}
+  100%{transform:rotateX(10deg) rotateY(332deg)}
+}
+.medal--spin .medal__body{animation-duration:5.5s;animation-timing-function:ease-in-out}
