@@ -227,8 +227,19 @@ function submit(e) {
   if (R.combo >= MULT_MAX && !wasMax && !inFever() && R.feverArmed) { R.feverArmed = false; startFever(); }
   renderHud();
 }
+/* l'explosion est dessinée à l'échelle de l'écran, au point projeté de la voiture,
+   sinon elle rétrécit avec elle et devient invisible à distance */
 function explodeCar(c) {
-  P.explode(c.el.querySelector('.car__fx'), $('pu-road'));
+  var p = project(c.lane, c.z);
+  var fx = document.createElement('div');
+  fx.className = 'pfx';
+  var s = Math.max(0.55, Math.min(1.1, 1 / c.z + 0.25));
+  fx.style.left = (p.x / 100 * R.sceneW) + 'px';
+  fx.style.top = (p.y / 100 * R.sceneH) + 'px';
+  fx.style.transform = 'translate(-50%,-60%) scale(' + s.toFixed(2) + ')';
+  $('pu-cars').appendChild(fx);
+  P.explode(fx, $('pu-road'));
+  setTimeout(function () { fx.remove(); }, 1500);
   removeCar(c, 'pcar--boom');
 }
 function chain(tank) {
@@ -251,8 +262,7 @@ function crash(c) {
   R.hits++;
   R.combo = 1; R.feverArmed = true;
   P.track.miss({ p1: c.p1.p, p2: c.p2.p, got1: c.got1, got2: c.got2 });
-  P.explode(c.el.querySelector('.car__fx'), $('pu-road'));
-  removeCar(c, 'pcar--boom');
+  explodeCar(c);
   if (Date.now() < R.invulnUntil) return;
   R.lives--;
   R.invulnUntil = Date.now() + 2000;

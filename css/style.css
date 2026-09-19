@@ -822,3 +822,8 @@ body.fitted .platefield__eu{flex-basis:32px}
 @keyframes dashHit{20%{box-shadow:0 -10px 30px rgba(255,60,40,.9),inset 0 4px 0 #ff5a3c}}
 .cockpit--blink .cockpit__dash{box-shadow:0 -10px 30px rgba(0,0,0,.7),inset 0 4px 0 #ff9a3c}
 @media (max-width:700px){.cockpit{height:26%}.wheel{width:62%;bottom:-40%}.gauge{width:26%;left:4%}}
+
+.pfx{position:absolute;width:1px;height:1px;z-index:1150;pointer-events:none;overflow:visible}
+.pfx .flash,.pfx .ring,.pfx .frag,.pfx .smoke{left:0;top:0}
+.pfx .smoke{bottom:auto;top:-10px}
+.pcar--boom{filter:brightness(4)}
