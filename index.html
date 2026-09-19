@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Plaque — le jeu des mots d'immatriculation</title>
-<link rel="stylesheet" href="css/style.css?v=59">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css?v=61">
 </head>
 <body>
 
@@ -16,8 +19,18 @@
 
   <!-- ══════════ ACCUEIL ══════════ -->
   <section id="screen-home" class="screen active">
-    <h1 class="logo">PLAQUE</h1>
-    <p class="tagline">Le jeu de mots des plaques d'immatriculation</p>
+    <div class="hero">
+      <div class="hero__road" aria-hidden="true">
+        <div class="road__sky"></div><div class="road__sun"></div><div class="road__ground"></div>
+        <div class="road__tarmac"></div>
+        <div class="road__edge road__edge--l"></div><div class="road__edge road__edge--r"></div>
+        <div class="road__posts">
+          <i class="post post--l" style="animation-delay:0s"></i><i class="post post--l" style="animation-delay:-.33s"></i><i class="post post--l" style="animation-delay:-.66s"></i><i class="post post--l" style="animation-delay:-.99s"></i>
+          <i class="post post--r" style="animation-delay:-.15s"></i><i class="post post--r" style="animation-delay:-.48s"></i><i class="post post--r" style="animation-delay:-.81s"></i><i class="post post--r" style="animation-delay:-1.14s"></i>
+        </div>
+      </div>
+      <h1 class="logo">PLAQUE</h1>
+      <p class="tagline">Le jeu de mots des plaques d'immatriculation</p>
 
     <div class="plate plate--demo" aria-hidden="true">
       <div class="plate__eu"><div class="plate__stars">★★★<br>★&nbsp;&nbsp;★<br>★★★</div><div class="plate__f">F</div></div>
@@ -32,13 +45,16 @@
 
     <p class="ruleline">Les deux lettres d'une paire, <b>dans l'ordre</b>, où que ce soit dans le mot :
       <em><b>P</b>o<b>L</b>ogne</em> · <em><b>M</b>a<b>T</b>raque</em></p>
+    </div>
 
     <div class="modes" id="opt-mode" role="radiogroup" aria-label="Mode de jeu">
-      <button data-v="trafic" class="on" role="radio">
-        <b>Trafic</b><em>au volant — trois voies, deux mots par voiture, 2 minutes</em>
+      <button data-v="trafic" class="on modecard modecard--trafic" role="radio">
+        <img src="assets/cars/coupe-rouge.webp" alt="">
+        <span><b>Trafic</b><em>au volant — trois voies, deux mots par voiture, 2 minutes</em></span>
       </button>
-      <button data-v="parking" role="radio">
-        <b>Parking</b><em>neuf places, les voitures se relaient — alignez les couleurs</em>
+      <button data-v="parking" class="modecard modecard--parking" role="radio">
+        <img src="assets/cars/van-bleu.webp" alt="">
+        <span><b>Parking</b><em>neuf places, les voitures se relaient — alignez les couleurs</em></span>
       </button>
     </div>
 
@@ -130,7 +146,8 @@
     <div class="lot" id="pk-lot"></div>
     <div class="tr-pairs pk-tokens" id="pk-tokens"></div>
 
-    <form id="pk-form" autocomplete="off">
+    <form id="pk-form" class="platefield" autocomplete="off">
+      <span class="platefield__eu">F</span>
       <input id="pk-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
              autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot…" aria-label="Votre mot" enterkeyhint="go">
     </form>
@@ -187,7 +204,8 @@
 
     <div class="tr-pairs" id="tr-pairs"></div>
 
-    <form id="tr-form" autocomplete="off">
+    <form id="tr-form" class="platefield" autocomplete="off">
+      <span class="platefield__eu">F</span>
       <input id="tr-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
              autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot…" aria-label="Votre mot" enterkeyhint="go">
     </form>
@@ -197,11 +215,11 @@
 
 </div>
 
-<script src="js/pairs.js?v=59"></script>
-<script src="js/departements.js?v=59"></script>
-<script src="js/dict.js?v=59"></script>
-<script src="js/game.js?v=59"></script>
-<script src="js/traffic.js?v=59"></script>
-<script src="js/parking.js?v=59"></script>
+<script src="js/pairs.js?v=61"></script>
+<script src="js/departements.js?v=61"></script>
+<script src="js/dict.js?v=61"></script>
+<script src="js/game.js?v=61"></script>
+<script src="js/traffic.js?v=61"></script>
+<script src="js/parking.js?v=61"></script>
 </body>
 </html>

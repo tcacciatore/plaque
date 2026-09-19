@@ -670,3 +670,100 @@ body.fitted .guide{bottom:auto;top:60px}
 @keyframes pulseBtn{50%{box-shadow:0 0 0 6px rgba(255,207,63,.18)}}
 .tok--on{animation:tokIn .35s cubic-bezier(.2,.8,.3,1.3)}
 @keyframes tokIn{from{transform:scale(.7)}to{transform:none}}
+
+/* ═══════════════════════════════════════════════════════════
+   Identité visuelle : la route au couchant
+   Bleu nuit, chaleur orangée en haut, jaune plaque en accent,
+   bleu autoroute en secondaire, typographie condensée façon signalétique.
+   ═══════════════════════════════════════════════════════════ */
+:root{
+  --bg:#080c14;--bg2:#121826;--bg3:#1a2233;--line:#26304a;
+  --txt:#eef2f8;--dim:#8f9bb3;--accent:#ffcf3f;--ok:#3ddc84;--ko:#ff6b6b;
+  --hot:#ff8a3c;--blue:#1e5fd8;
+  --font:"Barlow",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+}
+body{
+  font-family:var(--font);
+  background:
+    radial-gradient(120% 60% at 50% -12%,rgba(255,138,60,.22) 0%,rgba(255,138,60,0) 60%),
+    radial-gradient(90% 50% at 50% 0%,#1b2a44 0%,var(--bg) 70%) fixed;
+}
+h1,h2,h3,.hud__v,.stat__v,.final-score,.tok,.plate__body,.rank__head b,.career__rank b,.badge b,.modes b{font-family:var(--cond)}
+h2{font-size:26px!important;letter-spacing:.04em;text-transform:uppercase}
+.hud__v{font-size:22px;letter-spacing:.02em}
+.hud__k{font-family:var(--font)}
+.stat__v{font-size:24px}
+.tok{font-size:18px;letter-spacing:.14em}
+.final-score{font-size:76px;letter-spacing:.02em}
+
+/* ── accueil : la route en fond ── */
+.hero{position:relative;margin:-16px -16px 14px;padding:26px 16px 10px;overflow:hidden;border-radius:0 0 26px 26px}
+.hero__road{position:absolute;inset:0;--roadH:100%;opacity:.55;pointer-events:none;
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,.9) 55%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,.9) 55%,transparent 100%)}
+.hero__road .road__sky{inset:0 0 52% 0}
+.hero__road .road__sun{top:22%;width:120px;height:120px;margin-left:-60px}
+.hero__road .post{width:6px;height:36px}
+.hero .logo,.hero .tagline,.hero .plate,.hero .ruleline{position:relative}
+.logo{
+  font-family:var(--cond);font-weight:800;font-size:clamp(56px,15vw,96px);letter-spacing:.12em;line-height:1;
+  background:linear-gradient(180deg,#fff 30%,#ffd76a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 4px 18px rgba(0,0,0,.55));
+}
+.tagline{font-size:15px;color:#c8d0e0;margin-top:2px;text-shadow:0 2px 10px rgba(0,0,0,.7)}
+.hero .plate--demo{margin:18px auto 14px;box-shadow:0 18px 40px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.35)}
+.hero .ruleline{color:#d7dde9;margin-bottom:4px}
+.hero .ruleline b{color:#fff}
+
+/* ── cartes de mode illustrées ── */
+.modes{grid-template-columns:1fr 1fr;gap:10px}
+.modecard{display:flex!important;flex-direction:column;align-items:flex-start;gap:6px;padding:12px 14px 14px!important;
+  min-height:150px;position:relative;overflow:hidden;border-radius:16px!important}
+.modecard img{width:58%;height:auto;align-self:flex-end;margin:-4px -6px 0 0;filter:drop-shadow(0 8px 12px rgba(0,0,0,.6));transition:transform .25s}
+.modecard:hover img{transform:translateY(-3px) scale(1.03)}
+.modecard span{display:block}
+.modecard b{font-size:22px!important;letter-spacing:.04em;text-transform:uppercase}
+.modecard em{font-size:12px!important;line-height:1.35}
+.modecard--trafic{background:linear-gradient(160deg,#2a1d1a,#141826)!important}
+.modecard--parking{background:linear-gradient(160deg,#16213a,#121826)!important}
+.modecard.on{border-color:var(--accent)!important;box-shadow:0 0 0 1px var(--accent),0 12px 30px rgba(0,0,0,.45)}
+.modecard.on b{color:var(--accent)}
+@media (max-width:420px){.modes{grid-template-columns:1fr}.modecard{flex-direction:row;align-items:center;min-height:0}.modecard img{width:34%;margin:0;order:2}.modecard span{flex:1}}
+
+/* ── cartes, boutons, jauges ── */
+.rank,.missions,.stat,.recap,.lot,.collec__reg,.badge,.career__rank{box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.btn--big{font-family:var(--cond);font-size:24px;letter-spacing:.06em;text-transform:uppercase;padding:15px;border-radius:14px;
+  background:linear-gradient(180deg,#ffd86a,#ffc21f);box-shadow:0 10px 26px rgba(255,194,31,.28)}
+.btn--share{background:var(--bg3);box-shadow:none;text-transform:none;font-family:var(--font);font-size:16px;letter-spacing:0}
+.segmented button.on{background:linear-gradient(180deg,#ffd86a,#ffc21f)}
+.rank__fill,.collec__fill{background:linear-gradient(90deg,var(--hot),var(--accent))}
+.hud__item{background:linear-gradient(180deg,#151c2c,#111725)}
+
+/* ── le champ de saisie est une plaque vierge ── */
+.platefield{display:flex;align-items:stretch;background:linear-gradient(180deg,#fff,#e9edf2);border:3px solid #0b0d10;border-radius:9px;
+  overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.3);transition:.15s}
+.platefield:focus-within{box-shadow:0 0 0 3px rgba(255,207,63,.45),0 8px 24px rgba(0,0,0,.5)}
+.platefield__eu{flex:0 0 40px;background:var(--plate-blue);color:#fff;display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:6px;font-family:var(--cond);font-weight:800;font-size:16px}
+.platefield input,#tr-input,#pk-input{
+  flex:1;background:transparent;border:0;border-radius:0;color:#111;font-family:var(--cond);font-weight:800;
+  font-size:30px;letter-spacing:.06em;padding:8px 14px;outline:none;text-transform:uppercase;box-shadow:none;
+}
+.platefield input::placeholder{color:#9aa3b0;font-weight:600;letter-spacing:.02em;text-transform:none}
+.platefield input:focus{box-shadow:none;border:0}
+body.fitted .platefield input{font-size:24px;padding:6px 12px}
+body.fitted .platefield__eu{flex-basis:32px}
+
+/* ── entrée en cascade des blocs de l'accueil ── */
+#screen-home.active > *{animation:cascade .5s ease both}
+#screen-home.active > *:nth-child(2){animation-delay:.05s}
+#screen-home.active > *:nth-child(3){animation-delay:.1s}
+#screen-home.active > *:nth-child(4){animation-delay:.15s}
+#screen-home.active > *:nth-child(5){animation-delay:.2s}
+#screen-home.active > *:nth-child(6){animation-delay:.25s}
+#screen-home.active > *:nth-child(7){animation-delay:.3s}
+@keyframes cascade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.modecard img{height:104px;width:auto;max-width:62%;object-fit:contain}
+.modecard{justify-content:space-between}
+.rank__foot i{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%}
