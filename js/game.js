@@ -229,22 +229,51 @@ function adapt(delta) {
 
 /* ═══════════ badges ═══════════ */
 var BADGES = [
-  { id: 'lettre',   name: 'Lettré',        txt: '50 mots rares',            stat: 'rare',    goal: 50 },
-  { id: 'erudit',   name: 'Érudit',        txt: '200 mots rares',           stat: 'rare',    goal: 200 },
-  { id: 'expert',   name: 'Académicien',   txt: '20 mots d\'expert',        stat: 'expert',  goal: 20 },
-  { id: 'pyro',     name: 'Pyromane',      txt: '100 plaques lues',         stat: 'plates',  goal: 100 },
-  { id: 'incendie', name: 'Incendiaire',   txt: '500 plaques lues',         stat: 'plates',  goal: 500 },
-  { id: 'demineur', name: 'Démineur',      txt: '10 camions-citernes',      stat: 'tank',    goal: 10 },
-  { id: 'orfevre',  name: 'Orfèvre',       txt: '5 voitures dorées',        stat: 'gold',    goal: 5 },
-  { id: 'aligneur', name: 'Aligneur',      txt: '25 alignements de couleur', stat: 'lines',  goal: 25 },
-  { id: 'fievre',   name: 'Fiévreux',      txt: '10 fièvres déclenchées',   stat: 'fever',   goal: 10 },
-  { id: 'marathon', name: 'Marathonien',   txt: '30 parties',               stat: 'games',   goal: 30 },
-  { id: 'forcene',  name: 'Forcené',       txt: '100 parties',              stat: 'games',   goal: 100 },
-  { id: 'carto',    name: 'Cartographe',   txt: '50 départements',          stat: 'deps',    goal: 50 },
-  { id: 'tour',     name: 'Tour de France', txt: 'les 101 départements',    stat: 'deps',    goal: 101 },
-  { id: 'assidu',   name: 'Assidu',        txt: '7 jours d\'affilée',       stat: 'streak',  goal: 7 },
-  { id: 'fidele',   name: 'Fidèle',        txt: '30 jours d\'affilée',      stat: 'streak',  goal: 30 }
+  { id: 'lettre',   name: 'Lettré',         txt: '50 mots rares',             stat: 'rare',   goal: 50,  icon: 'book',    metal: 'bronze' },
+  { id: 'erudit',   name: 'Érudit',         txt: '200 mots rares',            stat: 'rare',   goal: 200, icon: 'book',    metal: 'or' },
+  { id: 'expert',   name: 'Académicien',    txt: '20 mots d\'expert',         stat: 'expert', goal: 20,  icon: 'cap',     metal: 'argent' },
+  { id: 'pyro',     name: 'Pyromane',       txt: '100 plaques lues',          stat: 'plates', goal: 100, icon: 'flame',   metal: 'bronze' },
+  { id: 'incendie', name: 'Incendiaire',    txt: '500 plaques lues',          stat: 'plates', goal: 500, icon: 'flame',   metal: 'or' },
+  { id: 'demineur', name: 'Démineur',       txt: '10 camions-citernes',       stat: 'tank',   goal: 10,  icon: 'barrel',  metal: 'argent' },
+  { id: 'orfevre',  name: 'Orfèvre',        txt: '5 voitures dorées',         stat: 'gold',   goal: 5,   icon: 'gem',     metal: 'or' },
+  { id: 'aligneur', name: 'Aligneur',       txt: '25 alignements de couleur', stat: 'lines',  goal: 25,  icon: 'align',   metal: 'argent' },
+  { id: 'fievre',   name: 'Fiévreux',       txt: '10 fièvres déclenchées',    stat: 'fever',  goal: 10,  icon: 'thermo',  metal: 'bronze' },
+  { id: 'marathon', name: 'Marathonien',    txt: '30 parties',                stat: 'games',  goal: 30,  icon: 'clock',   metal: 'bronze' },
+  { id: 'forcene',  name: 'Forcené',        txt: '100 parties',               stat: 'games',  goal: 100, icon: 'clock',   metal: 'or' },
+  { id: 'carto',    name: 'Cartographe',    txt: '50 départements',           stat: 'deps',   goal: 50,  icon: 'map',     metal: 'argent' },
+  { id: 'tour',     name: 'Tour de France', txt: 'les 101 départements',      stat: 'deps',   goal: 101, icon: 'trophy',  metal: 'or' },
+  { id: 'assidu',   name: 'Assidu',         txt: '7 jours d\'affilée',        stat: 'streak', goal: 7,   icon: 'calendar', metal: 'bronze' },
+  { id: 'fidele',   name: 'Fidèle',         txt: '30 jours d\'affilée',       stat: 'streak', goal: 30,  icon: 'calendar', metal: 'or' }
 ];
+/* pictogrammes en trait, 24×24 */
+var ICONS = {
+  book:     '<path d="M3 5h6a3 3 0 0 1 3 2 3 3 0 0 1 3-2h6v13h-6a3 3 0 0 0-3 2 3 3 0 0 0-3-2H3zM12 7v13"/>',
+  cap:      '<path d="M2 9l10-5 10 5-10 5zM6 11v4c0 2 3 4 6 4s6-2 6-4v-4M22 9v6"/>',
+  flame:    '<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3-1-3-1-6 1-9z"/>',
+  barrel:   '<path d="M6 4h12v16H6zM6 9h12M6 15h12M9 4v16M15 4v16"/>',
+  gem:      '<path d="M7 3h10l4 6-9 12-9-12zM3 9h18M9 9l3 12M15 9l-3 12"/>',
+  align:    '<path d="M3 8h5v8H3zM9.5 8h5v8h-5zM16 8h5v8h-5z"/>',
+  thermo:   '<path d="M10 4a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0zM12 8v7"/>',
+  clock:    '<circle cx="12" cy="13" r="8"/><path d="M12 8v5l3 2M9 3h6"/>',
+  map:      '<path d="M12 2l8 5v10l-8 5-8-5V7zM12 7l4 2.5v5L12 17l-4-2.5v-5z"/>',
+  trophy:   '<path d="M7 4h10v5a5 5 0 0 1-10 0zM5 5H3v2a4 4 0 0 0 4 3M19 5h2v2a4 4 0 0 1-4 3M9 21h6M12 14v7"/>',
+  calendar: '<path d="M4 6h16v14H4zM4 11h16M8 3v5M16 3v5M8 15h2M12 15h2"/>'
+};
+function badgeSVG(b, ok, size) {
+  var s = size || 56, metal = ok ? b.metal : 'off', gid = 'ins-' + metal + '-' + b.id + '-' + s;
+  return '<svg class="insigne insigne--' + metal + '" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" aria-hidden="true">' +
+    '<defs><radialGradient id="' + gid + '" cx=".35" cy=".3">' +
+      { bronze: '<stop offset="0" stop-color="#f3c08a"/><stop offset=".55" stop-color="#c0722f"/><stop offset="1" stop-color="#6e3d18"/>',
+        argent: '<stop offset="0" stop-color="#f4f7fb"/><stop offset=".55" stop-color="#a9b4c4"/><stop offset="1" stop-color="#5f6b7d"/>',
+        or:     '<stop offset="0" stop-color="#fff0b0"/><stop offset=".55" stop-color="#e2ae2a"/><stop offset="1" stop-color="#8a5f0e"/>',
+        off:    '<stop offset="0" stop-color="#3a4256"/><stop offset="1" stop-color="#1c2230"/>' }[metal] +
+    '</radialGradient></defs>' +
+    '<path d="M32 3l9 5h10v11l5 8-5 8v11H41l-9 6-9-6H13V35l-5-8 5-8V8h10z" fill="url(#' + gid + ')" stroke="rgba(0,0,0,.45)" stroke-width="1.5"/>' +
+    '<path d="M32 9l6 3.5h7v8l3.5 6.5L45 33.5v8h-7L32 45l-6-3.5h-7v-8L15.5 27 19 20.5v-8h7z" fill="none" stroke="rgba(255,255,255,' + (ok ? '.35' : '.08') + ')" stroke-width="1.2"/>' +
+    '<g transform="translate(20 20) scale(1)" fill="none" stroke="' + (ok ? '#fff' : '#6b7690') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[b.icon] + '</g>' +
+    '</svg>';
+}
+
 function stats() { return store.get('stats', {}); }
 function bumpStat(key, n, absolute) {
   var s = stats();
@@ -256,7 +285,7 @@ function bumpStat(key, n, absolute) {
     got[b.id] = dayNum();
     store.set('badges', got);
     session.badges.push(b);
-    toast('🏅 Badge <b>' + b.name + '</b> — ' + b.txt);
+    toast(badgeSVG(b, true, 30) + ' Badge <b>' + b.name + '</b> — ' + b.txt);
     sfx.win();
   });
 }
@@ -527,7 +556,7 @@ function endGame() {
                              (s.newRank.unlock ? ' — teinte <b>' + s.newRank.unlock + '</b> débloquée' : ''));
   html += row('🔥 Série de jours', st.n + ' jour' + (st.n > 1 ? 's' : '') +
               (bonus ? ' — carrière <b>+' + Math.round(bonus * 100) + ' %</b> : ' + gained + ' pts' : ''));
-  session.badges.forEach(function (b) { html += row('🏅 Badge', '<b>' + b.name + '</b> — ' + b.txt); });
+  session.badges.forEach(function (b) { html += row('Badge', badgeSVG(b, true, 34) + ' <b>' + b.name + '</b> — ' + b.txt); });
   html += missedHtml();
   $('end-recap').innerHTML = html + row('Total', state.total + ' pts', false, true);
   $('btn-share').textContent = 'Copier mon résultat';
@@ -593,8 +622,10 @@ function renderBadges() {
   $('badges-intro').innerHTML = '<b>' + Object.keys(got).length + '</b> badge' + (Object.keys(got).length > 1 ? 's' : '') + ' sur ' + BADGES.length;
   $('badges-list').innerHTML = BADGES.map(function (b) {
     var ok = !!got[b.id], v = Math.min(b.goal, s[b.stat] || 0);
-    return '<div class="badge' + (ok ? ' badge--on' : '') + '"><b>' + b.name + '</b><span>' + b.txt + '</span>' +
-           '<i>' + (ok ? '✓' : v + ' / ' + b.goal) + '</i></div>';
+    return '<div class="badge' + (ok ? ' badge--on' : '') + '">' + badgeSVG(b, ok) +
+           '<div class="badge__txt"><b>' + b.name + '</b><span>' + b.txt + '</span>' +
+           '<i>' + (ok ? '✓ obtenu' : v + ' / ' + b.goal) + '</i>' +
+           (ok ? '' : '<u style="width:' + Math.round(v / b.goal * 100) + '%"></u>') + '</div></div>';
   }).join('');
   screen('screen-badges');
 }
@@ -734,7 +765,10 @@ function refreshHome() {
   var s = streak(), alive = streakAlive(s);
   $('stat-streak').textContent = alive ? s.n : 0;
   $('stat-streak-k').textContent = !alive ? 'Jours d\'affilée' : s.last === dayNum() ? 'Jours d\'affilée ✓' : 'Jours — jouez aujourd\'hui';
-  $('stat-badges').textContent = Object.keys(store.get('badges', {})).length + '/' + BADGES.length;
+  var gotB = store.get('badges', {});
+  $('stat-badges').textContent = Object.keys(gotB).length + '/' + BADGES.length;
+  var recent = BADGES.filter(function (b) { return gotB[b.id]; }).sort(function (a, b) { return gotB[b.id] - gotB[a.id]; }).slice(0, 4);
+  $('stat-badges-row').innerHTML = recent.length ? recent.map(function (b) { return badgeSVG(b, true, 22); }).join('') : '';
   var pts = career(), r = rankOf(pts), rk = RANKS[r], next = RANKS[r + 1];
   $('stat-rank').textContent = rk.name;
   $('rank-img').src = rankSprite(rk);

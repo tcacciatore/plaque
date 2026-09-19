@@ -827,3 +827,15 @@ body.fitted .platefield__eu{flex-basis:32px}
 .pfx .flash,.pfx .ring,.pfx .frag,.pfx .smoke{left:0;top:0}
 .pfx .smoke{bottom:auto;top:-10px}
 .pcar--boom{filter:brightness(4)}
+
+/* ───────── insignes des badges ───────── */
+.badge{display:flex;align-items:center;gap:12px}
+.badge__txt{flex:1;min-width:0;position:relative}
+.badge__txt u{display:block;height:3px;background:var(--hot);border-radius:99px;margin-top:5px;text-decoration:none}
+.insigne{flex:0 0 auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))}
+.insigne--or{filter:drop-shadow(0 0 10px rgba(255,200,60,.55))}
+.insigne--argent{filter:drop-shadow(0 0 8px rgba(200,210,225,.45))}
+.insigne--bronze{filter:drop-shadow(0 0 8px rgba(205,127,50,.45))}
+.insigne--off{opacity:.7}
+.toast .insigne,.recap__row .insigne{vertical-align:middle;margin-right:4px}
+.stat__row{display:flex;justify-content:center;gap:2px;margin-top:4px;min-height:22px}
