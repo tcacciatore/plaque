@@ -559,7 +559,7 @@ function segmented(id, key, after) {
 /* ═══════════ saisie sans bouton : le mot se valide tout seul ═══════════
    Une courte pause de frappe suffit quand ce qui est tapé est un mot du
    dictionnaire qui va sur une plaque ; Entrée ou l'espace valident sur-le-champ. */
-var AUTO_MS = 380;
+var AUTO_MS = 900;      // la pause avant qu'un mot tapé se valide : le temps de finir « gagnant » après « gag »
 function autoSubmit(input, form, canAccept) {
   var timer = null;
   var fire = function () { clearTimeout(timer); timer = null; form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); };

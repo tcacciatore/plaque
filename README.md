@@ -19,11 +19,11 @@ fois lue. Le **numéro de département** rejoint votre collection à chaque plaq
 
 | Mode | Boucle |
 |---|---|
-| **Trafic** | Au volant sur trois voies (deux sur un écran de moins de 560 px, pour garder les plaques lisibles) : chaque voie a sa voiture, qui arrive à son heure (3,5 s d'écart au minimum) et reste 16 s devant vous ; les trois modèles sont toujours différents. Deux mots par voiture, un par paire. Une plaque lue fait **exploser** la voiture ; une plaque ratée la laisse filer, et la voie se réalimente après 3,5 à 5 s. La partie dure 2 minutes, mais chaque mot rallonge la partie de 1 s et la voiture visée de 2 s, et une plaque lue ajoute 3 s de plus (plafond 2 min 30). |
-| **Parking** | Neuf places sur trois rangées, tous les modèles présents, trois couleurs par parking. Les deux mots d'une plaque et la voiture explose ; une autre vient se garer. Chaque place garde la couleur de la dernière voiture pulvérisée : trois places alignées de même couleur (ligne, colonne, diagonale) rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge de 1 s (+3 s par plaque lue et par alignement, plafond 2 min 30). |
+| **Trafic** | Au volant sur trois voies (deux sur un écran de moins de 560 px, pour garder les plaques lisibles) : chaque voie a sa voiture, qui arrive à son heure (3,5 s d'écart au minimum) et reste 14 s devant vous ; les trois modèles sont toujours différents. Deux mots par voiture, un par paire. Une plaque lue fait **exploser** la voiture ; une plaque ratée la laisse filer, et la voie se réalimente après 3,5 à 5 s. La partie dure 2 minutes, mais chaque mot rallonge la partie de 1 s et la voiture visée de 2 s, et une plaque lue ajoute 2 s de plus (plafond 2 min 15). |
+| **Parking** | Neuf places sur trois rangées, tous les modèles présents, trois couleurs par parking. Les deux mots d'une plaque et la voiture explose ; une autre vient se garer. Chaque place garde la couleur de la dernière voiture pulvérisée : trois places alignées de même couleur (ligne, colonne, diagonale) rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge de 1 s (+2 s par plaque lue et par alignement, plafond 2 min 15). |
 
-La saisie n'a pas de bouton : un mot se valide tout seul après une courte pause de
-frappe dès qu'il est dans le dictionnaire et va sur une plaque (Entrée ou espace
+La saisie n'a pas de bouton : un mot se valide tout seul après une pause de frappe
+d'une seconde dès qu'il est dans le dictionnaire et va sur une plaque (Entrée ou espace
 valident immédiatement). Sur téléphone, la page se cale sur la hauteur visible,
 clavier ouvert compris, et la scène se redimensionne pour que tout reste à l'écran.
 
@@ -50,7 +50,7 @@ n'est jamais tirée deux fois dans la même partie.
 | **fièvre** | à ×5, dix secondes pendant lesquelles un seul mot suffit à lire une plaque ; puis la série redescend à ×3 |
 | **rush** | les vingt dernières secondes, tout compte double, le ciel vire au rouge |
 
-En Trafic, les voitures restent 16 s au départ et 10 s en fin de partie (la rampe), et les
+En Trafic, les voitures restent 14 s au départ et 9 s en fin de partie (la rampe), et les
 coupés se multiplient passé la première minute. La première voiture (Trafic) et la première
 rangée (Parking) ont toujours des paires accessibles.
 
