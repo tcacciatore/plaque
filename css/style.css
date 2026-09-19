@@ -767,3 +767,39 @@ body.fitted .platefield__eu{flex-basis:32px}
 .modecard img{height:104px;width:auto;max-width:62%;object-fit:contain}
 .modecard{justify-content:space-between}
 .rank__foot i{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%}
+
+/* ───────── mode Poursuite ───────── */
+.modes{grid-template-columns:1fr 1fr 1fr}
+@media (max-width:640px){.modes{grid-template-columns:1fr 1fr}.modecard--poursuite{grid-column:1 / -1;flex-direction:row;align-items:center;min-height:0}.modecard--poursuite img{width:32%;height:auto;margin:0;order:2}.modecard--poursuite span{flex:1}}
+@media (max-width:420px){.modes{grid-template-columns:1fr}}
+.modecard--poursuite{background:linear-gradient(160deg,#1f1a2c,#121826)!important}
+.road--pursuit .road__cars{overflow:hidden}
+.pcar{position:absolute;left:0;top:0;transform-origin:50% 100%;will-change:transform;pointer-events:auto}
+.pcar .car__ride{animation:cruise var(--ride,3.6s) ease-in-out infinite alternate}
+.pcar .car__body{animation:rumble .16s ease-in-out infinite alternate}
+.pplate{position:absolute;left:0;top:0;width:0;height:0;will-change:transform,opacity;transition:opacity .35s;pointer-events:auto;overflow:visible}
+.pplate .plate--pursuit{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:calc(var(--roadH) * .42);margin:0;border-width:2px;z-index:2;
+  box-shadow:0 2px 8px rgba(0,0,0,.7)}
+.pplate .plate__body{font-size:calc(var(--roadH) * .062);padding:2px 2px;gap:.08em}
+.pplate .plate__eu,.pplate .plate__dep{width:auto;min-width:13%;padding:2px 3px;justify-content:center}
+.pplate .plate__f,.pplate .plate__depnum{font-size:calc(var(--roadH) * .026);white-space:nowrap}
+.pplate.car--target .plate--car{box-shadow:0 2px 8px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
+.pcar--threat.pcar--near .car__body{filter:drop-shadow(0 0 12px rgba(255,90,60,.85))}
+.pcar--boom .car__ride{animation:boom .6s cubic-bezier(.2,.75,.4,1) forwards}
+.pcar--boom .car__body{animation:none}
+.pcar--pass{transition:opacity .5s;opacity:0}
+.me{position:absolute;left:0;top:0;transform-origin:50% 100%;z-index:1200;pointer-events:none;will-change:transform;opacity:.96}
+.me .car__body{animation:rumble .14s ease-in-out infinite alternate;filter:drop-shadow(0 10px 14px rgba(0,0,0,.7))}
+.me--hit{animation:meHit .5s ease-out}
+@keyframes meHit{20%{filter:brightness(3)}40%{transform:translate(-50%,-100%) scale(1)}}
+.me--blink .car__body{animation:blink .25s steps(2) infinite}
+@keyframes blink{to{opacity:.35}}
+.hud__v--lives{letter-spacing:.06em;font-size:20px}
+.hud__v--lives i{font-style:normal;color:var(--line)}
+.tokgroup--threat{border-color:rgba(255,90,60,.55)}
+.tok__warn{font-style:normal;color:#ff5a3c;font-size:14px;align-self:center;margin-right:2px}
+.road--pursuit.rush .road__sky{background:linear-gradient(180deg,#2a0b10 0%,#6a1b1b 46%,#a8452a 84%,#d9782f 100%)}
+@media (max-width:700px){
+  .pplate .plate--pursuit{width:calc(var(--roadH) * .5)}
+  .pplate .plate__body{font-size:calc(var(--roadH) * .074)}
+}

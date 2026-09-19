@@ -8,8 +8,9 @@
 
 /* ─────────── réglages ─────────── */
 var MODES = {
-  trafic:  { label: 'Trafic',  traffic: true },
-  parking: { label: 'Parking', parking: true }
+  trafic:    { label: 'Trafic',    traffic: true },
+  parking:   { label: 'Parking',   parking: true },
+  poursuite: { label: 'Poursuite', pursuit: true }
 };
 // la difficulté règle la richesse des paires tirées : n = mots courants disponibles
 var DIFF = {
@@ -503,7 +504,7 @@ function endGame() {
   animateRank(beforePts, beforeRank, career());
   if (!store.get('tuto', false)) store.set('tuto', true);
 
-  $('end-title').textContent = m.parking ? 'Parking — fin de service' : 'Vous êtes arrivé';
+  $('end-title').textContent = m.parking ? 'Parking — fin de service' : m.pursuit ? 'Fin de course' : 'Vous êtes arrivé';
   $('end-score').textContent = '0'; $('end-score').dataset.val = '0';
   setTimeout(function () { tweenNumber($('end-score'), state.total, 1200); }, 250);
   if (isBest || rankOf(career()) > beforeRank) setTimeout(function () { confetti(isBest ? 90 : 60); }, 700);
@@ -603,7 +604,11 @@ function shareText() {
   var words = h.reduce(function (a, x) { return a + x.words; }, 0);
   var done = h.filter(function (x) { return x.reached; }).length;
   var lines = [], bars = '';
-  if (m.parking) {
+  if (m.pursuit) {
+    lines.push('🏁 PLAQUE — Poursuite  ·  ' + DIFF[state.diff].label);
+    lines.push(done + ' voiture' + (done > 1 ? 's' : '') + ' dégommée' + (done > 1 ? 's' : '') + ' sur ' + h.length);
+    for (var u = 0; u < Math.min(12, h.length); u++) bars += h[u].reached ? '💥' : '⬜';
+  } else if (m.parking) {
     lines.push('💥 PLAQUE — Parking  ·  ' + DIFF[state.diff].label);
     lines.push(done + ' voiture' + (done > 1 ? 's' : '') + ' pulvérisée' + (done > 1 ? 's' : '') + ' sur ' + h.length);
     for (var q = 0; q < h.length; q++) bars += h[q].reached ? '💥' : '⬜';
@@ -714,11 +719,13 @@ function newGame() {
   guideStart();
   state.skill = 0;
   if (MODES[state.mode].parking) window.PARKING.start();
+  else if (MODES[state.mode].pursuit) window.PURSUIT.start();
   else window.TRAFFIC.start();
 }
 function stopAll() {
   if (window.TRAFFIC) window.TRAFFIC.stop();
   if (window.PARKING) window.PARKING.stop();
+  if (window.PURSUIT) window.PURSUIT.stop();
 }
 function refreshHome() {
   var m = MODES[state.mode];
@@ -739,7 +746,7 @@ function refreshHome() {
     return '<li class="mission' + (mi.ok ? ' mission--ok' : '') + '"><span>' + missionLabel(mi) + '</span>' +
            '<b>' + (mi.ok ? '✓' : mi.done + '/' + mi.goal) + '</b></li>';
   }).join('');
-  $('btn-play').textContent = m.parking ? 'Entrer dans le parking' : 'Démarrer le moteur';
+  $('btn-play').textContent = m.parking ? 'Entrer dans le parking' : m.pursuit ? 'Mettre les gaz' : 'Démarrer le moteur';
 }
 function segmented(id, key, after) {
   var box = $(id);
@@ -852,6 +859,7 @@ window.PLAQUE = {
   track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore, guideSay: guideSay,
   tweenNumber: tweenNumber, bump: bump, floatPts: floatPts,
   autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit,
+  myCar: function () { return rankSprite(RANKS[rankOf(career())]); },
   ghostSample: ghostSample, paintGhost: paintGhost,
   isWord:  function (w) { return DICT ? DICT.has(w) : false; },
   rarity:  function (w) { return RARITY ? (RARITY.get(w) || 0) : 0; },

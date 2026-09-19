@@ -15,11 +15,12 @@ de lettres**. Il faut taper des mots contenant les deux lettres d'une paire,
 Les trois chiffres du milieu sont la **cote** de la plaque, ce qu'elle rapporte une
 fois lue. Le **numéro de département** rejoint votre collection à chaque plaque lue.
 
-## Les deux modes
+## Les trois modes
 
 | Mode | Boucle |
 |---|---|
 | **Trafic** | Au volant sur trois voies (deux sur un écran de moins de 560 px, pour garder les plaques lisibles) : chaque voie a sa voiture, qui arrive à son heure (3,5 s d'écart au minimum) et reste 14 s devant vous ; les trois modèles sont toujours différents. Deux mots par voiture, un par paire. Une plaque lue fait **exploser** la voiture ; une plaque ratée la laisse filer, et la voie se réalimente après 3,5 à 5 s. La partie dure 2 minutes, mais chaque mot rallonge la partie de 1 s et la voiture visée de 2 s, et une plaque lue ajoute 2 s de plus (plafond 2 min 15). |
+| **Poursuite** | Vous roulez plus vite que tout le monde : les voitures surgissent à l'horizon et se rapprochent. Celles de votre voie sont des menaces à dégommer — deux mots — avant l'impact ; il n'y a pas d'esquive, seulement les mots. Celles des voies voisines vous frôlent : des points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin. Une plaque dégommée à moins d'une seconde de l'impact vaut ×1,5 (*in extremis*) ; au dernier pare-chocs, tout compte double. Votre voiture est celle de votre rang. |
 | **Parking** | Neuf places sur trois rangées, tous les modèles présents, trois couleurs par parking. Les deux mots d'une plaque et la voiture explose ; une autre vient se garer. Chaque place garde la couleur de la dernière voiture pulvérisée : trois places alignées de même couleur (ligne, colonne, diagonale) rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge de 1 s (+2 s par plaque lue et par alignement, plafond 2 min 15). |
 
 La saisie n'a pas de bouton : un mot se valide tout seul après une pause de frappe
@@ -87,11 +88,12 @@ fois plus souvent sur les plaques, et la grille se consulte depuis l'accueil.
 ## Structure
 
 ```
-index.html            écrans (accueil / trafic / parking / fin / carrière / collection)
+index.html            écrans (accueil / trafic / poursuite / parking / fin / carrière / badges / collection)
 css/style.css
 js/game.js            moteur : dictionnaire, règle, tirage, carrière, missions, collection, partage
 js/traffic.js         mode Trafic : la scène et sa boucle
 js/parking.js         mode Parking : la grille 3×3 en flux, les explosions, les marques de couleur
+js/pursuit.js         mode Poursuite : la course, les menaces, les pare-chocs
 js/dict.js            113 558 mots + rareté, gzip + base64 (395 Ko)
 js/pairs.js           344 paires jouables + exemples de mots
 js/departements.js    101 départements (nom, chef-lieu, région)
