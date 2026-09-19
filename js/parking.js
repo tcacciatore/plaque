@@ -188,6 +188,7 @@ function multiplier() { return K.rush ? 2 : 1; }
 function inFever() { return Date.now() < K.feverUntil; }
 function startFever() {
   K.feverUntil = Date.now() + FEVER * 1000;
+  P.track.fever();
   $('pk-lot').classList.add('fever');
   P.toast('🔥 <b>FIÈVRE</b> — pendant ' + FEVER + ' s, un seul mot suffit à lire une plaque');
   P.sfx.win();
@@ -199,8 +200,8 @@ function fmt(s) {
 }
 function renderHud() {
   $('pk-time').textContent = fmt(Math.max(0, K.timeLeft));
-  $('pk-left').innerHTML = K.done + (K.combo > 1 ? ' <i>×' + K.combo + '</i>' : '');
-  $('pk-score').textContent = K.score;
+  $('pk-left').innerHTML = K.done + (K.combo > 1 ? ' <i class="combo combo--' + K.combo + '">×' + K.combo + '</i>' : '');
+  P.tweenNumber($('pk-score'), K.score, 450);
   $('pk-timebox').classList.toggle('low', K.timeLeft <= 15);
 }
 function gainTime(sec) {
@@ -303,23 +304,30 @@ function submit(e) {
     c.pts += bonus; K.score += bonus; K.done++;
     gainTime(PLATE_TIME);
     P.sfx.dbl();
-    P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, dep: c.dep.num, depName: c.dep.nom });
+    P.floatPts(inp, '+' + (pts + bonus), 'float--win');
+    P.bump($('pk-score').parentNode.parentNode, 'bump--big');
+    P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, tank: c.tank, dep: c.dep.num, depName: c.dep.nom });
     feedback('💥 ' + who + ' pulvérisée ! cote <b>+' + bonus + '</b>' +
              (sport ? ' (🏎️ coupé ×1,5)' : '') + (c.gold ? ' (✨ dorée ×3)' : '') + (K.rush ? ' (rush ×2)' : '') +
              ' — ' + c.dep.num + ' ' + c.dep.nom, 'ok');
     leave(c, true);
+    P.guideSay(3, '💥 Sa <b>cote</b> — les trois chiffres — tombe dans votre score, et sa place garde sa couleur. Trois places alignées de même couleur : bonus.');
     checkLines(c.i);
     if (c.tank) chain(c.i);
     updateTokens();
   } else {
     (tier === 2 && rare) ? P.sfx.rare() : P.sfx.ok(K.combo);
+    P.floatPts(inp, '+' + pts, tier === 2 && rare ? 'float--rare' : '');
+    P.bump($('pk-score').parentNode.parentNode);
     feedback('+' + pts + ' sur ' + who +
              (both ? ' — <b>les deux paires d\'un coup</b> ×2' : '') +
              (ws.label ? ' — ' + ws.label : '') +
              (sport ? ' · 🏎️ <b>coupé ×1,5</b>' : '') +
              ' · il manque <b>' + (c.got1 ? c.p2.p : c.p1.p) + '</b>', 'ok');
     setTarget(c);
+    P.guideSay(2, 'Bien joué. Il reste <b>' + (c.got1 ? c.p2.p : c.p1.p) + '</b> sur cette voiture : un deuxième mot et elle explose. Sa place gardera sa couleur — alignez-en trois.');
   }
+  if (K.combo === 3) P.guideSay(4, 'Votre <b>série</b> monte : les points sont multipliés. Une erreur la remet à ×1 — à ×5, la fièvre.');
   if (K.combo >= 5 && !wasMax && !inFever() && K.feverArmed) { K.feverArmed = false; startFever(); }
   renderHud();
 }
@@ -344,6 +352,7 @@ function tow() {
   if (!K.running) return;
   var alive = K.spots.filter(Boolean);
   if (!alive.length) return;
+  P.track.miss({ p1: alive[0].p1.p, p2: alive[0].p2.p, got1: alive[0].got1, got2: alive[0].got2 });
   alive.sort(function (a, b) {
     return ((a.got1 || a.got2 ? 1 : 0) + (a === K.target ? 2 : 0)) - ((b.got1 || b.got2 ? 1 : 0) + (b === K.target ? 2 : 0));
   });
@@ -394,6 +403,8 @@ function start() {
   buildLot();
   updateTokens();
   renderHud();
+  P.guideSay(1, 'Neuf voitures, neuf plaques. Tapez un mot qui contient les deux lettres d\'une paire, dans l\'ordre — par exemple <b>' +
+    K.spots[0].p1.p[0] + '</b> puis <b>' + K.spots[0].p1.p[1] + '</b> pour <b>' + K.spots[0].p1.p + '</b>. Il se valide tout seul.');
   P.screen('screen-parking');
   P.fitViewport('screen-parking', '#pk-lot', '.hud, #pk-lot, .pk-tokens, #pk-form, .feedback, .hint-line');
   $('pk-input').focus();
@@ -406,7 +417,9 @@ function finish() {
   K.timers.forEach(clearTimeout);
   var hist = K.history.slice();
   K.spots.forEach(function (c) {
-    if (c) hist.push({ p1: c.p1.p, p2: c.p2.p, dep: c.dep.num, words: c.words, pts: c.pts, reached: false });
+    if (!c) return;
+    hist.push({ p1: c.p1.p, p2: c.p2.p, dep: c.dep.num, words: c.words, pts: c.pts, reached: false });
+    if (c.words < 2) P.track.miss({ p1: c.p1.p, p2: c.p2.p, got1: c.got1, got2: c.got2 });
   });
   P.state.history = hist;
   P.finishGame(

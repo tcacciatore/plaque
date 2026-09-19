@@ -128,6 +128,8 @@ function spawnLane(lane) {
   T.seen++;
   renderPairs();
   renderHud();
+  if (T.seen === 1) P.guideSay(1, 'Cette plaque porte deux paires de lettres : <b>' + car.p1.p + '</b> et <b>' + car.p2.p +
+    '</b>. Tapez un mot qui contient <b>' + car.p1.p[0] + '</b> puis <b>' + car.p1.p[1] + '</b>, dans l\'ordre — il se valide tout seul.');
 }
 
 function setTarget(car) {
@@ -176,6 +178,7 @@ function multiplier() {                          // rush ×2, dorée ×3, coupé
 function startFever() {
   T.feverUntil = Date.now() + FEVER * 1000;
   T.fevers++;
+  P.track.fever();
   document.querySelector('.road').classList.add('fever');
   P.toast('🔥 <b>FIÈVRE</b> — pendant ' + FEVER + ' s, un seul mot suffit à lire une plaque');
   P.sfx.win();
@@ -199,9 +202,8 @@ function fmt(s) {
 }
 function renderHud() {
   $('tr-time').textContent = fmt(Math.max(0, T.timeLeft));
-  $('tr-score').textContent = T.score;
-  $('tr-cars').textContent = T.done + (T.combo > 1 ? ' <i>×' + T.combo + '</i>' : '');
-  $('tr-cars').innerHTML = T.done + (T.combo > 1 ? ' <i>×' + T.combo + '</i>' : '');
+  P.tweenNumber($('tr-score'), T.score, 450);
+  $('tr-cars').innerHTML = T.done + (T.combo > 1 ? ' <i class="combo combo--' + T.combo + '">×' + T.combo + '</i>' : '');
   $('tr-timebox').classList.toggle('low', T.timeLeft <= 15);
 }
 function renderPairs() {
@@ -292,6 +294,8 @@ function submit(e) {
   car.extra += CAR_BONUS;
   P.track.word(w, pts, tier, T.combo);
   pop(car, '+' + pts, rare && tier === 2 ? 'rare' : '');
+  P.floatPts(inp, '+' + pts, tier === 2 && rare ? 'float--rare' : '');
+  P.bump($('tr-score').parentNode.parentNode);
   tier === 2 && rare ? P.sfx.rare() : P.sfx.ok(T.combo);
   var who = '<b class="mono">' + car.p1.p + '·' + car.num + '·' + car.p2.p + '</b>';
   feedback('+' + pts + ' sur ' + who +
@@ -301,6 +305,8 @@ function submit(e) {
            (T.combo > 1 ? ' · série <b>×' + T.combo + '</b>' : '') +
            (car.got1 && car.got2 ? '' : ' · il manque <b>' + (car.got1 ? car.p2.p : car.p1.p) + '</b>'), 'ok');
   if (!(car.got1 && car.got2)) setTarget(car);   // le mot suivant ira d'abord sur cette voiture
+  if (!(car.got1 && car.got2)) P.guideSay(2, 'Bien joué. Il reste l\'autre paire, <b>' + (car.got1 ? car.p2.p : car.p1.p) + '</b> : un deuxième mot et la voiture explose.');
+  if (T.combo === 3) P.guideSay(4, 'Votre <b>série</b> monte : les points sont multipliés. Une erreur la remet à ×1 — à ×5, la fièvre.');
   renderPairs();
 
   if (car.got1 && car.got2) readPlate(car, who, sport);
@@ -314,8 +320,11 @@ function readPlate(car, who, sport) {
   car.pts += bonus; T.score += bonus; T.done++;
   gainTime(PLATE_TIME);
   if (T.combo < MULT_MAX) { T.combo++; if (T.combo === MULT_MAX) T.feverArmed = true; }
-  P.track.plate(car.p1.p + '·' + car.num + '·' + car.p2.p, car.pts, { sport: sport, gold: car.gold, dep: car.dep.num, depName: car.dep.nom });
+  P.track.plate(car.p1.p + '·' + car.num + '·' + car.p2.p, car.pts, { sport: sport, gold: car.gold, tank: car.tank, dep: car.dep.num, depName: car.dep.nom });
   pop(car, 'COTE +' + bonus, 'win');
+  P.floatPts($('tr-input'), '+' + bonus, 'float--win');
+  P.bump($('tr-score').parentNode.parentNode, 'bump--big');
+  P.guideSay(3, '💥 Plaque lue ! Sa <b>cote</b> — les trois chiffres — tombe dans votre score. Plus les paires sont rares, plus elle est haute.');
   feedback('💥 <b>Plaque lue !</b> ' + who + ' — cote <b>+' + bonus + '</b>' +
            (sport ? ' (🏎️ coupé ×1,5)' : '') + (car.gold ? ' (✨ dorée ×3)' : '') + (T.rush ? ' (rush ×2)' : '') +
            ' — ' + car.dep.num + ' ' + car.dep.nom, 'ok');
@@ -354,6 +363,7 @@ function loop() {
         if (!c.words) T.combo = 1;              // une voiture partie sans un mot casse la série
         P.sfx.over();
         pop(c, 'trop tard', 'miss');
+        P.track.miss({ p1: c.p1.p, p2: c.p2.p, got1: c.got1, got2: c.got2 });
         leaveCar(c, false);
       }
     });

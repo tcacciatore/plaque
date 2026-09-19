@@ -128,9 +128,10 @@ function matchPair(word, pair) {
 /* ═══════════ tirage d'une plaque ═══════════ */
 function pairPool() {
   var d = DIFF[state.diff];
-  return window.PAIRS.filter(function (p) {
-    return p.n >= d.nMin && p.n <= d.nMax && p.ex.length >= 8;
-  });
+  var f = Math.pow(1.5, state.skill || 0);            // > 1 : plus rare ; < 1 : plus riche
+  var lo = d.nMin / f, hi = d.nMax / f;
+  var pool = window.PAIRS.filter(function (p) { return p.n >= lo && p.n <= hi && p.ex.length >= 8; });
+  return pool.length >= 8 ? pool : window.PAIRS.filter(function (p) { return p.n >= d.nMin && p.n <= d.nMax && p.ex.length >= 8; });
 }
 function pickDepartement() {
   var all = window.DEPARTEMENTS, have = collection();
@@ -204,6 +205,61 @@ function colors() {
 }
 function rankSprite(rank) { return 'assets/cars/' + rank.vehicle.id + '-' + rank.metal + '.webp'; }
 
+/* ═══════════ série de jours : une partie par jour l'entretient ═══════════
+   Le bonus de carrière grimpe de 10 % par jour de série, jusqu'à +100 %.        */
+function streak() { return store.get('streak', { last: 0, n: 0 }); }
+function streakAlive(s) { var d = dayNum(); return s.last === d || s.last === d - 1; }
+function streakBonus(s) { return streakAlive(s) && s.n > 1 ? Math.min(10, s.n - 1) * 0.1 : 0; }
+function bumpStreak() {
+  var s = streak(), d = dayNum();
+  if (s.last === d) return s;
+  s.n = (s.last === d - 1) ? s.n + 1 : 1;
+  s.last = d;
+  store.set('streak', s);
+  return s;
+}
+
+/* ═══════════ difficulté adaptative ═══════════
+   Trois plaques ratées d'affilée : des paires plus riches. Des plaques lues à la
+   chaîne : des paires plus rares, donc des cotes plus hautes. Invisible, borné.  */
+function adapt(delta) {
+  state.skill = Math.max(-3, Math.min(3, (state.skill || 0) + delta));
+}
+
+/* ═══════════ badges ═══════════ */
+var BADGES = [
+  { id: 'lettre',   name: 'Lettré',        txt: '50 mots rares',            stat: 'rare',    goal: 50 },
+  { id: 'erudit',   name: 'Érudit',        txt: '200 mots rares',           stat: 'rare',    goal: 200 },
+  { id: 'expert',   name: 'Académicien',   txt: '20 mots d\'expert',        stat: 'expert',  goal: 20 },
+  { id: 'pyro',     name: 'Pyromane',      txt: '100 plaques lues',         stat: 'plates',  goal: 100 },
+  { id: 'incendie', name: 'Incendiaire',   txt: '500 plaques lues',         stat: 'plates',  goal: 500 },
+  { id: 'demineur', name: 'Démineur',      txt: '10 camions-citernes',      stat: 'tank',    goal: 10 },
+  { id: 'orfevre',  name: 'Orfèvre',       txt: '5 voitures dorées',        stat: 'gold',    goal: 5 },
+  { id: 'aligneur', name: 'Aligneur',      txt: '25 alignements de couleur', stat: 'lines',  goal: 25 },
+  { id: 'fievre',   name: 'Fiévreux',      txt: '10 fièvres déclenchées',   stat: 'fever',   goal: 10 },
+  { id: 'marathon', name: 'Marathonien',   txt: '30 parties',               stat: 'games',   goal: 30 },
+  { id: 'forcene',  name: 'Forcené',       txt: '100 parties',              stat: 'games',   goal: 100 },
+  { id: 'carto',    name: 'Cartographe',   txt: '50 départements',          stat: 'deps',    goal: 50 },
+  { id: 'tour',     name: 'Tour de France', txt: 'les 101 départements',    stat: 'deps',    goal: 101 },
+  { id: 'assidu',   name: 'Assidu',        txt: '7 jours d\'affilée',       stat: 'streak',  goal: 7 },
+  { id: 'fidele',   name: 'Fidèle',        txt: '30 jours d\'affilée',      stat: 'streak',  goal: 30 }
+];
+function stats() { return store.get('stats', {}); }
+function bumpStat(key, n, absolute) {
+  var s = stats();
+  s[key] = absolute ? Math.max(s[key] || 0, n) : (s[key] || 0) + n;
+  store.set('stats', s);
+  var got = store.get('badges', {});
+  BADGES.forEach(function (b) {
+    if (got[b.id] || b.stat !== key || s[key] < b.goal) return;
+    got[b.id] = dayNum();
+    store.set('badges', got);
+    session.badges.push(b);
+    toast('🏅 Badge <b>' + b.name + '</b> — ' + b.txt);
+    sfx.win();
+  });
+}
+
 /* ═══════════ missions du jour ═══════════ */
 var MISSION_TYPES = {
   plates:  { n: [8, 12, 20],   txt: function (n) { return 'Pulvériser ' + n + ' voitures'; } },
@@ -262,7 +318,8 @@ function progress(type, n, absolute) {
 var session = {};
 function sessionStart() {
   session = { words: 0, bestWord: null, bestWordPts: 0, maxCombo: 1, bestPlate: null, bestPlatePts: 0,
-              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, lines: 0, newDeps: 0, newRank: null, missionsDone: [], t0: Date.now() };
+              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, lines: 0, newDeps: 0, newRank: null, missionsDone: [],
+              badges: [], missed: [], t0: Date.now() };
 }
 var track = {
   word: function (w, pts, tier, combo) {
@@ -270,25 +327,80 @@ var track = {
     if (pts > session.bestWordPts) { session.bestWordPts = pts; session.bestWord = w; }
     if (combo > session.maxCombo) session.maxCombo = combo;
     if (combo >= 5) progress('combo5', 1);
-    if (tier === 2) { session.rare++; progress('rare', 1); }
-    if (tier === 2 && w.length >= 9) session.expert++;
+    if (tier === 2) { session.rare++; progress('rare', 1); bumpStat('rare', 1); }
+    if (tier === 2 && w.length >= 9) { session.expert++; bumpStat('expert', 1); }
+    if (combo >= 5 && !session.fever5) { session.fever5 = true; }
     progress('long', w.length, true);
   },
   plate: function (label, pts, opts) {
     session.plates++;
+    bumpStat('plates', 1);
+    adapt(0.5);
+    if (opts && opts.tank) bumpStat('tank', 1);
     if (opts && opts.dep && collect(opts.dep)) {
       session.newDeps++;
       progress('deps', 1);
       addCareer(CAREER.dep);
+      bumpStat('deps', collection().length, true);
       toast('🗺️ Nouveau département — ' + opts.dep + ' ' + (opts.depName || '') + ' · ' + collection().length + '/101');
     }
     if (pts > session.bestPlatePts) { session.bestPlatePts = pts; session.bestPlate = label; }
     progress('plates', 1);
     if (opts && opts.sport) { session.sport++; progress('sport', 1); }
-    if (opts && opts.gold)  { session.gold++;  progress('gold', 1); }
+    if (opts && opts.gold)  { session.gold++;  progress('gold', 1); bumpStat('gold', 1); }
   },
-  line: function () { session.lines++; progress('lines', 1); }
+  line:  function () { session.lines++; progress('lines', 1); bumpStat('lines', 1); },
+  miss:  function (car) { session.missed.push(car); adapt(-1); },     // une plaque partie sans être lue
+  fever: function () { bumpStat('fever', 1); }
 };
+
+/* ═══════════ le « juice » : compteurs qui défilent, score qui réagit ═══════════ */
+var tweens = {};
+function tweenNumber(el, to, ms) {
+  var id = el.id || Math.random();
+  var from = parseInt((el.dataset.val || el.textContent).replace(/\D/g, ''), 10) || 0;
+  if (from === to) { el.textContent = to; el.dataset.val = to; return; }
+  cancelAnimationFrame(tweens[id]);
+  var t0 = performance.now(), dur = ms || 500;
+  el.dataset.val = to;
+  var step = function (now) {
+    var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = Math.round(from + (to - from) * e);
+    if (k < 1) tweens[id] = requestAnimationFrame(step);
+  };
+  tweens[id] = requestAnimationFrame(step);
+}
+function bump(el, cls) {
+  el.classList.remove(cls || 'bump'); void el.offsetWidth; el.classList.add(cls || 'bump');
+}
+/* les points gagnés jaillissent du champ de saisie */
+function floatPts(input, txt, cls) {
+  var f = document.createElement('i');
+  f.className = 'float ' + (cls || '');
+  f.textContent = txt;
+  var r = input.getBoundingClientRect();
+  f.style.left = (r.left + 24 + Math.random() * 60) + 'px';
+  f.style.top = (r.top - 6) + 'px';
+  document.body.appendChild(f);
+  setTimeout(function () { f.remove(); }, 1000);
+}
+/* confettis pour un record ou un nouveau rang */
+function confetti(n) {
+  var box = document.createElement('div');
+  box.className = 'confetti';
+  var tints = ['#ffcf3f', '#3ddc84', '#ff6b6b', '#8ab6ff', '#ff9a3c', '#fff'];
+  for (var i = 0; i < (n || 60); i++) {
+    var p = document.createElement('i');
+    p.style.left = (Math.random() * 100) + 'vw';
+    p.style.background = tints[i % tints.length];
+    p.style.animationDelay = (Math.random() * 0.8) + 's';
+    p.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
+    p.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+    box.appendChild(p);
+  }
+  document.body.appendChild(box);
+  setTimeout(function () { box.remove(); }, 3600);
+}
 
 /* petit message éphémère, en haut de l'écran */
 function toast(msg) {
@@ -316,10 +428,17 @@ function ghostCommit(isBest) {
   for (var i = 0; i < ghost.cur.length; i++) { if (ghost.cur[i] != null) last = ghost.cur[i]; arr.push(last); }
   store.set(ghostKey(), arr);
 }
-/* affiche l'écart au record dans une pastille du HUD */
+/* la pastille du HUD alterne : écart au record, puis distance au prochain rang */
 function paintGhost(el, sec, score) {
+  var showRank = Math.floor(sec / 5) % 2 === 1;
   var ref = ghostAt(sec);
-  if (ref == null) { el.textContent = ''; el.className = 'ghost'; return; }
+  if (showRank || ref == null) {
+    var pts = career() + score, r = rankOf(pts), nx = RANKS[r + 1];
+    if (!nx) { el.textContent = ''; el.className = 'ghost'; return; }
+    el.textContent = nx.name + ' dans ' + (nx.pts - pts);
+    el.className = 'ghost ghost--rank';
+    return;
+  }
   var d = score - ref;
   el.textContent = (d >= 0 ? '+' : '') + d + ' vs record';
   el.className = 'ghost ' + (d >= 0 ? 'ghost--up' : 'ghost--down');
@@ -372,10 +491,22 @@ function endGame() {
   if (isBest) store.set(bestKey(), state.total);
   ghostCommit(isBest);
   progress('score', state.total, true);
-  addCareer(state.total);
+  bumpStat('games', 1);
+  if (session.fever5) bumpStat('combo5', 1);
+
+  var beforePts = career(), beforeRank = rankOf(beforePts);
+  var st = bumpStreak();
+  bumpStat('streak', st.n, true);
+  var bonus = streakBonus(st);
+  var gained = Math.round(state.total * (1 + bonus));
+  addCareer(gained);
+  animateRank(beforePts, beforeRank, career());
+  if (!store.get('tuto', false)) store.set('tuto', true);
 
   $('end-title').textContent = m.parking ? 'Parking — fin de service' : 'Vous êtes arrivé';
-  $('end-score').textContent = state.total;
+  $('end-score').textContent = '0'; $('end-score').dataset.val = '0';
+  setTimeout(function () { tweenNumber($('end-score'), state.total, 1200); }, 250);
+  if (isBest || rankOf(career()) > beforeRank) setTimeout(function () { confetti(isBest ? 90 : 60); }, 700);
   $('end-best').innerHTML = isBest
     ? '🏆 <b>Nouveau record</b> en ' + m.label + ' · ' + DIFF[state.diff].label +
       (best ? ' — l\'ancien : ' + best : '')
@@ -393,11 +524,78 @@ function endGame() {
   s.missionsDone.forEach(function (lbl) { html += row('🎯 Mission accomplie', lbl); });
   if (s.newRank) html += row('🏅 Nouveau rang', '<b>' + s.newRank.name + '</b>' +
                              (s.newRank.unlock ? ' — teinte <b>' + s.newRank.unlock + '</b> débloquée' : ''));
-  var cr = career(), ri = rankOf(cr), nx = RANKS[ri + 1];
-  html += row('Carrière', '<b>' + RANKS[ri].name + '</b> · ' + cr + ' pts' + (nx ? ' — prochain rang à ' + nx.pts : ''));
+  html += row('🔥 Série de jours', st.n + ' jour' + (st.n > 1 ? 's' : '') +
+              (bonus ? ' — carrière <b>+' + Math.round(bonus * 100) + ' %</b> : ' + gained + ' pts' : ''));
+  session.badges.forEach(function (b) { html += row('🏅 Badge', '<b>' + b.name + '</b> — ' + b.txt); });
+  html += missedHtml();
   $('end-recap').innerHTML = html + row('Total', state.total + ' pts', false, true);
   $('btn-share').textContent = 'Copier mon résultat';
   screen('screen-end');
+}
+
+/* la barre de rang de l'écran de fin se remplit sous les yeux du joueur */
+function animateRank(fromPts, fromRank, toPts) {
+  var box = $('end-rank');
+  var rk = RANKS[fromRank], nx = RANKS[fromRank + 1];
+  var toRank = rankOf(toPts);
+  var pct = function (p, r) { var a = RANKS[r], b = RANKS[r + 1]; return b ? Math.min(100, (p - a.pts) / (b.pts - a.pts) * 100) : 100; };
+  box.querySelector('img').src = rankSprite(rk);
+  box.querySelector('b').textContent = rk.name;
+  box.querySelector('i').textContent = nx ? 'prochain : ' + nx.name + ' à ' + nx.pts : 'rang maximal';
+  var bar = box.querySelector('.rank__fill');
+  bar.style.transition = 'none';
+  bar.style.width = pct(fromPts, fromRank) + '%';
+  void bar.offsetWidth;
+  bar.style.transition = 'width 1.4s cubic-bezier(.2,.7,.3,1)';
+  setTimeout(function () {
+    bar.style.width = (toRank > fromRank ? 100 : pct(toPts, fromRank)) + '%';
+    if (toRank > fromRank) setTimeout(function () {
+      var nr = RANKS[toRank];
+      box.querySelector('img').src = rankSprite(nr);
+      box.querySelector('b').textContent = nr.name;
+      box.querySelector('i').textContent = RANKS[toRank + 1] ? 'prochain : ' + RANKS[toRank + 1].name + ' à ' + RANKS[toRank + 1].pts : 'rang maximal';
+      box.classList.add('rank--up');
+      bar.style.transition = 'none'; bar.style.width = '0%'; void bar.offsetWidth;
+      bar.style.transition = 'width 1s ease-out'; bar.style.width = pct(toPts, toRank) + '%';
+      sfx.win();
+    }, 1500);
+  }, 350);
+}
+
+/* ce que le joueur aurait pu jouer sur les plaques qui lui ont échappé */
+function missedHtml() {
+  var out = [], seen = {};
+  session.missed.forEach(function (car) {
+    [[car.p1, car.got1], [car.p2, car.got2]].forEach(function (pp) {
+      if (pp[1] || out.length >= 6 || seen[pp[0]]) return;
+      var pair = window.PAIRS.filter(function (p) { return p.p === pp[0]; })[0];
+      if (!pair) return;
+      seen[pp[0]] = true;
+      var w = pair.ex[Math.floor(Math.random() * Math.min(4, pair.ex.length))];
+      var hit = matchPair(norm(w), pp[0]);
+      var html = '', k = 0;
+      for (var i = 0; i < w.length; i++) {
+        var plain = norm(w[i]);
+        html += (plain && hit && (k === hit[0] || k === hit[1])) ? '<b>' + w[i] + '</b>' : w[i];
+        if (plain) k++;
+      }
+      out.push('<em>' + pp[0] + ' → ' + html + '</em>');
+    });
+  });
+  if (!out.length) return '';
+  return '<div class="recap__row recap__row--missed"><span>Vous auriez pu jouer</span><span>' + out.join(' ') + '</span></div>';
+}
+
+/* ═══════════ page des badges ═══════════ */
+function renderBadges() {
+  var got = store.get('badges', {}), s = stats();
+  $('badges-intro').innerHTML = '<b>' + Object.keys(got).length + '</b> badge' + (Object.keys(got).length > 1 ? 's' : '') + ' sur ' + BADGES.length;
+  $('badges-list').innerHTML = BADGES.map(function (b) {
+    var ok = !!got[b.id], v = Math.min(b.goal, s[b.stat] || 0);
+    return '<div class="badge' + (ok ? ' badge--on' : '') + '"><b>' + b.name + '</b><span>' + b.txt + '</span>' +
+           '<i>' + (ok ? '✓' : v + ' / ' + b.goal) + '</i></div>';
+  }).join('');
+  screen('screen-badges');
 }
 
 function shareText() {
@@ -513,6 +711,8 @@ function newGame() {
   state.total = 0; state.history = []; state.rng = Math.random; state.usedPairs = {};
   sessionStart();
   ghostStart();
+  guideStart();
+  state.skill = 0;
   if (MODES[state.mode].parking) window.PARKING.start();
   else window.TRAFFIC.start();
 }
@@ -524,6 +724,10 @@ function refreshHome() {
   var m = MODES[state.mode];
   $('stat-collec').textContent = collection().length + '/101';
   $('stat-best').textContent = store.get(bestKey(), 0);
+  var s = streak(), alive = streakAlive(s);
+  $('stat-streak').textContent = alive ? s.n : 0;
+  $('stat-streak-k').textContent = !alive ? 'Jours d\'affilée' : s.last === dayNum() ? 'Jours d\'affilée ✓' : 'Jours — jouez aujourd\'hui';
+  $('stat-badges').textContent = Object.keys(store.get('badges', {})).length + '/' + BADGES.length;
   var pts = career(), r = rankOf(pts), rk = RANKS[r], next = RANKS[r + 1];
   $('stat-rank').textContent = rk.name;
   $('rank-img').src = rankSprite(rk);
@@ -554,6 +758,18 @@ function segmented(id, key, after) {
     var t = box.querySelector('[data-v="' + saved + '"]');
     if (t) t.click(); else store.set(key, state[key]);
   }
+}
+
+/* ═══════════ première partie guidée ═══════════
+   Quelques bulles au bon moment, une seule fois, pour un joueur qui découvre.   */
+var guide = { on: false, step: 0 };
+function guideStart() { guide.on = !store.get('tuto', false); guide.step = 0; }
+function guideSay(step, msg) {
+  if (!guide.on || guide.step >= step) return;
+  guide.step = step;
+  var t = $('guide');
+  t.innerHTML = msg;
+  t.classList.remove('go'); void t.offsetWidth; t.classList.add('go');
 }
 
 /* ═══════════ saisie sans bouton : le mot se valide tout seul ═══════════
@@ -633,7 +849,8 @@ window.PLAQUE = {
   shuffle: shuffle, pick: pick, rand: rand, row: row, explode: explode,
   collection: collection, collect: collect, finishGame: finishGame,
   DIFF: DIFF, MODES: MODES, state: state, newPlate: newPlate, endGame: endGame,
-  track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore,
+  track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore, guideSay: guideSay,
+  tweenNumber: tweenNumber, bump: bump, floatPts: floatPts,
   autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit,
   ghostSample: ghostSample, paintGhost: paintGhost,
   isWord:  function (w) { return DICT ? DICT.has(w) : false; },
@@ -659,6 +876,8 @@ document.addEventListener('DOMContentLoaded', function () {
   $('btn-share').addEventListener('click', copyShare);
   $('btn-collection').addEventListener('click', renderCollection);
   $('btn-career').addEventListener('click', renderCareer);
+  $('btn-badges').addEventListener('click', renderBadges);
+  $('btn-badges-back').addEventListener('click', window.PLAQUE.goHome);
   $('btn-career-back').addEventListener('click', window.PLAQUE.goHome);
   $('btn-collection-back').addEventListener('click', window.PLAQUE.goHome);
   $('btn-home').addEventListener('click', window.PLAQUE.goHome);

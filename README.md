@@ -64,10 +64,19 @@ seuils qui croissent (1 200, 4 000, 8 200 … ≈ 360 000 points). Le véhicule 
 affiché à l'accueil dans son métal, avec la progression vers le rang suivant ; la berline,
 le pick-up et le coupé débloquent chacun une teinte de carrosserie (violet, chrome, nacré).
 
-Trois **missions par jour**, tirées de la date donc identiques pour tout le monde, avec
-leur progression à l'accueil. Pendant la partie, le **fantôme du record** affiche l'écart au
-meilleur score *au même instant*. À la fin : meilleur mot, voiture la plus chère, plus longue
-série, missions accomplies, nouveau rang.
+Une partie par jour entretient la **série de jours** : chaque jour d'affilée ajoute 10 % aux
+points de carrière gagnés, jusqu'à +100 %. Trois **missions par jour**, tirées de la date
+donc identiques pour tout le monde, et quinze **badges** transverses (mots rares, plaques,
+citernes, alignements, fièvres, parties, départements, assiduité).
+
+Pendant la partie, la pastille sous le score alterne entre le **fantôme du record** (l'écart
+au meilleur score *au même instant*) et le **prochain rang** (« Berline argent dans 340 »).
+La **difficulté s'adapte** en silence : trois plaques ratées d'affilée et les paires tirées
+s'enrichissent ; des plaques lues à la chaîne et elles se raréfient — avec des cotes plus
+hautes. À la fin : le score défile, la barre de rang se remplit (confettis si elle franchit
+un seuil ou si c'est un record), meilleur mot, voiture la plus chère, plus longue série,
+missions, badges, et **ce que vous auriez pu jouer** sur les plaques qui vous ont échappé.
+La toute première partie est guidée par quelques bulles.
 
 ### Collection
 

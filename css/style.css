@@ -611,3 +611,62 @@ body.fitted .soundbtn{display:none}
   .road .plate--car .plate__eu,.road .plate--car .plate__dep{min-width:12%}
   .road .plate--car .plate__depnum,.road .plate--car .plate__f{font-size:clamp(8px,2.3vw,11px)}
 }
+
+/* ───────── série, badges, guide, rang de fin ───────── */
+.homestats{flex-wrap:wrap}
+.homestats .stat{flex:1 1 40%}
+.stat--fire .stat__v{color:#ff9a3c}
+.ghost--rank{color:var(--accent)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px}
+.badge{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--dim)}
+.badge b{display:block;color:var(--txt);font-size:14px}
+.badge span{display:block;font-size:12px;margin:2px 0 4px}
+.badge i{font-style:normal;font-size:12px;font-variant-numeric:tabular-nums}
+.badge--on{border-color:var(--accent);background:linear-gradient(180deg,#2a2411,#1a1d24)}
+.badge--on b{color:var(--accent)}
+.badge--on i{color:var(--ok)}
+.guide{
+  position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translate(-50%,20px);z-index:31;
+  background:rgba(20,24,31,.96);border:1px solid var(--accent);color:var(--txt);border-radius:14px;
+  padding:12px 16px;font-size:14px;line-height:1.45;opacity:0;pointer-events:none;max-width:min(92vw,520px);
+  box-shadow:0 8px 30px rgba(0,0,0,.6);
+}
+.guide b{color:var(--accent)}
+.guide.go{animation:guideIn 7s ease-out}
+@keyframes guideIn{0%{opacity:0;transform:translate(-50%,20px)}6%,88%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,10px)}}
+body.fitted .guide{bottom:auto;top:60px}
+.rank--end{cursor:default;margin:14px 0}
+.rank--end:hover{border-color:var(--line)}
+.rank--up{border-color:var(--accent);box-shadow:0 0 24px rgba(255,207,63,.35);animation:rankUp .6s ease-out}
+@keyframes rankUp{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+.recap__row--missed{flex-direction:column;gap:6px}
+.recap__row--missed em{font-style:normal;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:3px 8px;margin:0 4px 4px 0;display:inline-block;font-size:13px}
+.recap__row--missed em b{color:var(--accent)}
+
+/* ───────── juice : tout ce qui réagit ───────── */
+.bump{animation:bump .3s ease-out}
+.bump--big{animation:bumpBig .45s ease-out}
+@keyframes bump{30%{transform:scale(1.06)}100%{transform:none}}
+@keyframes bumpBig{25%{transform:scale(1.12);border-color:var(--accent)}100%{transform:none}}
+.combo{font-style:normal;color:var(--dim);transition:.2s}
+.combo--2{color:var(--txt)}
+.combo--3{color:var(--accent)}
+.combo--4{color:#ff9a3c;text-shadow:0 0 8px rgba(255,154,60,.7)}
+.combo--5{color:#ff5a3c;text-shadow:0 0 10px rgba(255,90,60,.9);animation:flame .5s ease-in-out infinite alternate}
+@keyframes flame{from{text-shadow:0 0 6px rgba(255,90,60,.7)}to{text-shadow:0 0 16px rgba(255,150,60,1),0 0 30px rgba(255,90,60,.6)}}
+.float{
+  position:fixed;z-index:40;pointer-events:none;font-style:normal;font-weight:800;font-size:20px;color:var(--ok);
+  text-shadow:0 2px 8px #000;animation:floatUp 1s ease-out forwards;
+}
+.float--rare{color:var(--rare)}
+.float--win{color:var(--accent);font-size:26px}
+@keyframes floatUp{0%{opacity:0;transform:translateY(6px) scale(.7)}20%{opacity:1;transform:translateY(-8px) scale(1.1)}100%{opacity:0;transform:translateY(-56px) scale(1)}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.confetti i{position:absolute;top:-14px;width:9px;height:14px;border-radius:2px;animation:confetti linear forwards}
+@keyframes confetti{to{transform:translateY(110vh) rotate(720deg);opacity:.2}}
+.final-score{animation:scoreIn .6s cubic-bezier(.2,.8,.3,1.4)}
+@keyframes scoreIn{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+#btn-again{animation:pulseBtn 1.6s ease-in-out infinite}
+@keyframes pulseBtn{50%{box-shadow:0 0 0 6px rgba(255,207,63,.18)}}
+.tok--on{animation:tokIn .35s cubic-bezier(.2,.8,.3,1.3)}
+@keyframes tokIn{from{transform:scale(.7)}to{transform:none}}

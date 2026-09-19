@@ -4,11 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Plaque — le jeu des mots d'immatriculation</title>
-<link rel="stylesheet" href="css/style.css?v=58">
+<link rel="stylesheet" href="css/style.css?v=59">
 </head>
 <body>
 
 <div id="toast" class="toast"></div>
+<div id="guide" class="guide"></div>
 <button id="btn-sound" class="soundbtn" title="Son" aria-label="Activer ou couper le son">🔊</button>
 
 <div id="app">
@@ -68,8 +69,12 @@
     </div>
 
     <div class="homestats">
+      <div class="stat stat--fire"><span class="stat__v">🔥 <span id="stat-streak">0</span></span><span class="stat__k" id="stat-streak-k">Jours d'affilée</span></div>
       <button class="stat" id="btn-collection">
         <span class="stat__v" id="stat-collec">0/101</span><span class="stat__k">Départements</span>
+      </button>
+      <button class="stat" id="btn-badges">
+        <span class="stat__v" id="stat-badges">0/15</span><span class="stat__k">Badges</span>
       </button>
       <div class="stat"><span class="stat__v" id="stat-best">0</span><span class="stat__k">Record</span></div>
     </div>
@@ -86,7 +91,8 @@
         <li>Les <strong>trois chiffres</strong> d'une plaque sont sa <strong>cote</strong> : ce qu'elle rapporte une fois lue. Paires rares, cote élevée.</li>
         <li>Trois mots d'affilée sans faute font monter le <strong>multiplicateur</strong> — une erreur le remet à ×1. À <strong>×5</strong>, dix secondes de <strong>fièvre</strong> : un seul mot suffit à lire une plaque. Les <strong>mots rares</strong> rapportent un bonus.</li>
         <li>Les <strong>vingt dernières secondes</strong>, tout compte double. Les voitures <strong>dorées</strong> valent ×3 (et leur marque au sol est un joker de couleur). Le <strong>camion-citerne</strong> souffle ses voisines quand il explose.</li>
-        <li>Chaque point marqué compte pour votre <strong>carrière</strong> : neuf véhicules, chacun en bronze, argent puis or — de la citadine bronze au coupé or. Certains rangs débloquent une teinte de carrosserie. Trois <strong>missions</strong> par jour, les mêmes pour tout le monde.</li>
+        <li>Chaque point marqué compte pour votre <strong>carrière</strong> : neuf véhicules, chacun en bronze, argent puis or — de la citadine bronze au coupé or. Certains rangs débloquent une teinte de carrosserie. Trois <strong>missions</strong> par jour, les mêmes pour tout le monde, et des <strong>badges</strong> à décrocher.</li>
+        <li>Une partie par jour entretient votre <strong>série</strong> : chaque jour d'affilée ajoute 10 % aux points de carrière, jusqu'à +100 %.</li>
         <li>Chaque plaque entièrement lue ajoute son <strong>département</strong> à votre collection — les 101 sont à découvrir.</li>
       </ol>
     </details>
@@ -99,6 +105,14 @@
     <h2 id="end-title">Fin de partie</h2>
     <p class="final-score" id="end-score">0</p>
     <p class="best" id="end-best"></p>
+    <div class="rank rank--end" id="end-rank">
+      <img class="rank__img" src="assets/cars/citadine-bronze.webp" alt="">
+      <div class="rank__body">
+        <div class="rank__head"><span class="rank__k">Carrière</span><b>Citadine bronze</b></div>
+        <div class="rank__bar"><div class="rank__fill"></div></div>
+        <div class="rank__foot"><i></i></div>
+      </div>
+    </div>
     <div class="recap" id="end-recap"></div>
     <button id="btn-share" class="btn btn--big btn--share">Copier mon résultat</button>
     <button id="btn-again" class="btn btn--big">Rejouer</button>
@@ -130,6 +144,14 @@
     <p class="collec__intro" id="career-intro"></p>
     <div id="career-list"></div>
     <button id="btn-career-back" class="btn btn--big">Retour</button>
+  </section>
+
+  <!-- ══════════ BADGES ══════════ -->
+  <section id="screen-badges" class="screen">
+    <h2>Badges</h2>
+    <p class="collec__intro" id="badges-intro"></p>
+    <div id="badges-list" class="badges"></div>
+    <button id="btn-badges-back" class="btn btn--big">Retour</button>
   </section>
 
   <!-- ══════════ COLLECTION ══════════ -->
@@ -175,11 +197,11 @@
 
 </div>
 
-<script src="js/pairs.js?v=58"></script>
-<script src="js/departements.js?v=58"></script>
-<script src="js/dict.js?v=58"></script>
-<script src="js/game.js?v=58"></script>
-<script src="js/traffic.js?v=58"></script>
-<script src="js/parking.js?v=58"></script>
+<script src="js/pairs.js?v=59"></script>
+<script src="js/departements.js?v=59"></script>
+<script src="js/dict.js?v=59"></script>
+<script src="js/game.js?v=59"></script>
+<script src="js/traffic.js?v=59"></script>
+<script src="js/parking.js?v=59"></script>
 </body>
 </html>
