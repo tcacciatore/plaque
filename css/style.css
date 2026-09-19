@@ -803,3 +803,22 @@ body.fitted .platefield__eu{flex-basis:32px}
   .pplate .plate--pursuit{width:calc(var(--roadH) * .5)}
   .pplate .plate__body{font-size:calc(var(--roadH) * .074)}
 }
+
+/* ───────── Poursuite : le cockpit ───────── */
+.cockpit{position:absolute;left:0;right:0;bottom:0;height:30%;z-index:1200;pointer-events:none}
+.cockpit__dash{position:absolute;left:-4%;right:-4%;bottom:0;height:100%;
+  background:linear-gradient(180deg,#151922 0%,#0f1218 40%,#0a0c11 100%);
+  border-radius:50% 50% 0 0 / 60% 60% 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.7),inset 0 4px 0 #2a3040}
+.gauge{position:absolute;left:8%;bottom:8%;width:22%;max-width:130px;text-align:center}
+.gauge svg{width:100%;height:auto;display:block}
+.gauge b{display:block;font-family:var(--cond);font-size:clamp(14px,2.6vw,20px);color:#e8edf5;margin-top:-6px;letter-spacing:.03em}
+.gauge i{font-style:normal;font-size:.6em;color:var(--dim)}
+.wheel{position:absolute;left:50%;bottom:-38%;width:min(52%,300px);transform-origin:50% 60%;transform:translateX(-50%)}
+.wheel svg{width:100%;height:auto;display:block;filter:drop-shadow(0 8px 16px rgba(0,0,0,.7))}
+.wheel__badge{position:absolute;left:50%;top:50%;width:22%;transform:translate(-50%,-56%);filter:drop-shadow(0 2px 4px rgba(0,0,0,.8))}
+.wheel{animation:none}
+#pu-wheel{left:50%;margin-left:0}
+.cockpit--hit .cockpit__dash{animation:dashHit .5s ease-out}
+@keyframes dashHit{20%{box-shadow:0 -10px 30px rgba(255,60,40,.9),inset 0 4px 0 #ff5a3c}}
+.cockpit--blink .cockpit__dash{box-shadow:0 -10px 30px rgba(0,0,0,.7),inset 0 4px 0 #ff9a3c}
+@media (max-width:700px){.cockpit{height:26%}.wheel{width:62%;bottom:-40%}.gauge{width:26%;left:4%}}

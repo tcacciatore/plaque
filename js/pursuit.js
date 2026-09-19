@@ -1,10 +1,10 @@
 /* ═══════════════════════════════════════════════════════════
    PLAQUE — mode Poursuite
-   Vous roulez plus vite que tout le monde. Les voitures surgissent
-   à l'horizon et se rapprochent ; celles de votre voie sont des
-   menaces : lisez leur plaque avant l'impact, elles explosent.
-   Celles des voies voisines vous frôlent — des points à prendre.
-   Trois pare-chocs, et la vitesse qui monte. Sans fin.
+   Au volant, vue de l'intérieur. Vous roulez plus vite que tout le
+   monde ; les voitures surgissent à l'horizon et se rapprochent.
+   Un seul mot sur l'une des deux paires suffit à dégommer une
+   plaque. Celles de votre voie sont des menaces : avant l'impact.
+   Trois pare-chocs, la vitesse qui monte. Sans fin.
    ═══════════════════════════════════════════════════════════ */
 (function () {
 'use strict';
@@ -12,8 +12,8 @@
 var P = null;
 var LIVES = 3;
 var LANES = [-30, 0, 30], MY_LANE = 1;
-var Z_FAR = 10, Z_READ = 7, Z_HIT = 1.05, Z_PASS = 0.55;
-var V0 = 0.8, V_RAMP = 0.01, V_MAX = 2.2;            // vitesse en profondeur (z/s), sa montée par seconde, son plafond
+var Z_FAR = 10, Z_READ = 6.5, Z_HIT = 1.8, Z_PASS = 1.2;   // l'impact a lieu au bord du capot
+var V0 = 0.95, V_RAMP = 0.012, V_MAX = 2.6;          // vitesse en profondeur (z/s), sa montée par seconde, son plafond
 var SPAWN0 = 4.5, SPAWN_MIN = 2.2;                    // intervalle entre deux arrivées, au départ et au plus serré
 var CENTER0 = 0.42, CENTER_MAX = 0.68;                // part des voitures qui arrivent sur votre voie
 var FEVER = 10, MULT_MAX = 5;
@@ -160,7 +160,7 @@ function startFever() {
   R.feverUntil = Date.now() + FEVER * 1000;
   $('pu-road').classList.add('fever');
   P.track.fever();
-  P.toast('🔥 <b>FIÈVRE</b> — pendant ' + FEVER + ' s, un seul mot suffit à lire une plaque');
+  P.toast('🔥 <b>FIÈVRE</b> — pendant ' + FEVER + ' s, tout compte double');
   P.sfx.win();
 }
 
@@ -197,43 +197,33 @@ function submit(e) {
   var c = best.c, hit = best.h1 || best.h2;
   var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
   var sport = c.shape === SPORT;
-  var pts = Math.round(ws.pts * R.combo * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * multiplier());
-  var both = best.h1 && best.h2;
-  if (both) pts *= 2;
+  var both = best.h1 && best.h2;                                  // les deux paires dans le même mot : ×2
+  var fever = inFever() ? 2 : 1;
+  var pts = Math.round(ws.pts * R.combo * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * multiplier() * (both ? 2 : 1) * fever);
   if (best.h1) { c.got1 = w; flashPair(c, 1); }
   if (best.h2) { c.got2 = w; flashPair(c, 2); }
-  if (inFever() && !(c.got1 && c.got2)) { if (!c.got1) { c.got1 = '🔥'; flashPair(c, 1); } else { c.got2 = '🔥'; flashPair(c, 2); } }
   c.words += both ? 2 : 1; c.pts += pts; R.score += pts;
   var wasMax = R.combo >= MULT_MAX;
   R.combo = Math.min(MULT_MAX, R.combo + 1);
   P.track.word(w, pts, tier, R.combo);
-  P.floatPts(inp, '+' + pts, tier === 2 && rare ? 'float--rare' : '');
-  P.bump($('pu-score').parentNode.parentNode);
-  pop(c, '+' + pts, rare && tier === 2 ? 'rare' : '');
   var who = '<b class="mono">' + c.p1.p + '·' + c.num + '·' + c.p2.p + '</b>';
 
-  if (c.got1 && c.got2) {
-    var extremis = c.lane === MY_LANE && c.z < 1.7;
-    var bonus = Math.round(c.value * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * (extremis ? 1.5 : 1) * multiplier());
-    c.pts += bonus; R.score += bonus; R.done++;
-    P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, tank: c.tank, dep: c.dep.num, depName: c.dep.nom });
-    pop(c, (extremis ? 'IN EXTREMIS ' : 'COTE ') + '+' + bonus, 'win');
-    P.floatPts(inp, '+' + bonus, 'float--win');
-    P.bump($('pu-score').parentNode.parentNode, 'bump--big');
-    feedback('💥 <b>Dégommée !</b> ' + who + ' — cote <b>+' + bonus + '</b>' +
-             (extremis ? ' (🫀 in extremis ×1,5)' : '') + (sport ? ' (🏎️ coupé ×1,5)' : '') + (c.gold ? ' (✨ dorée ×3)' : '') +
-             (R.lives === 1 ? ' (dernier pare-chocs ×2)' : ''), 'ok');
-    P.guideSay(3, '💥 Dégommée ! Sa <b>cote</b> tombe dans votre score. Les voitures sur <b>votre voie</b> (⚠) sont des menaces : lisez-les avant l\'impact.');
-    explodeCar(c);
-    if (c.tank) chain(c);
-  } else {
-    (tier === 2 && rare) ? P.sfx.rare() : P.sfx.ok(R.combo);
-    feedback('+' + pts + ' sur ' + who + (ws.label ? ' — ' + ws.label : '') + (sport ? ' · 🏎️ <b>coupé ×1,5</b>' : '') +
-             ' · il manque <b>' + (c.got1 ? c.p2.p : c.p1.p) + '</b>', 'ok');
-    setTarget(c);
-    P.guideSay(2, 'Bien joué. Il reste <b>' + (c.got1 ? c.p2.p : c.p1.p) + '</b> : un deuxième mot et elle explose.');
-  }
-  if (R.combo === 3) P.guideSay(4, 'Votre <b>série</b> monte. Une erreur ou un impact la remet à ×1 — à ×5, la fièvre.');
+  var extremis = c.lane === MY_LANE && c.z < Z_HIT + 0.8;
+  var bonus = Math.round(c.value * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * (extremis ? 1.5 : 1) * (both ? 2 : 1) * multiplier() * fever);
+  c.pts += bonus; R.score += bonus; R.done++;
+  c.words = 2;
+  P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, tank: c.tank, dep: c.dep.num, depName: c.dep.nom });
+  pop(c, (extremis ? 'IN EXTREMIS ' : 'COTE ') + '+' + bonus, 'win');
+  P.floatPts(inp, '+' + (pts + bonus), 'float--win');
+  P.bump($('pu-score').parentNode.parentNode, 'bump--big');
+  feedback('💥 <b>Dégommée !</b> ' + who + ' — <b>+' + (pts + bonus) + '</b>' +
+           (ws.label ? ' · ' + ws.label : '') + (both ? ' · les deux paires ×2' : '') +
+           (extremis ? ' · 🫀 in extremis ×1,5' : '') + (sport ? ' · 🏎️ coupé ×1,5' : '') + (c.gold ? ' · ✨ dorée ×3' : '') +
+           (fever > 1 ? ' · 🔥 fièvre ×2' : '') + (R.lives === 1 ? ' · dernier pare-chocs ×2' : ''), 'ok');
+  P.guideSay(2, '💥 Dégommée ! Un seul mot suffit, sur l\'une ou l\'autre paire. Sa <b>cote</b> tombe dans votre score. Les voitures sur <b>votre voie</b> (⚠) doivent sauter avant l\'impact.');
+  explodeCar(c);
+  if (c.tank) chain(c);
+  if (R.combo === 3) P.guideSay(4, 'Votre <b>série</b> monte. Une erreur ou un impact la remet à ×1 — à ×5, dix secondes de fièvre où tout compte double.');
   if (R.combo >= MULT_MAX && !wasMax && !inFever() && R.feverArmed) { R.feverArmed = false; startFever(); }
   renderHud();
 }
@@ -266,7 +256,8 @@ function crash(c) {
   if (Date.now() < R.invulnUntil) return;
   R.lives--;
   R.invulnUntil = Date.now() + 2000;
-  $('pu-me').classList.remove('me--hit'); void $('pu-me').offsetWidth; $('pu-me').classList.add('me--hit');
+  var ck = $('pu-cockpit');
+  ck.classList.remove('cockpit--hit'); void ck.offsetWidth; ck.classList.add('cockpit--hit');
   P.sfx.over();
   feedback('💢 <b>Impact !</b> ' + (R.lives > 0 ? 'Il vous reste ' + R.lives + ' pare-choc' + (R.lives > 1 ? 's' : '') + (R.lives === 1 ? ' — tout compte double' : '') : 'Plus de pare-chocs…'), 'ko');
   renderHud();
@@ -285,9 +276,7 @@ function renderHud() {
 function measure() {
   var r = $('pu-road').getBoundingClientRect();
   R.sceneW = r.width; R.sceneH = r.height;
-  var me = $('pu-me');                                    // votre voiture : bas de cadre, on voit son toit et son coffre
-  me.style.width = (0.40 * R.sceneH) + 'px';
-  place(me, MY_LANE, 0.72, 0);
+  $('pu-badge').src = P.myCar();
   R.cars.forEach(function (c) { c.el.style.width = (SIZE[c.shape] * R.sceneH) + 'px'; place(c.el, c.lane, c.z); placePlate(c); });
 }
 
@@ -318,7 +307,12 @@ function frame(now) {
   });
   if (R.feverUntil && !inFever()) { R.feverUntil = 0; $('pu-road').classList.remove('fever'); R.combo = 3; R.feverArmed = true; }
   $('pu-road').classList.toggle('rush', R.lives === 1);
-  $('pu-me').classList.toggle('me--blink', Date.now() < R.invulnUntil);
+  $('pu-cockpit').classList.toggle('cockpit--blink', Date.now() < R.invulnUntil);
+  // le volant vit : léger balancement, et l'aiguille suit la vraie vitesse
+  var sway = Math.sin(now / 900) * 2.2 + Math.sin(now / 173) * 0.5;
+  $('pu-wheel').style.transform = 'translateX(-50%) rotate(' + sway.toFixed(2) + 'deg)';
+  $('pu-needle').style.transform = 'rotate(' + (-110 + (R.v / V_MAX) * 220).toFixed(1) + 'deg)';
+  $('pu-speed').textContent = Math.round(R.v * 52);
   if (Math.floor(now / 200) !== Math.floor((now - dt * 1000) / 200)) {
     P.ghostSample(played(), R.score); P.paintGhost($('pu-ghost'), played(), R.score); renderHud();
   }
@@ -332,14 +326,13 @@ function start() {
   R.t0 = Date.now(); R.last = performance.now();
   $('pu-cars').innerHTML = '';
   $('pu-input').value = '';
-  $('pu-me').querySelector('img').src = P.myCar();
   $('pu-road').classList.remove('rush', 'fever');
   feedback('&nbsp;', '');
   P.screen('screen-pursuit');
   P.fitViewport('screen-pursuit', '.road', '.hud, .road, .tr-pairs, #pu-form, .feedback, .hint-line');
   measure();
   renderHud(); renderTokens();
-  P.guideSay(1, 'Vous roulez plus vite que tout le monde. Les voitures arrivent de l\'horizon : tapez un mot pour chaque paire de la plaque et la voiture explose. Celles de <b>votre voie</b> doivent sauter avant l\'impact.');
+  P.guideSay(1, 'Vous roulez plus vite que tout le monde. Les voitures arrivent de l\'horizon : <b>un mot</b> qui contient l\'une des deux paires, et la voiture explose. Celles de <b>votre voie</b> doivent sauter avant le capot.');
   $('pu-input').focus();
   cancelAnimationFrame(R.raf);
   R.raf = requestAnimationFrame(frame);
