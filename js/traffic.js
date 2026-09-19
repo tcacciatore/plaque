@@ -395,7 +395,7 @@ function start() {
   P = window.PLAQUE;
   buildPosts();
   // deux voies sur un petit écran : les plaques y restent lisibles
-  var two = window.innerWidth < NARROW;
+  var two = Math.min(window.innerWidth, screen.width || 9999) < NARROW;
   LANES = two ? LANES2 : LANES3;
   document.querySelector('.road').classList.toggle('road--two', two);
   T.running = true; T.timeLeft = GAME_TIME; T.score = 0;
@@ -409,6 +409,7 @@ function start() {
   feedback('&nbsp;', '');
   renderHud(); renderPairs();
   P.screen('screen-traffic');
+  P.fitViewport('screen-traffic', '.road', '.hud, .road, .tr-pairs, #tr-form, .feedback, .hint-line');
   $('tr-input').focus();
   loop();
   // les trois voies s'amorcent à des instants différents
@@ -440,6 +441,12 @@ window.TRAFFIC = { start: start, stop: stop, submit: submit };
 
 document.addEventListener('DOMContentLoaded', function () {
   $('tr-form').addEventListener('submit', submit);
+  window.PLAQUE.autoSubmit($('tr-input'), $('tr-form'), function (w) {
+    return T.lanes.some(function (c) {
+      return c && !c.gone && w !== c.got1 && w !== c.got2 &&
+             ((!c.got1 && P.matchPair(w, c.p1.p)) || (!c.got2 && P.matchPair(w, c.p2.p)));
+    });
+  });
   $('tr-pairs').addEventListener('pointerdown', function (e) {
     var g = e.target.closest('.tokgroup');
     if (!g) return;

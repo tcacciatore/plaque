@@ -353,6 +353,7 @@ function plateValue(p1, p2) {
 /* Fin de partie partagée par les modes : le récap du mode, puis l'écran de résultat. */
 var modeRecap = '';
 function finishGame(recapHtml, baseScore) {
+  unfit();
   modeRecap = recapHtml;
   state.total = baseScore;
   endGame();
@@ -555,6 +556,77 @@ function segmented(id, key, after) {
   }
 }
 
+/* ═══════════ saisie sans bouton : le mot se valide tout seul ═══════════
+   Une courte pause de frappe suffit quand ce qui est tapé est un mot du
+   dictionnaire qui va sur une plaque ; Entrée ou l'espace valident sur-le-champ. */
+var AUTO_MS = 380;
+function autoSubmit(input, form, canAccept) {
+  var timer = null;
+  var fire = function () { clearTimeout(timer); timer = null; form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); };
+  input.addEventListener('input', function () {
+    clearTimeout(timer); timer = null;
+    var raw = input.value;
+    if (/\s$/.test(raw)) { input.value = raw.trim(); if (input.value) fire(); return; }
+    var w = norm(raw);
+    if (w.length >= 3 && DICT && DICT.has(w) && canAccept(w)) timer = setTimeout(fire, AUTO_MS);
+  });
+}
+
+/* ═══════════ mise en page au viewport visible ═══════════
+   Sur téléphone, le clavier prend la moitié de l'écran : la scène se redimensionne
+   pour que tout — compteurs, scène, jetons, champ — tienne dans ce qui reste,
+   sans que la page ne défile.                                                    */
+var fitted = null;
+function fitViewport(screenId, sceneSel, stackSel) {
+  fitted = { screen: screenId, scene: sceneSel, stack: stackSel };
+  applyFit();
+}
+function applyFit() {
+  if (!fitted) return;
+  var scr = $(fitted.screen);
+  if (!scr || !scr.classList.contains('active')) return;
+  var vv = window.visualViewport;
+  var h = Math.round(vv ? vv.height : window.innerHeight);
+  document.body.classList.add('fitted');
+  scr.style.height = h + 'px';
+  var scene = scr.querySelector(fitted.scene);
+  if (!scene) return;
+  var used = 0;
+  Array.prototype.forEach.call(scr.querySelectorAll(fitted.stack), function (el) {
+    if (el === scene) return;
+    var r = el.getBoundingClientRect();
+    var st = getComputedStyle(el);
+    used += r.height + parseFloat(st.marginTop) + parseFloat(st.marginBottom);
+  });
+  var pad = 28;
+  var avail = Math.max(150, h - used - pad);
+  if (scene.classList.contains('road')) {
+    var ms = getComputedStyle(scene);
+    scene.style.setProperty('--roadH', avail - parseFloat(ms.marginTop) - parseFloat(ms.marginBottom) + 'px');
+  } else {                                   // le parking : on le réduit à l'échelle
+    scene.style.transform = '';
+    var nat = scene.offsetHeight;
+    var k = Math.min(1, avail / nat);
+    scene.style.transformOrigin = '50% 0';
+    scene.style.transform = 'scale(' + k.toFixed(3) + ')';
+    scene.style.marginBottom = (nat * k - nat + 8) + 'px';
+  }
+  window.scrollTo(0, 0);
+}
+function unfit() {
+  fitted = null;
+  document.body.classList.remove('fitted');
+  Array.prototype.forEach.call(document.querySelectorAll('.screen'), function (s) { s.style.height = ''; });
+  var road = document.querySelector('.road'); if (road) road.style.removeProperty('--roadH');
+  var lot = $('pk-lot'); if (lot) { lot.style.transform = ''; lot.style.marginBottom = ''; }
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', applyFit);
+  window.visualViewport.addEventListener('scroll', function () { if (fitted) window.scrollTo(0, 0); });
+}
+window.addEventListener('resize', applyFit);
+window.addEventListener('orientationchange', function () { setTimeout(applyFit, 250); });
+
 /* ═══════════ passerelle pour les modes (js/traffic.js, js/parking.js) ═══════════ */
 window.PLAQUE = {
   $: $, norm: norm, matchPair: matchPair, screen: screen, sfx: sfx, store: store,
@@ -562,10 +634,11 @@ window.PLAQUE = {
   collection: collection, collect: collect, finishGame: finishGame,
   DIFF: DIFF, MODES: MODES, state: state, newPlate: newPlate, endGame: endGame,
   track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore,
+  autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit,
   ghostSample: ghostSample, paintGhost: paintGhost,
   isWord:  function (w) { return DICT ? DICT.has(w) : false; },
   rarity:  function (w) { return RARITY ? (RARITY.get(w) || 0) : 0; },
-  goHome:  function () { stopAll(); refreshHome(); screen('screen-home'); }
+  goHome:  function () { stopAll(); unfit(); refreshHome(); screen('screen-home'); }
 };
 
 document.addEventListener('DOMContentLoaded', function () {

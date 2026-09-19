@@ -424,11 +424,6 @@ button.stat:hover{border-color:var(--accent)}
 /* deux voies : une seule séparation, au centre, et des voitures plus larges */
 .road--two .road__lane--l,.road--two .road__lane--r{clip-path:polygon(49.8% 0,50.2% 0,50.6% 100%,49.4% 100%)}
 .road--two .car{width:min(calc(var(--roadH) * var(--w,.74)), 48.5%)}
-.road--two .plate--car{width:calc(var(--plateW,46%) * 2.3);border-width:2.5px}
-.road--two .car__timer{width:calc(var(--plateW,46%) * 2.3);height:5px}
-.road--two .plate--car .plate__body{font-size:clamp(16px,5.4vw,24px);padding:3px 2px}
-.road--two .plate--car .plate__eu,.road--two .plate--car .plate__dep{min-width:12%}
-.road--two .plate--car .plate__depnum,.road--two .plate--car .plate__f{font-size:clamp(8px,2.3vw,11px)}
 .road--two .plate--car .plate__depnum{font-size:clamp(7px,2vw,9px)}
 
 /* le bloc « ride » : la voiture avance et recule doucement, avec un léger roulis */
@@ -591,3 +586,28 @@ button.stat:hover{border-color:var(--accent)}
 .sport-tag--gold{border-color:#ffd54a;color:#ffd54a;background:rgba(60,45,10,.9)}
 .sport-tag--tank{border-color:#ff8a3c;color:#ff8a3c;background:rgba(50,25,10,.9)}
 .car--gold .car__body,.spot__car--gold .car__body{filter:drop-shadow(0 0 12px rgba(255,213,74,.75))}
+
+/* ───────── téléphone : tout tient dans l'écran visible, clavier compris ───────── */
+body.fitted{overflow:hidden;padding-top:6px;padding-bottom:0;height:100dvh}
+body.fitted .screen.active{display:flex;flex-direction:column;overflow:hidden}
+body.fitted .hud{flex:0 0 auto}
+body.fitted .hud__item{padding:4px 8px}
+body.fitted .hud__v{font-size:16px}
+body.fitted .ghost{display:none}
+body.fitted .road{flex:0 0 auto;margin:8px 0 6px}
+body.fitted .tr-pairs,body.fitted .pk-tokens{margin:0 0 6px;min-height:0}
+body.fitted #tr-form,body.fitted #pk-form{flex:0 0 auto}
+body.fitted .feedback{margin:4px 2px 0;min-height:20px;font-size:13px}
+body.fitted .hint-line{margin-top:4px;font-size:13px}
+body.fitted .soundbtn{display:none}
+#tr-input,#pk-input{width:100%}
+
+/* les plaques du Trafic, grandes quoi qu'il arrive sur un petit écran
+   (décidé en CSS pour ne pas dépendre d'une version de script en cache) */
+@media (max-width:700px){
+  .road .plate--car{width:calc(var(--plateW,46%) * 2.3);border-width:2.5px}
+  .road .car__timer{width:calc(var(--plateW,46%) * 2.3);height:5px}
+  .road .plate--car .plate__body{font-size:clamp(16px,5.4vw,24px);padding:3px 2px}
+  .road .plate--car .plate__eu,.road .plate--car .plate__dep{min-width:12%}
+  .road .plate--car .plate__depnum,.road .plate--car .plate__f{font-size:clamp(8px,2.3vw,11px)}
+}

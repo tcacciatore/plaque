@@ -395,6 +395,7 @@ function start() {
   updateTokens();
   renderHud();
   P.screen('screen-parking');
+  P.fitViewport('screen-parking', '#pk-lot', '.hud, #pk-lot, .pk-tokens, #pk-form, .feedback, .hint-line');
   $('pk-input').focus();
   loop();
 }
@@ -424,6 +425,12 @@ window.PARKING = { start: start, stop: stop };
 
 document.addEventListener('DOMContentLoaded', function () {
   $('pk-form').addEventListener('submit', submit);
+  window.PLAQUE.autoSubmit($('pk-input'), $('pk-form'), function (w) {
+    return K.spots.some(function (c) {
+      return c && w !== c.got1 && w !== c.got2 &&
+             ((!c.got1 && P.matchPair(w, c.p1.p)) || (!c.got2 && P.matchPair(w, c.p2.p)));
+    });
+  });
   $('pk-skip').addEventListener('click', tow);
   var pickSpot = function (e) {
     var g = e.target.closest('.spot, .tokgroup');
