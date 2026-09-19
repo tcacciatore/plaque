@@ -23,8 +23,8 @@ fois lue. Le **numéro de département** rejoint votre collection à chaque plaq
 | **Poursuite** | Vue de l'intérieur, au volant — tableau de bord, compteur qui suit la vraie vitesse, votre véhicule de rang en insigne. Vous roulez plus vite que tout le monde : les voitures surgissent à l'horizon et se rapprochent. **Un seul mot**, sur l'une ou l'autre paire, dégomme une plaque (les deux paires dans un mot : ×2). Celles de votre voie sont des menaces à faire sauter avant le capot ; il n'y a pas d'esquive, seulement les mots. Celles des voies voisines vous frôlent : des points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin. *In extremis* ×1,5, dernier pare-chocs ×2, fièvre ×2. |
 | **Parking** | Neuf places sur trois rangées, tous les modèles présents, trois couleurs par parking. Les deux mots d'une plaque et la voiture explose ; une autre vient se garer. Chaque place garde la couleur de la dernière voiture pulvérisée : trois places alignées de même couleur (ligne, colonne, diagonale) rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge de 1 s (+2 s par plaque lue et par alignement, plafond 2 min 15). |
 
-La saisie n'a pas de bouton : un mot se valide tout seul après une pause de frappe
-d'une seconde dès qu'il est dans le dictionnaire et va sur une plaque (Entrée ou espace
+La saisie n'a pas de bouton : un mot se valide tout seul après une demi-seconde de pause de frappe
+— dès qu'il est dans le dictionnaire et va sur une plaque (Entrée ou espace
 valident immédiatement). Sur téléphone, la page se cale sur la hauteur visible,
 clavier ouvert compris, et la scène se redimensionne pour que tout reste à l'écran.
 
