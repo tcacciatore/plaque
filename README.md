@@ -68,8 +68,10 @@ le pick-up et le coupé débloquent chacun une teinte de carrosserie (violet, ch
 Une partie par jour entretient la **série de jours** : chaque jour d'affilée ajoute 10 % aux
 points de carrière gagnés, jusqu'à +100 %. Trois **missions par jour**, tirées de la date
 donc identiques pour tout le monde, et quinze **badges** transverses (mots rares, plaques,
-citernes, alignements, fièvres, parties, départements, assiduité), chacun avec son
-insigne — un écusson bronze, argent ou or dessiné en SVG, gris tant qu'il n'est pas obtenu.
+citernes, alignements, fièvres, parties, départements, assiduité), chacun avec sa
+médaille en trois dimensions (CSS, sans image) : face bombée aux reflets métalliques, teinte
+propre, tranche épaisse, dos gravé, reflet qui glisse ; grise tant qu'elle n'est pas obtenue.
+Un clic l'ouvre en grand, où elle tourne sur elle-même.
 
 Pendant la partie, la pastille sous le score alterne entre le **fantôme du record** (l'écart
 au meilleur score *au même instant*) et le **prochain rang** (« Berline argent dans 340 »).

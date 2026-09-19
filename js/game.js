@@ -229,21 +229,21 @@ function adapt(delta) {
 
 /* ═══════════ badges ═══════════ */
 var BADGES = [
-  { id: 'lettre',   name: 'Lettré',         txt: '50 mots rares',             stat: 'rare',   goal: 50,  icon: 'book',    metal: 'bronze' },
-  { id: 'erudit',   name: 'Érudit',         txt: '200 mots rares',            stat: 'rare',   goal: 200, icon: 'book',    metal: 'or' },
-  { id: 'expert',   name: 'Académicien',    txt: '20 mots d\'expert',         stat: 'expert', goal: 20,  icon: 'cap',     metal: 'argent' },
-  { id: 'pyro',     name: 'Pyromane',       txt: '100 plaques lues',          stat: 'plates', goal: 100, icon: 'flame',   metal: 'bronze' },
-  { id: 'incendie', name: 'Incendiaire',    txt: '500 plaques lues',          stat: 'plates', goal: 500, icon: 'flame',   metal: 'or' },
-  { id: 'demineur', name: 'Démineur',       txt: '10 camions-citernes',       stat: 'tank',   goal: 10,  icon: 'barrel',  metal: 'argent' },
-  { id: 'orfevre',  name: 'Orfèvre',        txt: '5 voitures dorées',         stat: 'gold',   goal: 5,   icon: 'gem',     metal: 'or' },
-  { id: 'aligneur', name: 'Aligneur',       txt: '25 alignements de couleur', stat: 'lines',  goal: 25,  icon: 'align',   metal: 'argent' },
-  { id: 'fievre',   name: 'Fiévreux',       txt: '10 fièvres déclenchées',    stat: 'fever',  goal: 10,  icon: 'thermo',  metal: 'bronze' },
-  { id: 'marathon', name: 'Marathonien',    txt: '30 parties',                stat: 'games',  goal: 30,  icon: 'clock',   metal: 'bronze' },
-  { id: 'forcene',  name: 'Forcené',        txt: '100 parties',               stat: 'games',  goal: 100, icon: 'clock',   metal: 'or' },
-  { id: 'carto',    name: 'Cartographe',    txt: '50 départements',           stat: 'deps',   goal: 50,  icon: 'map',     metal: 'argent' },
-  { id: 'tour',     name: 'Tour de France', txt: 'les 101 départements',      stat: 'deps',   goal: 101, icon: 'trophy',  metal: 'or' },
-  { id: 'assidu',   name: 'Assidu',         txt: '7 jours d\'affilée',        stat: 'streak', goal: 7,   icon: 'calendar', metal: 'bronze' },
-  { id: 'fidele',   name: 'Fidèle',         txt: '30 jours d\'affilée',       stat: 'streak', goal: 30,  icon: 'calendar', metal: 'or' }
+  { id: 'lettre',   name: 'Lettré',         txt: '50 mots rares',             stat: 'rare',   goal: 50,  icon: 'book',    metal: 'bronze', tint: '#4f7cf0' },
+  { id: 'erudit',   name: 'Érudit',         txt: '200 mots rares',            stat: 'rare',   goal: 200, icon: 'book',    metal: 'or', tint: '#3b5fd6' },
+  { id: 'expert',   name: 'Académicien',    txt: '20 mots d\'expert',         stat: 'expert', goal: 20,  icon: 'cap',     metal: 'argent', tint: '#8a5cf0' },
+  { id: 'pyro',     name: 'Pyromane',       txt: '100 plaques lues',          stat: 'plates', goal: 100, icon: 'flame',   metal: 'bronze', tint: '#ff5a3c' },
+  { id: 'incendie', name: 'Incendiaire',    txt: '500 plaques lues',          stat: 'plates', goal: 500, icon: 'flame',   metal: 'or', tint: '#e03a1e' },
+  { id: 'demineur', name: 'Démineur',       txt: '10 camions-citernes',       stat: 'tank',   goal: 10,  icon: 'barrel',  metal: 'argent', tint: '#ff9a3c' },
+  { id: 'orfevre',  name: 'Orfèvre',        txt: '5 voitures dorées',         stat: 'gold',   goal: 5,   icon: 'gem',     metal: 'or', tint: '#ffcf3f' },
+  { id: 'aligneur', name: 'Aligneur',       txt: '25 alignements de couleur', stat: 'lines',  goal: 25,  icon: 'align',   metal: 'argent', tint: '#3ddc84' },
+  { id: 'fievre',   name: 'Fiévreux',       txt: '10 fièvres déclenchées',    stat: 'fever',  goal: 10,  icon: 'thermo',  metal: 'bronze', tint: '#ff3c6e' },
+  { id: 'marathon', name: 'Marathonien',    txt: '30 parties',                stat: 'games',  goal: 30,  icon: 'clock',   metal: 'bronze', tint: '#35c4d6' },
+  { id: 'forcene',  name: 'Forcené',        txt: '100 parties',               stat: 'games',  goal: 100, icon: 'clock',   metal: 'or', tint: '#1fa3b8' },
+  { id: 'carto',    name: 'Cartographe',    txt: '50 départements',           stat: 'deps',   goal: 50,  icon: 'map',     metal: 'argent', tint: '#2e86de' },
+  { id: 'tour',     name: 'Tour de France', txt: 'les 101 départements',      stat: 'deps',   goal: 101, icon: 'trophy',  metal: 'or', tint: '#ffb13d' },
+  { id: 'assidu',   name: 'Assidu',         txt: '7 jours d\'affilée',        stat: 'streak', goal: 7,   icon: 'calendar', metal: 'bronze', tint: '#ff8a3c' },
+  { id: 'fidele',   name: 'Fidèle',         txt: '30 jours d\'affilée',       stat: 'streak', goal: 30,  icon: 'calendar', metal: 'or', tint: '#ff6a2a' }
 ];
 /* pictogrammes en trait, 24×24 */
 var ICONS = {
@@ -259,19 +259,39 @@ var ICONS = {
   trophy:   '<path d="M7 4h10v5a5 5 0 0 1-10 0zM5 5H3v2a4 4 0 0 0 4 3M19 5h2v2a4 4 0 0 1-4 3M9 21h6M12 14v7"/>',
   calendar: '<path d="M4 6h16v14H4zM4 11h16M8 3v5M16 3v5M8 15h2M12 15h2"/>'
 };
-function badgeSVG(b, ok, size) {
-  var s = size || 56, metal = ok ? b.metal : 'off', gid = 'ins-' + metal + '-' + b.id + '-' + s;
-  return '<svg class="insigne insigne--' + metal + '" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" aria-hidden="true">' +
-    '<defs><radialGradient id="' + gid + '" cx=".35" cy=".3">' +
-      { bronze: '<stop offset="0" stop-color="#f3c08a"/><stop offset=".55" stop-color="#c0722f"/><stop offset="1" stop-color="#6e3d18"/>',
-        argent: '<stop offset="0" stop-color="#f4f7fb"/><stop offset=".55" stop-color="#a9b4c4"/><stop offset="1" stop-color="#5f6b7d"/>',
-        or:     '<stop offset="0" stop-color="#fff0b0"/><stop offset=".55" stop-color="#e2ae2a"/><stop offset="1" stop-color="#8a5f0e"/>',
-        off:    '<stop offset="0" stop-color="#3a4256"/><stop offset="1" stop-color="#1c2230"/>' }[metal] +
-    '</radialGradient></defs>' +
-    '<path d="M32 3l9 5h10v11l5 8-5 8v11H41l-9 6-9-6H13V35l-5-8 5-8V8h10z" fill="url(#' + gid + ')" stroke="rgba(0,0,0,.45)" stroke-width="1.5"/>' +
-    '<path d="M32 9l6 3.5h7v8l3.5 6.5L45 33.5v8h-7L32 45l-6-3.5h-7v-8L15.5 27 19 20.5v-8h7z" fill="none" stroke="rgba(255,255,255,' + (ok ? '.35' : '.08') + ')" stroke-width="1.2"/>' +
-    '<g transform="translate(20 20) scale(1)" fill="none" stroke="' + (ok ? '#fff' : '#6b7690') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[b.icon] + '</g>' +
-    '</svg>';
+/* une médaille en trois dimensions : face bombée aux reflets métalliques, tranche
+   épaisse, dos gravé. Verrouillée : grise. En grand, elle tourne sur elle-même. */
+function badgeMedal(b, ok, size, spin) {
+  var s = size || 64;
+  var slices = '';
+  for (var i = 1; i <= 7; i++) slices += '<i class="medal__slice" style="transform:translateZ(' + (-i * s * 0.012) + 'px)"></i>';
+  return '<div class="medal medal--' + b.metal + (ok ? '' : ' medal--off') + (spin ? ' medal--spin' : '') +
+         '" style="--size:' + s + 'px;--tint:' + b.tint + '" data-badge="' + b.id + '">' +
+           '<div class="medal__body">' +
+             slices +
+             '<div class="medal__face medal__face--front">' +
+               '<div class="medal__ring"></div><div class="medal__dome"></div>' +
+               '<svg viewBox="0 0 24 24" class="medal__icon" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[b.icon] + '</svg>' +
+               '<div class="medal__glint"></div>' +
+             '</div>' +
+             '<div class="medal__face medal__face--back"><span>PLAQUE</span><b>' + b.name + '</b></div>' +
+           '</div>' +
+         '</div>';
+}
+var badgeSVG = badgeMedal;
+
+/* la médaille en grand */
+function openMedal(b) {
+  var got = store.get('badges', {}), s = stats(), ok = !!got[b.id];
+  var v = Math.min(b.goal, s[b.stat] || 0);
+  $('medal-stage').innerHTML = badgeMedal(b, ok, 210, true);
+  $('medal-name').textContent = b.name;
+  $('medal-txt').textContent = b.txt;
+  $('medal-state').innerHTML = ok
+    ? '<b>Obtenu</b>' + (got[b.id] > 1 ? ' — ' + new Date(got[b.id] * 86400000).toLocaleDateString('fr-FR') : '')
+    : v + ' / ' + b.goal + ' — <u style="width:' + Math.round(v / b.goal * 100) + '%"></u>';
+  $('medal-modal').hidden = false;
+  sfx.time();
 }
 
 function stats() { return store.get('stats', {}); }
@@ -622,7 +642,7 @@ function renderBadges() {
   $('badges-intro').innerHTML = '<b>' + Object.keys(got).length + '</b> badge' + (Object.keys(got).length > 1 ? 's' : '') + ' sur ' + BADGES.length;
   $('badges-list').innerHTML = BADGES.map(function (b) {
     var ok = !!got[b.id], v = Math.min(b.goal, s[b.stat] || 0);
-    return '<div class="badge' + (ok ? ' badge--on' : '') + '">' + badgeSVG(b, ok) +
+    return '<div class="badge' + (ok ? ' badge--on' : '') + '" data-badge="' + b.id + '">' + badgeMedal(b, ok, 64) +
            '<div class="badge__txt"><b>' + b.name + '</b><span>' + b.txt + '</span>' +
            '<i>' + (ok ? '✓ obtenu' : v + ' / ' + b.goal) + '</i>' +
            (ok ? '' : '<u style="width:' + Math.round(v / b.goal * 100) + '%"></u>') + '</div></div>';
@@ -920,6 +940,20 @@ document.addEventListener('DOMContentLoaded', function () {
   $('btn-career').addEventListener('click', renderCareer);
   $('btn-badges').addEventListener('click', renderBadges);
   $('btn-badges-back').addEventListener('click', window.PLAQUE.goHome);
+  $('badges-list').addEventListener('click', function (e) {
+    var el = e.target.closest('.badge'); if (!el) return;
+    var b = BADGES.filter(function (x) { return x.id === el.dataset.badge; })[0];
+    if (b) openMedal(b);
+  });
+  $('stat-badges-row').addEventListener('click', function (e) {
+    var m = e.target.closest('.medal'); if (!m) return;
+    e.stopPropagation();
+    var b = BADGES.filter(function (x) { return x.id === m.dataset.badge; })[0];
+    if (b) openMedal(b);
+  });
+  $('medal-modal').addEventListener('click', function (e) {
+    if (e.target === this || e.target.closest('[data-close]')) this.hidden = true;
+  });
   $('btn-career-back').addEventListener('click', window.PLAQUE.goHome);
   $('btn-collection-back').addEventListener('click', window.PLAQUE.goHome);
   $('btn-home').addEventListener('click', window.PLAQUE.goHome);
