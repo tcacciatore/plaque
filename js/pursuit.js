@@ -12,10 +12,12 @@
 var P = null;
 var LIVES = 3;
 var LANES = [-30, 0, 30], MY_LANE = 1;
-var Z_FAR = 10, Z_READ = 6.5, Z_HIT = 1.8, Z_PASS = 1.2;   // l'impact a lieu au bord du capot
-var V0 = 0.95, V_RAMP = 0.012, V_MAX = 2.6;          // vitesse en profondeur (z/s), sa montée par seconde, son plafond
-var SPAWN0 = 4.5, SPAWN_MIN = 2.2;                    // intervalle entre deux arrivées, au départ et au plus serré
-var CENTER0 = 0.42, CENTER_MAX = 0.68;                // part des voitures qui arrivent sur votre voie
+var Z_FAR = 10, Z_READ = 9.2, Z_HIT = 1.8, Z_PASS = 1.2;   // la plaque se lit dès l'horizon ; l'impact a lieu au bord du capot
+var V0 = 0.68, V_RAMP = 0.005, V_MAX = 1.7;          // vitesse en profondeur (z/s), sa montée par seconde, son plafond
+                                                     // → ~11 s pour lire une plaque au départ, ~6 s après deux minutes
+var SPAWN0 = 6.0, SPAWN_MIN = 3.6;                    // intervalle entre deux arrivées, au départ et au plus serré
+var CENTER0 = 0.34, CENTER_MAX = 0.50;                // part des voitures qui arrivent sur votre voie
+var REL_THREAT = [0.72, 0.92], REL_OTHER = [0.85, 1.2];   // celles de votre voie freinent devant vous : plus de temps pour elles
 var FEVER = 10, MULT_MAX = 5;
 var GOLD_ODDS = 22, GOLD_MULT = 3, TANK_ODDS = 12;
 // le parc (silhouettes, plaques, tailles, bonus) est décrit une fois pour toutes dans js/game.js
@@ -65,16 +67,17 @@ function spawn() {
   var t = played();
   var centerShare = Math.min(CENTER_MAX, CENTER0 + t / 240 * (CENTER_MAX - CENTER0));
   var lane = Math.random() < centerShare ? MY_LANE : (Math.random() < 0.5 ? 0 : 2);
-  // pas deux voitures trop proches sur la même voie
-  var blocked = R.cars.some(function (c) { return c.lane === lane && c.z > Z_FAR - 3; });
-  if (blocked) { lane = [0, 1, 2].filter(function (l) { return !R.cars.some(function (c) { return c.lane === l && c.z > Z_FAR - 3; }); })[0]; }
+  // pas deux voitures trop proches sur la même voie : leurs plaques se chevaucheraient
+  var free = function (l) { return !R.cars.some(function (c) { return c.lane === l && c.z > Z_FAR - 5.5; }); };
+  if (!free(lane)) { lane = [0, 2, 1].filter(free)[0]; }
   if (lane == null) return;
 
   var plate = P.newPlate(R.cars.length === 0 && R.done === 0), shape = pickShape();
   var gold = shape !== TANK && P.rand(GOLD_ODDS) === 0;
   var c = {
     p1: plate.p1, p2: plate.p2, dep: plate.dep, value: plate.value, num: String(plate.value).padStart(3, '0'),
-    shape: shape, lane: lane, z: Z_FAR, rel: 0.85 + Math.random() * 0.35, gold: gold, tank: shape === TANK,
+    shape: shape, lane: lane, z: Z_FAR, gold: gold, tank: shape === TANK,
+    rel: (function (r) { return r[0] + Math.random() * (r[1] - r[0]); })(lane === MY_LANE ? REL_THREAT : REL_OTHER),
     got1: null, got2: null, words: 0, pts: 0, gone: false, born: Date.now()
   };
   P.initCar(c, 'poursuite');
@@ -107,7 +110,10 @@ function placePlate(c) {
   var p = project(c.lane, c.z);
   var readable = c.z <= Z_READ;
   var s = Math.max(0.62, Math.min(1, 1 / c.z));           // la plaque reste lisible bien avant la voiture
-  var px = p.x / 100 * R.sceneW;
+  // loin, les voies convergent et les plaques se recouvriraient : on les écarte
+  // latéralement, d'autant plus que la voiture est loin ; l'écart se referme à l'approche
+  var spread = (c.lane - MY_LANE) * 0.15 * Math.max(0, 1 - Z_HIT / c.z);
+  var px = (p.x / 100 + spread) * R.sceneW;
   var F = FLEET[c.shape];
   var carH = F.size * R.sceneH / F.ratio * p.s;            // hauteur affichée de la voiture
   var py = p.y / 100 * R.sceneH - carH * (1 - F.plateY / 100);
@@ -317,7 +323,7 @@ function frame(now) {
   if (!R.running) return;
   var dt = Math.min(0.05, (now - R.last) / 1000); R.last = now;
   R.v = Math.min(V_MAX, R.v + V_RAMP * dt);
-  R.km += R.v * dt * 0.045;
+  R.km += R.v * dt * 0.063;      // même kilométrage qu'avant le ralentissement
   R.nextSpawn -= dt;
   if (R.nextSpawn <= 0) {
     spawn();
@@ -344,7 +350,7 @@ function frame(now) {
   var sway = Math.sin(now / 900) * 2.2 + Math.sin(now / 173) * 0.5;
   $('pu-wheel').style.transform = 'translateX(-50%) rotate(' + sway.toFixed(2) + 'deg)';
   $('pu-needle').style.transform = 'rotate(' + (-110 + (R.v / V_MAX) * 220).toFixed(1) + 'deg)';
-  $('pu-speed').textContent = Math.round(R.v * 52);
+  $('pu-speed').textContent = Math.round(R.v * 78);
   if (Math.floor(now / 200) !== Math.floor((now - dt * 1000) / 200)) {
     P.ghostSample(played(), R.score); P.paintGhost($('pu-ghost'), played(), R.score); renderHud();
   }
