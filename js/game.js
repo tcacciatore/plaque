@@ -531,6 +531,7 @@ function plateValue(p1, p2) {
 var modeRecap = '';
 function finishGame(recapHtml, baseScore) {
   unfit();
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   modeRecap = recapHtml;
   state.total = baseScore;
   endGame();

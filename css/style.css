@@ -960,3 +960,7 @@ body.fitted .platefield__eu{flex-basis:32px}
   100%{transform:rotateX(10deg) rotateY(332deg)}
 }
 .medal--spin .medal__body{animation-duration:5.5s;animation-timing-function:ease-in-out}
+
+.end-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.end-actions .btn{margin:0;font-size:16px;padding:13px 10px}
+@media (max-width:420px){.end-actions{grid-template-columns:1fr}}

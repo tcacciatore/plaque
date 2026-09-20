@@ -19,8 +19,14 @@ var TANK_ODDS = 14;                 // camion-citerne : un sur 14, explosion en 
 var WORD_TIME = 1;                  // secondes de partie gagnées par mot valide
 var PLATE_TIME = 2;                 // secondes de partie gagnées en plus par plaque lue
 var CAR_BONUS = 2;                  // secondes rendues à la voiture visée par mot valide
-var SPAWN_GAP = 3500;               // écart minimal entre deux apparitions, toutes voies confondues, en ms
-var GAP_MIN   = 3500, GAP_MAX = 5000;// délai avant qu'une voie libre se réalimente, en ms
+// rythme d'arrivée selon la difficulté : écart minimal entre deux apparitions,
+// toutes voies confondues, puis délai avant qu'une voie libre se réalimente (ms)
+var PACE = {
+  facile: { gap: 7000, min: 6000, max: 8000 },
+  normal: { gap: 5500, min: 4500, max: 6500 },
+  expert: { gap: 4000, min: 3500, max: 5000 }
+};
+var SPAWN_GAP = 5500, GAP_MIN = 4500, GAP_MAX = 6500;   // réglés au démarrage d'après PACE
 var TIME_CAP  = 135;                // la partie ne dépasse jamais 2 min 15
 var LANES3    = [-30, 0, 30];       // décalage de chaque voie, en % de la largeur de scène
 var LANES2    = [-25, 25];          // sur petit écran : deux voies plus écartées, voitures plus grandes
@@ -408,6 +414,8 @@ function start() {
   var two = Math.min(window.innerWidth, screen.width || 9999) < NARROW;
   LANES = two ? LANES2 : LANES3;
   document.querySelector('.road').classList.toggle('road--two', two);
+  var pace = PACE[P.state.diff] || PACE.normal;
+  SPAWN_GAP = pace.gap; GAP_MIN = pace.min; GAP_MAX = pace.max;
   T.running = true; T.timeLeft = GAME_TIME; T.score = 0;
   T.done = 0; T.seen = 0; T.combo = 1; T.lanes = LANES.map(function () { return null; }); T.history = []; T.lastSpawn = 0; T.target = null;
   T.t0 = Date.now(); T.feverUntil = 0; T.fevers = 0; T.rush = false; T.feverArmed = true;
