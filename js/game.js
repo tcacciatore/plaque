@@ -40,9 +40,33 @@ function shuffle(a) {
 }
 function screen(id) {
   var all = document.querySelectorAll('.screen');
+  var was = document.querySelector('.screen.active');
   for (var i = 0; i < all.length; i++) all[i].classList.remove('active');
   $(id).classList.add('active');
   window.scrollTo(0, 0);
+  if (was && was.id !== id) warp();            // on change d'écran comme on prend la route
+}
+/* le voile de transition : un fuseau de traits de vitesse qui s'ouvre depuis le centre */
+function warp() {
+  var w = $('warp');
+  if (!w) return;
+  w.classList.remove('go');
+  void w.offsetWidth;
+  w.classList.add('go');
+}
+/* le départ : la route de l'accueil accélère, la voiture s'élance, puis la partie commence */
+var launching = false;
+function launch() {
+  if (launching || $('btn-play').disabled) return;
+  launching = true;
+  var hero = document.querySelector('.hero');
+  hero.classList.add('launch');
+  sfx.time();
+  setTimeout(function () {
+    hero.classList.remove('launch');
+    launching = false;
+    newGame();
+  }, 480);
 }
 
 /* ─────────── stockage ─────────── */
@@ -915,6 +939,13 @@ function refreshHome() {
   $('stat-rank').textContent = rk.name;
   $('rank-img').src = rankSprite(rk);
   $('rank-img').className = 'rank__img rank__img--' + rk.metal;
+  $('hero-car').src = rankSprite(rk);                       // votre voiture roule sur la route de l'accueil
+  Array.prototype.forEach.call(document.querySelectorAll('.modecard__best'), function (el) {
+    var best = store.get('best.' + el.dataset.best + '.' + state.diff, 0);
+    el.textContent = best ? 'Record : ' + best : 'Jamais joué';
+  });
+  var ids = Object.keys(MODES), dots = $('modes-dots').children;
+  for (var di = 0; di < dots.length; di++) dots[di].classList.toggle('on', ids[di] === state.mode);
   $('rank-bar').style.width = next ? Math.round((pts - rk.pts) / (next.pts - rk.pts) * 100) + '%' : '100%';
   $('rank-xp').textContent = next ? pts + ' / ' + next.pts + ' pts' : pts + ' pts';
   $('rank-next').textContent = next ? 'Prochain : ' + next.name : 'Rang maximal';
@@ -1058,7 +1089,32 @@ document.addEventListener('DOMContentLoaded', function () {
     this.textContent = audio.on ? '🔊' : '🔇';
     if (audio.on) sfx.time();
   });
-  $('btn-play').addEventListener('click', newGame);
+  $('btn-play').addEventListener('click', launch);
+  // le carrousel des modes : la carte centrée devient le mode choisi, et le mode choisi se centre
+  var modesEl = $('opt-mode'), scrollT = null, autoTarget = null, autoUntil = 0;
+  function centerMode() {
+    var b = modesEl.querySelector('[data-v="' + state.mode + '"]');
+    if (b && modesEl.scrollWidth > modesEl.clientWidth + 4) {
+      autoTarget = b.offsetLeft - (modesEl.clientWidth - b.offsetWidth) / 2;
+      autoUntil = Date.now() + 1200;               // le temps du défilement programmé, on ne re-sélectionne pas
+      modesEl.scrollTo({ left: autoTarget, behavior: 'smooth' });
+    }
+  }
+  modesEl.addEventListener('scroll', function () {
+    clearTimeout(scrollT);
+    scrollT = setTimeout(function () {
+      if (Date.now() < autoUntil && Math.abs(modesEl.scrollLeft - autoTarget) > 3) return;   // défilement programmé en cours
+      autoUntil = 0;
+      var mid = modesEl.scrollLeft + modesEl.clientWidth / 2, best = null, bd = 1e9;
+      Array.prototype.forEach.call(modesEl.querySelectorAll('button'), function (b) {
+        var d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - mid);
+        if (d < bd) { bd = d; best = b; }
+      });
+      if (best && !best.classList.contains('on')) best.click();
+    }, 90);
+  });
+  modesEl.addEventListener('click', function () { setTimeout(centerMode, 0); });
+  setTimeout(centerMode, 50);
   $('btn-again').addEventListener('click', newGame);
   $('btn-share').addEventListener('click', copyShare);
   $('btn-collection').addEventListener('click', renderCollection);

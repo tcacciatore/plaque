@@ -738,7 +738,6 @@ h2{font-size:26px!important;letter-spacing:.04em;text-transform:uppercase}
 .modecard--parking{background:linear-gradient(160deg,#16213a,#121826)!important}
 .modecard.on{border-color:var(--accent)!important;box-shadow:0 0 0 1px var(--accent),0 12px 30px rgba(0,0,0,.45)}
 .modecard.on b{color:var(--accent)}
-@media (max-width:420px){.modes{grid-template-columns:1fr}.modecard{flex-direction:row;align-items:center;min-height:0}.modecard img{width:34%;margin:0;order:2}.modecard span{flex:1}}
 
 /* ── cartes, boutons, jauges ── */
 .rank,.missions,.stat,.recap,.lot,.collec__reg,.badge,.career__rank{box-shadow:0 8px 24px rgba(0,0,0,.35)}
@@ -773,14 +772,11 @@ body.fitted .platefield__eu{flex-basis:32px}
 #screen-home.active > *:nth-child(6){animation-delay:.25s}
 #screen-home.active > *:nth-child(7){animation-delay:.3s}
 @keyframes cascade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.modecard img{height:104px;width:auto;max-width:62%;object-fit:contain}
 .modecard{justify-content:space-between}
 .rank__foot i{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%}
 
 /* ───────── mode Poursuite ───────── */
 .modes{grid-template-columns:1fr 1fr 1fr}
-@media (max-width:640px){.modes{grid-template-columns:1fr 1fr}.modecard--poursuite{grid-column:1 / -1;flex-direction:row;align-items:center;min-height:0}.modecard--poursuite img{width:32%;height:auto;margin:0;order:2}.modecard--poursuite span{flex:1}}
-@media (max-width:420px){.modes{grid-template-columns:1fr}}
 .modecard--poursuite{background:linear-gradient(160deg,#1f1a2c,#121826)!important}
 .road--pursuit .road__cars{overflow:hidden}
 .pcar{position:absolute;left:0;top:0;transform-origin:50% 100%;will-change:transform;pointer-events:auto}
@@ -973,3 +969,81 @@ body.fitted .platefield__eu{flex-basis:32px}
 .end-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .end-actions .btn{margin:0;font-size:16px;padding:13px 10px}
 @media (max-width:420px){.end-actions{grid-template-columns:1fr}}
+
+
+/* ═══════════ accueil repensé : la route derrière, les modes en carrousel ═══════════ */
+.hero{padding:30px 16px 12px;border-radius:0 0 30px 30px;min-height:min(78vh,560px);display:flex;flex-direction:column;justify-content:flex-start}
+.hero__road{opacity:.9;
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.95) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,.55) 100%);
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.95) 0%,rgba(0,0,0,1) 60%,rgba(0,0,0,.55) 100%)}
+.hero__road .road__sky{inset:0 0 50% 0}
+.hero__road .road__ground,.hero__road .road__tarmac,.hero__road .road__edge{top:50%}
+.hero__road .road__tarmac{clip-path:polygon(46.5% 0,53.5% 0,140% 100%,-40% 100%)}
+.hero__road .road__sun{top:calc(50% - 96px);width:140px;height:140px;margin-left:-70px;opacity:.9}
+.hero__road .post{animation-duration:1.6s}
+/* votre voiture de rang, au premier plan, qui tangue doucement */
+.hero__car{position:absolute;left:50%;top:51%;width:min(34%,170px);transform:translateX(-50%);
+  filter:drop-shadow(0 18px 22px rgba(0,0,0,.7));animation:heroRide 3.2s ease-in-out infinite;
+  transition:transform .5s cubic-bezier(.4,0,.8,.4),opacity .5s}
+@keyframes heroRide{0%,100%{transform:translateX(-50%) translateY(0) rotate(0)}50%{transform:translateX(-50%) translateY(-3px) rotate(.4deg)}}
+.hero .logo{margin-top:6px;font-size:clamp(64px,17vw,104px)}
+.hero .plate--demo{margin:auto auto 12px;max-width:min(88%,400px)}
+.hero .ruleline{margin-bottom:2px;text-shadow:0 1px 8px rgba(0,0,0,.8)}
+/* le départ : la route accélère, la voiture s'élance vers l'horizon */
+.hero.launch .post{animation-duration:.42s}
+.hero.launch .hero__car{animation:none;transform:translateX(-50%) translateY(-48%) scale(.55);opacity:0}
+.hero.launch .plate--demo{transition:transform .45s ease-in,opacity .45s;transform:scale(.9);opacity:0}
+
+.modes-wrap{margin:14px -16px 6px;position:relative}
+.modes{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px calc(50% - min(38vw,150px)) 12px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0}
+.modes::-webkit-scrollbar{display:none}
+.modecard{flex:0 0 min(76vw,300px);scroll-snap-align:center;min-height:224px;padding:16px 16px 14px!important;
+  border-radius:20px!important;justify-content:flex-start!important;transition:transform .25s,box-shadow .25s,border-color .25s}
+.modecard img{height:118px;width:auto;max-width:82%;object-fit:contain;margin:2px -6px 0 0;align-self:flex-end}
+.modecard span{margin-top:auto}
+.modecard b{font-size:26px!important;letter-spacing:.05em}
+.modecard em{font-size:12.5px!important;color:#c3ccdb!important}
+.modecard__best{display:block;font-style:normal;font-size:11.5px;color:var(--dim);margin-top:6px;letter-spacing:.04em;text-transform:uppercase}
+.modecard.on .modecard__best{color:var(--accent)}
+.modecard--poursuite{background:linear-gradient(160deg,#1c1424,#121826)!important}
+.modecard:not(.on){transform:scale(.96);opacity:.85}
+.modes__dots{display:flex;justify-content:center;gap:6px;margin-top:-2px}
+.modes__dots i{width:6px;height:6px;border-radius:3px;background:var(--line);transition:.25s}
+.modes__dots i.on{width:20px;background:var(--accent)}
+@media (min-width:720px){
+  .modes{display:grid;grid-template-columns:repeat(3,1fr);overflow:visible;padding:8px 16px 6px}
+  .modecard{flex:auto;min-height:230px}
+  .modes__dots{display:none}
+}
+
+/* ═══════════ le HUD dans le décor : projeté sur le pare-brise ═══════════ */
+.hud--scene{position:absolute;top:8px;left:8px;right:8px;z-index:1300;gap:6px;pointer-events:none}
+.hud--scene .hud__item{background:rgba(6,10,16,.42);border:1px solid rgba(255,255,255,.13);border-radius:12px;padding:5px 10px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 20px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08)}
+.hud--scene .hud__k{color:rgba(232,237,245,.62);font-size:10px}
+.hud--scene .hud__v{text-shadow:0 1px 6px rgba(0,0,0,.7);font-size:21px}
+.hud--scene .ghost{text-shadow:0 1px 4px rgba(0,0,0,.8)}
+body.fitted .hud--scene .hud__item{padding:3px 8px}
+body.fitted .hud--scene .hud__v{font-size:17px}
+@media (max-width:420px){.hud--scene .hud__item{padding:4px 6px}.hud--scene .hud__v{font-size:17px}.hud--scene .hud__k{font-size:9px;letter-spacing:.06em}}
+/* la route commence directement sous le titre de l'écran : plus de bandeau au-dessus */
+#screen-traffic .road,#screen-pursuit .road{margin-top:0}
+/* le parking : le HUD devient le panneau d'entrée, soudé au parking */
+.hud--lot{background:linear-gradient(180deg,#1f2733,#181e28);border:1px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0;
+  padding:8px 10px 6px;gap:0;position:relative;z-index:2}
+.hud--lot .hud__item{background:none;border:0;border-radius:0;padding:2px 8px}
+.hud--lot .hud__item+.hud__item{border-left:1px solid var(--line)}
+.hud--lot::after{content:'';position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:repeating-linear-gradient(90deg,#f0d24a 0 14px,transparent 14px 24px);opacity:.6}
+#screen-parking .lot{border-radius:0 0 14px 14px;margin-top:0}
+
+/* ═══════════ transitions : le voile « départ » ═══════════ */
+.warp{position:fixed;inset:0;z-index:5000;pointer-events:none;opacity:0;
+  background:repeating-conic-gradient(from 0deg at 50% 46%,transparent 0deg 5deg,rgba(255,230,170,.16) 5deg 6.2deg);
+  mask-image:radial-gradient(circle at 50% 46%,transparent 18%,#000 62%);
+  -webkit-mask-image:radial-gradient(circle at 50% 46%,transparent 18%,#000 62%)}
+.warp.go{animation:warp .46s cubic-bezier(.2,.6,.3,1)}
+@keyframes warp{0%{opacity:0;transform:scale(.5)}25%{opacity:.9}100%{opacity:0;transform:scale(1.6)}}
+.screen.active{animation:arrive .38s cubic-bezier(.2,.7,.2,1)}
+@keyframes arrive{from{opacity:0;transform:scale(.965) translateY(16px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.warp{display:none}.screen.active{animation:none}.hero__car{animation:none}}

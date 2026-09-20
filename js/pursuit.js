@@ -371,7 +371,7 @@ function start() {
   $('pu-road').classList.remove('rush', 'fever');
   feedback('&nbsp;', '');
   P.screen('screen-pursuit');
-  P.fitViewport('screen-pursuit', '.road', '.hud, .road, .tr-pairs, #pu-form, .feedback, .hint-line');
+  P.fitViewport('screen-pursuit', '.road', '.road, .tr-pairs, #pu-form, .feedback, .hint-line');
   measure();
   renderHud(); renderTokens();
   P.guideSay(1, 'Vous roulez plus vite que tout le monde. Les voitures arrivent de l\'horizon : <b>un mot</b> qui contient l\'une des deux paires, et la voiture explose. Celles de <b>votre voie</b> doivent sauter avant le capot.');

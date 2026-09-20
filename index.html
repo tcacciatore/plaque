@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="css/style.css?v=82">
+<link rel="stylesheet" href="css/style.css?v=83">
 </head>
 <body>
 
@@ -22,6 +22,7 @@
   </div>
 </div>
 <div id="guide" class="guide"></div>
+<div id="warp" class="warp" aria-hidden="true"></div>
 <button id="btn-sound" class="soundbtn" title="Son" aria-label="Activer ou couper le son">🔊</button>
 
 <div id="app">
@@ -37,6 +38,7 @@
           <i class="post post--l" style="animation-delay:0s"></i><i class="post post--l" style="animation-delay:-.33s"></i><i class="post post--l" style="animation-delay:-.66s"></i><i class="post post--l" style="animation-delay:-.99s"></i>
           <i class="post post--r" style="animation-delay:-.15s"></i><i class="post post--r" style="animation-delay:-.48s"></i><i class="post post--r" style="animation-delay:-.81s"></i><i class="post post--r" style="animation-delay:-1.14s"></i>
         </div>
+        <img class="hero__car" id="hero-car" src="assets/cars/citadine-bronze.webp" alt="">
       </div>
       <h1 class="logo">PLAQUE</h1>
       <p class="tagline">Le jeu de mots des plaques d'immatriculation</p>
@@ -56,19 +58,22 @@
       <em><b>P</b>o<b>L</b>ogne</em> · <em><b>M</b>a<b>T</b>raque</em></p>
     </div>
 
-    <div class="modes" id="opt-mode" role="radiogroup" aria-label="Mode de jeu">
-      <button data-v="trafic" class="on modecard modecard--trafic" role="radio">
-        <img src="assets/cars/coupe-rouge.webp" alt="">
-        <span><b>Trafic</b><em>au volant — trois voies, deux mots par voiture, 2 minutes</em></span>
-      </button>
-      <button data-v="parking" class="modecard modecard--parking" role="radio">
-        <img src="assets/cars/van-bleu.webp" alt="">
-        <span><b>Parking</b><em>neuf places, les voitures se relaient — alignez les couleurs</em></span>
-      </button>
-      <button data-v="poursuite" class="modecard modecard--poursuite" role="radio">
-        <img src="assets/cars/pickup-noir.webp" alt="">
-        <span><b>Poursuite</b><em>au volant, un mot par plaque — trois pare-chocs, sans fin</em></span>
-      </button>
+    <div class="modes-wrap">
+      <div class="modes" id="opt-mode" role="radiogroup" aria-label="Mode de jeu">
+        <button data-v="trafic" class="on modecard modecard--trafic" role="radio">
+          <img src="assets/cars/coupe-rouge.webp" alt="">
+          <span><b>Trafic</b><em>au volant — trois voies, deux mots par voiture, 2 minutes</em><i class="modecard__best" data-best="trafic"></i></span>
+        </button>
+        <button data-v="parking" class="modecard modecard--parking" role="radio">
+          <img src="assets/cars/van-bleu.webp" alt="">
+          <span><b>Parking</b><em>neuf places, les voitures se relaient — alignez les couleurs</em><i class="modecard__best" data-best="parking"></i></span>
+        </button>
+        <button data-v="poursuite" class="modecard modecard--poursuite" role="radio">
+          <img src="assets/cars/supercar-noir.webp" alt="">
+          <span><b>Poursuite</b><em>au volant, un mot par plaque — trois pare-chocs, sans fin</em><i class="modecard__best" data-best="poursuite"></i></span>
+        </button>
+      </div>
+      <div class="modes__dots" id="modes-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
     </div>
 
     <div class="settings">
@@ -154,13 +159,12 @@
 
   <!-- ══════════ MODE POURSUITE ══════════ -->
   <section id="screen-pursuit" class="screen">
-    <header class="hud">
-      <div class="hud__item" id="pu-timebox"><span class="hud__k">Pare-chocs</span><span class="hud__v hud__v--lives" id="pu-lives"></span></div>
-      <div class="hud__item hud__item--goal"><span class="hud__k">Score</span><span class="hud__v" id="pu-score">0</span><span class="ghost" id="pu-ghost"></span></div>
-      <div class="hud__item hud__item--mult"><span class="hud__k">Distance</span><span class="hud__v" id="pu-km">0.0 <i>km</i></span></div>
-    </header>
-
     <div class="road road--pursuit" id="pu-road">
+      <header class="hud hud--scene">
+        <div class="hud__item" id="pu-timebox"><span class="hud__k">Pare-chocs</span><span class="hud__v hud__v--lives" id="pu-lives"></span></div>
+        <div class="hud__item hud__item--goal"><span class="hud__k">Score</span><span class="hud__v" id="pu-score">0</span><span class="ghost" id="pu-ghost"></span></div>
+        <div class="hud__item hud__item--mult"><span class="hud__k">Distance</span><span class="hud__v" id="pu-km">0.0 <i>km</i></span></div>
+      </header>
       <div class="road__sky"></div>
       <div class="road__sun"></div>
       <div class="road__ground"></div>
@@ -210,7 +214,7 @@
 
   <!-- ══════════ MODE PARKING ══════════ -->
   <section id="screen-parking" class="screen">
-    <header class="hud">
+    <header class="hud hud--lot">
       <div class="hud__item" id="pk-timebox"><span class="hud__k">Temps</span><span class="hud__v" id="pk-time">2:00</span><span class="hud__gain" id="pk-gain"></span></div>
       <div class="hud__item hud__item--goal"><span class="hud__k">Score</span><span class="hud__v" id="pk-score">0</span><span class="ghost" id="pk-ghost"></span></div>
       <div class="hud__item hud__item--mult"><span class="hud__k">Pulvérisées</span><span class="hud__v" id="pk-left">0</span></div>
@@ -255,13 +259,12 @@
 
   <!-- ══════════ MODE TRAFIC ══════════ -->
   <section id="screen-traffic" class="screen">
-    <header class="hud">
-      <div class="hud__item" id="tr-timebox"><span class="hud__k">Temps</span><span class="hud__v" id="tr-time">2:00</span><span class="hud__gain" id="tr-gain"></span></div>
-      <div class="hud__item hud__item--goal"><span class="hud__k">Score</span><span class="hud__v" id="tr-score">0</span><span class="ghost" id="tr-ghost"></span></div>
-      <div class="hud__item hud__item--mult"><span class="hud__k">Plaques lues</span><span class="hud__v" id="tr-cars">0</span></div>
-    </header>
-
     <div class="road">
+      <header class="hud hud--scene">
+        <div class="hud__item" id="tr-timebox"><span class="hud__k">Temps</span><span class="hud__v" id="tr-time">2:00</span><span class="hud__gain" id="tr-gain"></span></div>
+        <div class="hud__item hud__item--goal"><span class="hud__k">Score</span><span class="hud__v" id="tr-score">0</span><span class="ghost" id="tr-ghost"></span></div>
+        <div class="hud__item hud__item--mult"><span class="hud__k">Plaques lues</span><span class="hud__v" id="tr-cars">0</span></div>
+      </header>
       <div class="road__sky"></div>
       <div class="road__sun"></div>
       <div class="road__ground"></div>
@@ -288,12 +291,12 @@
 
 </div>
 
-<script src="js/pairs.js?v=82"></script>
-<script src="js/departements.js?v=82"></script>
-<script src="js/dict.js?v=82"></script>
-<script src="js/game.js?v=82"></script>
-<script src="js/traffic.js?v=82"></script>
-<script src="js/parking.js?v=82"></script>
-<script src="js/pursuit.js?v=82"></script>
+<script src="js/pairs.js?v=83"></script>
+<script src="js/departements.js?v=83"></script>
+<script src="js/dict.js?v=83"></script>
+<script src="js/game.js?v=83"></script>
+<script src="js/traffic.js?v=83"></script>
+<script src="js/parking.js?v=83"></script>
+<script src="js/pursuit.js?v=83"></script>
 </body>
 </html>

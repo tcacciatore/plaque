@@ -447,7 +447,7 @@ function start() {
   feedback('&nbsp;', '');
   renderHud(); renderPairs();
   P.screen('screen-traffic');
-  P.fitViewport('screen-traffic', '.road', '.hud, .road, .tr-pairs, #tr-form, .feedback, .hint-line');
+  P.fitViewport('screen-traffic', '.road', '.road, .tr-pairs, #tr-form, .feedback, .hint-line');
   $('tr-input').focus();
   loop();
   // les trois voies s'amorcent à des instants différents
