@@ -46,25 +46,14 @@ var $ = function (id) { return document.getElementById(id); };
 /* Sprites rendus hors ligne par build/render_cars.py : une seule <img> par
    voiture, sans filtre ni fusion au runtime — c'est moins coûteux à animer
    qu'un SVG, que le navigateur devait re-rastériser à chaque échelle.       */
-var SHAPES = ['berline', 'suv', 'citadine', 'pickup', 'van', 'coupe'];
-var TANK = 'citerne';
-// largeur affichée, en fraction de la hauteur de scène : c'est elle qui fixe
-// la distance apparente, indépendamment de la largeur de l'écran
-var SIZE = { berline: [.68, .74], suv: [.64, .70], citadine: [.60, .66],
-             pickup: [.66, .72], van: [.56, .62], coupe: [.72, .78], citerne: [.52, .56] };
-// position de l'emplacement de plaque, mesurée sur le rendu (build/render_cars.py)
-var PLATE_Y = { berline: 71.5, suv: 73.3, citadine: 69.5, pickup: 56.8, van: 70.5, coupe: 62.7, citerne: 75.5 };
-var PLATE_W = { berline: 47.3, suv: 45.0, citadine: 48.8, pickup: 43.6, van: 45.0, coupe: 43.0, citerne: 44.3 };
+// le parc (silhouettes, plaques, tailles, bonus) est décrit une fois pour toutes dans js/game.js
+var FLEET = window.PLAQUE.FLEET, TANK = window.PLAQUE.TANK;
 var SPRITES = 'assets/cars/';
-// tirage pondéré : le coupé est rare, et ses mots valent plus
-var DRAW = ['berline', 'suv', 'citadine', 'pickup', 'van', 'berline', 'citadine', 'coupe'];
-var SPORT = 'coupe', SPORT_BONUS = 1.5;
-var preloaded = false;
+var isSport = function (s) { return !!FLEET[s].sport; };
 
-function preloadCars() {
-  if (preloaded) return;
-  preloaded = true;
-  SHAPES.concat([TANK]).forEach(function (s) {
+function preloadCars(roster) {
+  // seules les silhouettes de la partie sont préchargées, dans toutes leurs teintes
+  roster.concat([TANK]).forEach(function (s) {
     P.colors().concat(['or']).forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '.webp'; });
   });
 }
@@ -89,8 +78,9 @@ function pickShape() {
   var present = T.lanes.filter(Boolean).map(function (c) { return c.shape; });
   var late = played() > 60;                       // en fin de partie, les coupés se multiplient
   if (present.indexOf(TANK) === -1 && T.seen > 2 && P.rand(TANK_ODDS) === 0) return TANK;
-  if (present.indexOf(SPORT) === -1 && P.rand(late ? 4 : 8) === 0) return SPORT;
-  var pool = SHAPES.filter(function (s) { return s !== SPORT && present.indexOf(s) === -1; });
+  var sports = T.roster.filter(function (s) { return isSport(s) && present.indexOf(s) === -1; });
+  if (sports.length && P.rand(late ? 4 : 8) === 0) return P.pick(sports);
+  var pool = T.roster.filter(function (s) { return !isSport(s) && present.indexOf(s) === -1; });
   return P.pick(pool);
 }
 
@@ -109,12 +99,12 @@ function spawnLane(lane) {
     born: Date.now(), extra: 0
   };
   var el = document.createElement('div');
-  el.className = 'car car--in' + (shape === SPORT ? ' car--sport' : '') + (gold ? ' car--gold' : '') + (car.tank ? ' car--tank' : '');
-  var sz = SIZE[shape];
-  el.style.setProperty('--w', (sz[0] + Math.random() * (sz[1] - sz[0])).toFixed(3));
+  el.className = 'car car--in' + (isSport(shape) ? ' car--sport' : '') + (gold ? ' car--gold' : '') + (car.tank ? ' car--tank' : '');
+  var F = FLEET[shape];
+  el.style.setProperty('--w', (F.size - 0.06 * Math.random()).toFixed(3));
   el.style.setProperty('--lane', LANES[lane] + '%');
-  el.style.setProperty('--plateY', PLATE_Y[shape] + '%');
-  el.style.setProperty('--plateW', PLATE_W[shape] + '%');
+  el.style.setProperty('--plateY', F.plateY + '%');
+  el.style.setProperty('--plateW', F.plateW + '%');
   el.style.setProperty('--ride', (3.4 + Math.random() * 2.2).toFixed(2) + 's');
   el.style.setProperty('--ridePhase', (-Math.random() * 5).toFixed(2) + 's');
   el.innerHTML = '<div class="car__ride">' +
@@ -217,7 +207,7 @@ function renderPairs() {
   var box = $('tr-pairs');
   if (!alive.length) { box.innerHTML = '<span class="tok tok--wait">…</span>'; return; }
   box.innerHTML = alive.map(function (c) {
-    var sp = c.shape === SPORT ? ' tok--sport' : '';
+    var sp = isSport(c.shape) ? ' tok--sport' : '';
     var tg = c === T.target ? ' tok--target' : '';
     return '<span class="tokgroup' + tg + '" data-lane="' + c.lane + '">' +
            '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + (c.got1 ? '✓' : c.p1.p) + '</span>' +
@@ -284,8 +274,8 @@ function submit(e) {
 
   var car = best.c, hit = best.h1 || best.h2;
   var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
-  var sport = car.shape === SPORT;
-  var pts = Math.round(ws.pts * T.combo * (sport ? SPORT_BONUS : 1) * (car.gold ? GOLD_MULT : 1) * multiplier());
+  var sport = isSport(car.shape);
+  var pts = Math.round(ws.pts * T.combo * P.sportBonus(car.shape) * (car.gold ? GOLD_MULT : 1) * multiplier());
 
   var both = best.h1 && best.h2;                 // les deux paires dans le même mot
   if (both) pts *= 2;
@@ -307,7 +297,7 @@ function submit(e) {
   feedback('+' + pts + ' sur ' + who +
            (both ? ' — <b>les deux paires d\'un coup</b> ×2' : '') +
            (ws.label ? ' — ' + ws.label : '') +
-           (sport ? ' · 🏎️ <b>coupé ×' + String(SPORT_BONUS).replace('.', ',') + '</b>' : '') +
+           (sport ? ' · <b>' + P.sportTag(car.shape) + '</b>' : '') +
            (T.combo > 1 ? ' · série <b>×' + T.combo + '</b>' : '') +
            (car.got1 && car.got2 ? '' : ' · il manque <b>' + (car.got1 ? car.p2.p : car.p1.p) + '</b>'), 'ok');
   if (!(car.got1 && car.got2)) setTarget(car);   // le mot suivant ira d'abord sur cette voiture
@@ -322,7 +312,7 @@ function submit(e) {
 
 /* la plaque est lue : la cote tombe, la voiture explose — la citerne emporte ses voisines */
 function readPlate(car, who, sport) {
-  var bonus = Math.round(car.value * (sport ? SPORT_BONUS : 1) * (car.gold ? GOLD_MULT : 1) * multiplier());
+  var bonus = Math.round(car.value * P.sportBonus(car.shape) * (car.gold ? GOLD_MULT : 1) * multiplier());
   car.pts += bonus; T.score += bonus; T.done++;
   gainTime(PLATE_TIME);
   if (T.combo < MULT_MAX) { T.combo++; if (T.combo === MULT_MAX) T.feverArmed = true; }
@@ -422,7 +412,8 @@ function start() {
   document.querySelector('.road').classList.remove('rush', 'fever');
   T.timers.forEach(clearTimeout); T.timers = LANES.map(function () { return null; });
   $('tr-cars-layer').innerHTML = '';
-  preloadCars();
+  T.roster = P.fleetRoster();
+  preloadCars(T.roster);
   $('tr-input').value = '';
   feedback('&nbsp;', '');
   renderHud(); renderPairs();

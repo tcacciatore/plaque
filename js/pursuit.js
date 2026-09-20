@@ -18,12 +18,10 @@ var SPAWN0 = 4.5, SPAWN_MIN = 2.2;                    // intervalle entre deux a
 var CENTER0 = 0.42, CENTER_MAX = 0.68;                // part des voitures qui arrivent sur votre voie
 var FEVER = 10, MULT_MAX = 5;
 var GOLD_ODDS = 22, GOLD_MULT = 3, TANK_ODDS = 12;
-var SHAPES = ['berline', 'suv', 'citadine', 'pickup', 'van', 'coupe'];
-var SPORT = 'coupe', SPORT_BONUS = 1.5, TANK = 'citerne';
-var PLATE_Y = { berline: 71.5, suv: 73.3, citadine: 69.5, pickup: 56.8, van: 70.5, coupe: 62.7, citerne: 75.5 };
-var PLATE_W = { berline: 47.3, suv: 45.0, citadine: 48.8, pickup: 43.6, van: 45.0, coupe: 43.0, citerne: 44.3 };
-var SIZE = { berline: .74, suv: .70, citadine: .66, pickup: .72, van: .62, coupe: .78, citerne: .56 };
+// le parc (silhouettes, plaques, tailles, bonus) est décrit une fois pour toutes dans js/game.js
+var FLEET = window.PLAQUE.FLEET, TANK = window.PLAQUE.TANK;
 var SPRITES = 'assets/cars/';
+var isSport = function (s) { return !!FLEET[s].sport; };
 
 var R = { running: false, cars: [], lives: LIVES, score: 0, km: 0, done: 0, dodged: 0, hits: 0, combo: 1,
           t0: 0, last: 0, v: V0, nextSpawn: 0, raf: null, target: null, feverUntil: 0, feverArmed: true,
@@ -43,7 +41,7 @@ function place(el, lane, z, w) {
 
 /* ─────────── voitures ─────────── */
 function plateHTML(c) {
-  return '<div class="plate plate--car plate--pursuit" style="--plateY:' + PLATE_Y[c.shape] + '%;--plateW:' + PLATE_W[c.shape] + '%">' +
+  return '<div class="plate plate--car plate--pursuit" style="--plateY:' + FLEET[c.shape].plateY + '%;--plateW:' + FLEET[c.shape].plateW + '%">' +
       '<div class="plate__eu"><div class="plate__f">F</div></div>' +
       '<div class="plate__body">' +
         '<span class="plate__letters" data-pair="1">' + c.p1.p + '</span>' +
@@ -57,9 +55,10 @@ function plateHTML(c) {
 function pickShape() {
   var present = R.cars.map(function (c) { return c.shape; });
   if (present.indexOf(TANK) === -1 && R.done + R.dodged > 3 && P.rand(TANK_ODDS) === 0) return TANK;
-  if (present.indexOf(SPORT) === -1 && P.rand(7) === 0) return SPORT;
-  var pool = SHAPES.filter(function (s) { return s !== SPORT && present.indexOf(s) === -1; });
-  return P.pick(pool.length ? pool : SHAPES);
+  var sports = R.roster.filter(function (s) { return isSport(s) && present.indexOf(s) === -1; });
+  if (sports.length && P.rand(7) === 0) return P.pick(sports);
+  var pool = R.roster.filter(function (s) { return !isSport(s) && present.indexOf(s) === -1; });
+  return P.pick(pool.length ? pool : R.roster);
 }
 function spawn() {
   var t = played();
@@ -78,9 +77,9 @@ function spawn() {
     got1: null, got2: null, words: 0, pts: 0, gone: false, born: Date.now()
   };
   var el = document.createElement('div');
-  el.className = 'pcar' + (lane === MY_LANE ? ' pcar--threat' : '') + (shape === SPORT ? ' car--sport' : '') +
+  el.className = 'pcar' + (lane === MY_LANE ? ' pcar--threat' : '') + (isSport(shape) ? ' car--sport' : '') +
                  (gold ? ' car--gold' : '') + (c.tank ? ' car--tank' : '');
-  el.style.width = (SIZE[shape] * R.sceneH) + 'px';
+  el.style.width = (FLEET[shape].size * R.sceneH) + 'px';
   el.innerHTML = '<div class="car__ride">' +
                    (gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' : c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' : '') +
                    '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + (gold ? 'or' : P.pick(P.colors())) + '.webp">' +
@@ -104,8 +103,9 @@ function placePlate(c) {
   var readable = c.z <= Z_READ;
   var s = Math.max(0.62, Math.min(1, 1 / c.z));           // la plaque reste lisible bien avant la voiture
   var px = p.x / 100 * R.sceneW;
-  var carH = SIZE[c.shape] * R.sceneH * 0.66 * p.s;       // hauteur affichée de la voiture (ratio ≈ 1,5)
-  var py = p.y / 100 * R.sceneH - carH * (1 - PLATE_Y[c.shape] / 100);
+  var F = FLEET[c.shape];
+  var carH = F.size * R.sceneH / F.ratio * p.s;            // hauteur affichée de la voiture
+  var py = p.y / 100 * R.sceneH - carH * (1 - F.plateY / 100);
   c.pl.style.transform = 'translate3d(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px,0) translate(-50%,-50%) scale(' + s.toFixed(3) + ')';
   c.pl.style.opacity = readable ? '1' : '0';
   c.pl.style.zIndex = String(Math.round(1001 - c.z * 50));
@@ -133,7 +133,7 @@ function renderTokens() {
   var vis = R.cars.filter(function (c) { return !c.gone && c.z <= Z_READ + 0.6; }).sort(function (a, b) { return a.z - b.z; });
   if (!vis.length) { box.innerHTML = '<span class="tok tok--wait">…</span>'; return; }
   box.innerHTML = vis.map(function (c, i) {
-    var sp = c.shape === SPORT ? ' tok--sport' : '';
+    var sp = isSport(c.shape) ? ' tok--sport' : '';
     var tg = c === R.target ? ' tok--target' : '';
     var th = c.lane === MY_LANE ? ' tokgroup--threat' : '';
     return '<span class="tokgroup' + tg + th + '" data-i="' + R.cars.indexOf(c) + '">' +
@@ -196,10 +196,10 @@ function submit(e) {
 
   var c = best.c, hit = best.h1 || best.h2;
   var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
-  var sport = c.shape === SPORT;
+  var sport = isSport(c.shape);
   var both = best.h1 && best.h2;                                  // les deux paires dans le même mot : ×2
   var fever = inFever() ? 2 : 1;
-  var pts = Math.round(ws.pts * R.combo * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * multiplier() * (both ? 2 : 1) * fever);
+  var pts = Math.round(ws.pts * R.combo * P.sportBonus(c.shape) * (c.gold ? GOLD_MULT : 1) * multiplier() * (both ? 2 : 1) * fever);
   if (best.h1) { c.got1 = w; flashPair(c, 1); }
   if (best.h2) { c.got2 = w; flashPair(c, 2); }
   c.words += both ? 2 : 1; c.pts += pts; R.score += pts;
@@ -209,7 +209,7 @@ function submit(e) {
   var who = '<b class="mono">' + c.p1.p + '·' + c.num + '·' + c.p2.p + '</b>';
 
   var extremis = c.lane === MY_LANE && c.z < Z_HIT + 0.8;
-  var bonus = Math.round(c.value * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * (extremis ? 1.5 : 1) * (both ? 2 : 1) * multiplier() * fever);
+  var bonus = Math.round(c.value * P.sportBonus(c.shape) * (c.gold ? GOLD_MULT : 1) * (extremis ? 1.5 : 1) * (both ? 2 : 1) * multiplier() * fever);
   c.pts += bonus; R.score += bonus; R.done++;
   c.words = 2;
   P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, tank: c.tank, dep: c.dep.num, depName: c.dep.nom });
@@ -287,7 +287,7 @@ function measure() {
   var r = $('pu-road').getBoundingClientRect();
   R.sceneW = r.width; R.sceneH = r.height;
   $('pu-badge').src = P.myCar();
-  R.cars.forEach(function (c) { c.el.style.width = (SIZE[c.shape] * R.sceneH) + 'px'; place(c.el, c.lane, c.z); placePlate(c); });
+  R.cars.forEach(function (c) { c.el.style.width = (FLEET[c.shape].size * R.sceneH) + 'px'; place(c.el, c.lane, c.z); placePlate(c); });
 }
 
 /* ─────────── boucle ─────────── */
@@ -333,6 +333,10 @@ function start() {
   P = window.PLAQUE;
   R.running = true; R.cars = []; R.lives = LIVES; R.score = 0; R.km = 0; R.done = 0; R.dodged = 0; R.hits = 0;
   R.combo = 1; R.v = V0; R.nextSpawn = 1.2; R.target = null; R.feverUntil = 0; R.feverArmed = true; R.invulnUntil = 0; R.history = [];
+  R.roster = P.fleetRoster();
+  R.roster.concat([TANK]).forEach(function (s) {      // préchargement du roster de la partie
+    P.colors().concat(['or']).forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '.webp'; });
+  });
   R.t0 = Date.now(); R.last = performance.now();
   $('pu-cars').innerHTML = '';
   $('pu-input').value = '';

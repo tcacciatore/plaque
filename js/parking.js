@@ -21,13 +21,10 @@ var TANK_ODDS = 14;                    // camion-citerne : ses voisines explosen
 var WORD_TIME = 1, PLATE_TIME = 2;     // secondes gagnées par mot, et en plus par plaque lue
 var TOW_PENALTY = 15;                  // secondes perdues en faisant remorquer une voiture
 var PARK_MIN = 2500, PARK_MAX = 4500;  // délai avant qu'une place libre soit réoccupée, en ms
-var SHAPES = ['berline', 'suv', 'citadine', 'pickup', 'van', 'coupe'];
-var TANK = 'citerne';
-var SPORT = 'coupe', SPORT_BONUS = 1.5;
-var WIDTH = { berline: 97, suv: 95, citadine: 92, pickup: 97, van: 82, coupe: 100, citerne: 78 };   // % de la place
-var PLATE_Y = { berline: 71.5, suv: 73.3, citadine: 69.5, pickup: 56.8, van: 70.5, coupe: 62.7, citerne: 75.5 };
-var PLATE_W = { berline: 47.3, suv: 45.0, citadine: 48.8, pickup: 43.6, van: 45.0, coupe: 43.0, citerne: 44.3 };
+// le parc (silhouettes, plaques, tailles, bonus) est décrit une fois pour toutes dans js/game.js
+var FLEET = window.PLAQUE.FLEET, TANK = window.PLAQUE.TANK;
 var SPRITES = 'assets/cars/';
+var isSport = function (s) { return !!FLEET[s].sport; };
 
 var K = { spots: [], marks: [], palette: [], done: 0, seen: 0, lines: 0, score: 0, combo: 1,
           timeLeft: 0, timers: [], tick: null, running: false, target: null, history: [],
@@ -39,9 +36,10 @@ function pickShape() {
   // un modèle absent du parking si possible ; le coupé reste rare, la citerne plus encore
   var present = K.spots.filter(Boolean).map(function (c) { return c.shape; });
   if (present.indexOf(TANK) === -1 && K.seen >= SPOTS && P.rand(TANK_ODDS) === 0) return TANK;
-  if (present.indexOf(SPORT) === -1 && P.rand(6) === 0) return SPORT;
-  var pool = SHAPES.filter(function (s) { return s !== SPORT && present.indexOf(s) === -1; });
-  if (!pool.length) pool = SHAPES.filter(function (s) { return s !== SPORT; });
+  var sports = K.roster.filter(function (s) { return isSport(s) && present.indexOf(s) === -1; });
+  if (sports.length && P.rand(6) === 0) return P.pick(sports);
+  var pool = K.roster.filter(function (s) { return !isSport(s) && present.indexOf(s) === -1; });
+  if (!pool.length) pool = K.roster.filter(function (s) { return !isSport(s); });
   return P.pick(pool);
 }
 
@@ -59,11 +57,12 @@ function makeCar(i, shape, color, easy) {
 }
 
 function carHTML(c) {
-  return '<div class="spot__car' + (c.shape === SPORT ? ' spot__car--sport' : '') + (c.gold ? ' spot__car--gold' : '') +
-      '" style="--plateY:' + PLATE_Y[c.shape] + '%;--plateW:' + PLATE_W[c.shape] + '%;width:' + WIDTH[c.shape] + '%">' +
+  var F = FLEET[c.shape];
+  return '<div class="spot__car' + (isSport(c.shape) ? ' spot__car--sport' : '') + (c.gold ? ' spot__car--gold' : '') +
+      '" style="--plateY:' + F.plateY + '%;--plateW:' + F.plateW + '%;width:' + F.width + '%">' +
         (c.gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' :
          c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' :
-         c.shape === SPORT ? '<span class="sport-tag">🏎️ ×1,5</span>' : '') +
+         isSport(c.shape) ? '<span class="sport-tag">' + P.sportTag(c.shape) + '</span>' : '') +
         '<img class="car__body" alt="" draggable="false" src="' + SPRITES + c.shape + '-' + c.color + '.webp">' +
         '<div class="car__shadow"></div>' +
         '<div class="plate plate--car plate--park">' +
@@ -85,8 +84,12 @@ function buildLot() {
   do { K.palette = P.shuffle(P.colors()).slice(0, 3); }
   while (clash.some(function (c) { return K.palette.indexOf(c[0]) !== -1 && K.palette.indexOf(c[1]) !== -1; }));
 
-  // tous les modèles présents au départ : les six, plus trois tirés parmi les non-coupés
-  var shapes = SHAPES.slice(), extra = SHAPES.filter(function (s) { return s !== SPORT; });
+  // tous les modèles du roster présents au départ, complétés par des silhouettes courantes
+  K.roster = P.fleetRoster();
+  K.roster.concat([TANK]).forEach(function (s) {      // les remplaçantes arrivent sans délai de chargement
+    P.colors().concat(['or']).forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '.webp'; });
+  });
+  var shapes = K.roster.slice(), extra = K.roster.filter(function (s) { return !isSport(s); });
   while (shapes.length < SPOTS) shapes.push(P.pick(extra));
   P.shuffle(shapes);
 
@@ -224,7 +227,7 @@ function setTarget(c) {
 function updateTokens() {
   $('pk-tokens').innerHTML = K.spots.map(function (c) {
     if (!c) return '<span class="tokgroup tokgroup--empty"><span class="tok tok--wait">…</span></span>';
-    var sp = c.shape === SPORT ? ' tok--sport' : '';
+    var sp = isSport(c.shape) ? ' tok--sport' : '';
     var tg = c === K.target ? ' tok--target' : '';
     return '<span class="tokgroup' + tg + '" data-i="' + c.i + '">' +
            '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + c.p1.p + '</span>' +
@@ -283,8 +286,8 @@ function submit(e) {
 
   var c = best.c, hit = best.h1 || best.h2;
   var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
-  var sport = c.shape === SPORT;
-  var pts = Math.round(ws.pts * K.combo * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * multiplier());
+  var sport = isSport(c.shape);
+  var pts = Math.round(ws.pts * K.combo * P.sportBonus(c.shape) * (c.gold ? GOLD_MULT : 1) * multiplier());
   var both = best.h1 && best.h2;
   if (both) pts *= 2;
   if (best.h1) { c.got1 = w; flashPair(c, 1); }
@@ -300,7 +303,7 @@ function submit(e) {
   var who = '<b class="mono">' + c.p1.p + '·' + c.num + '·' + c.p2.p + '</b>';
 
   if (c.got1 && c.got2) {
-    var bonus = Math.round(c.value * (sport ? SPORT_BONUS : 1) * (c.gold ? GOLD_MULT : 1) * multiplier());
+    var bonus = Math.round(c.value * P.sportBonus(c.shape) * (c.gold ? GOLD_MULT : 1) * multiplier());
     c.pts += bonus; K.score += bonus; K.done++;
     gainTime(PLATE_TIME);
     P.sfx.dbl();

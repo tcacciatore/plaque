@@ -46,6 +46,7 @@ n'est jamais tirée deux fois dans la même partie.
 | série | ×1 à ×5, +1 par mot — une erreur la remet à ×1 |
 | **cote** | les trois chiffres de la plaque : ce qu'elle rapporte une fois lue, de 100 (paires riches) à 900 (paires rares) |
 | coupé | ×1,5 sur ses mots et sa cote (une voiture sur huit) |
+| supercar | ×2 sur ses mots et sa cote (aussi rare) |
 | voiture dorée | ×3 (une sur vingt-cinq) ; en Parking sa marque au sol est un joker de couleur |
 | camion-citerne | (un sur quatorze) quand il explose, ses voisines explosent avec lui, pour la moitié de leur cote |
 | **fièvre** | à ×5, dix secondes pendant lesquelles un seul mot suffit à lire une plaque ; puis la série redescend à ×3 |
@@ -59,8 +60,8 @@ rangée (Parking) ont toujours des paires accessibles.
 
 Chaque point marqué en partie s'ajoute à la **carrière** — les missions en rapportent 400,
 un nouveau département 100. Neuf véhicules, du moins au plus prestigieux (citadine,
-utilitaire, camping-car, berline, break, 4×4, pick-up, cabriolet, coupé sport), chacun en
-**bronze**, **argent** puis **or** : 27 rangs, de la citadine bronze au coupé or, avec des
+utilitaire, monospace, camping-car, berline, break, 4×4, pick-up, camion, cabriolet, ancienne, coupé sport, supercar), chacun en
+**bronze**, **argent** puis **or** : 39 rangs, de la citadine bronze à la supercar or, avec des
 seuils qui croissent (1 200, 4 000, 8 200 … ≈ 360 000 points). Le véhicule du rang est
 affiché à l'accueil dans son métal, avec la progression vers le rang suivant ; la berline,
 le pick-up et le coupé débloquent chacun une teinte de carrosserie (violet, chrome, nacré).
@@ -115,18 +116,27 @@ animer qu'un SVG (que le navigateur re-rastérise à chaque échelle). Mesuré �
 121 images/s pendant l'éloignement, pire image à 9 ms.
 
 `build/render_cars.py` les calcule par ray marching sur des surfaces implicites
-(SDF), avec éclairage GGX, ombres douces, occlusion ambiante et tone mapping ACES.
+(SDF), en supersampling ×3, avec éclairage GGX, ombres douces, occlusion ambiante,
+tone mapping ACES et un **environnement procédural** (ciel du couchant, ligne
+d'horizon, bandes lumineuses de studio) réfléchi par tout ce qui brille : vernis de
+peinture à double lobe et Fresnel, verre, chromes, optiques de feux à réflecteur
+strié. Les peintures chrome, or, argent et bronze sont métallisées. Les faces
+arrière sont légèrement galbées pour que le reflet y balaie l'horizon.
 Les carrosseries sont décrites dans le script : aucun modèle sous licence, aucune
 marque reproduite. La géométrie n'est rendue qu'une fois par silhouette ; les
 couleurs sont composées ensuite depuis les tampons d'éclairage, donc ajouter une
 teinte ne coûte pas un nouveau rendu.
 
-Sept silhouettes — berline, break, citadine, pick-up, utilitaire, coupé sport,
-camion-citerne — en douze teintes : huit de base, trois à débloquer par les rangs,
-et l'or des voitures dorées. Les sprites ne sont chargés qu'au lancement d'une partie.
+Quatorze silhouettes — berline, break, citadine, monospace, pick-up, utilitaire,
+camping-car, 4×4, camion, cabriolet, ancienne, coupé sport, supercar, camion-citerne —
+en quatorze teintes : huit de base, trois à débloquer par les rangs, l'or des
+voitures dorées, et les métaux de carrière. Le parc est décrit dans `FLEET`
+(`js/game.js`) ; chaque partie tire un **roster** de cinq silhouettes courantes plus
+les deux sportives, et ne précharge que celui-là : le poids chargé reste le même
+qu'avec sept silhouettes, la variété vient d'une partie à l'autre.
 
 ```bash
-arch -arm64 python3 build/render_cars.py assets/cars              # ~2 min 30, 48 sprites
+arch -arm64 python3 build/render_cars.py assets/cars              # ~20 min, 196 sprites
 arch -arm64 python3 build/render_cars.py /tmp/essai coupe rouge   # une silhouette, une teinte
 ```
 

@@ -162,15 +162,19 @@ function newPlate(easy) {
    Chaque point marqué en partie compte. Citadine bronze → argent → or, puis utilitaire
    bronze… jusqu'au coupé or. Certains rangs débloquent une teinte de carrosserie.        */
 var VEHICLES = [
-  { id: 'citadine', name: 'Citadine' },
-  { id: 'van',      name: 'Utilitaire' },
-  { id: 'camper',   name: 'Camping-car' },
-  { id: 'berline',  name: 'Berline',   unlock: 'violet' },
-  { id: 'suv',      name: 'Break' },
-  { id: '4x4',      name: '4×4' },
-  { id: 'pickup',   name: 'Pick-up',   unlock: 'chrome' },
-  { id: 'cabrio',   name: 'Cabriolet' },
-  { id: 'coupe',    name: 'Coupé sport', unlock: 'nacre' }
+  { id: 'citadine',  name: 'Citadine' },
+  { id: 'van',       name: 'Utilitaire' },
+  { id: 'monospace', name: 'Monospace' },
+  { id: 'camper',    name: 'Camping-car' },
+  { id: 'berline',   name: 'Berline',   unlock: 'violet' },
+  { id: 'suv',       name: 'Break' },
+  { id: '4x4',       name: '4×4' },
+  { id: 'pickup',    name: 'Pick-up',   unlock: 'chrome' },
+  { id: 'camion',    name: 'Camion' },
+  { id: 'cabrio',    name: 'Cabriolet' },
+  { id: 'ancienne',  name: 'Ancienne' },
+  { id: 'coupe',     name: 'Coupé sport', unlock: 'nacre' },
+  { id: 'supercar',  name: 'Supercar' }
 ];
 var METALS = ['bronze', 'argent', 'or'];
 var RANKS = [];
@@ -187,6 +191,40 @@ for (var vi = 0; vi < VEHICLES.length; vi++) {
 }
 var CAREER = { mission: 400, dep: 100 };
 var BASE_COLORS = ['rouge', 'bleu', 'blanc', 'noir', 'vert', 'jaune', 'gris', 'orange'];
+
+/* ═══════════ le parc : toutes les silhouettes rendues par build/render_cars.py ═══════════
+   plateY / plateW : centre et largeur de l'emplacement de plaque sur le sprite, en % (layout.json) ;
+   size : largeur affichée en Trafic et Poursuite, en fraction de la hauteur de scène ;
+   width : largeur dans une place de Parking, en % ; sport : multiplicateur de points.          */
+var FLEET = {
+  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, width:  97 },
+  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, width:  95 },
+  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, width:  92 },
+  monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, width:  92 },
+  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, width:  97 },
+  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, width:  82 },
+  camper:    { name: 'Camping-car',  plateY: 73.1, plateW: 38.7, ratio: 1.312, size: 0.60, width:  80 },
+  '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, width:  95 },
+  camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, width:  76 },
+  cabrio:    { name: 'Cabriolet',    plateY: 71.0, plateW: 41.7, ratio: 1.579, size: 0.76, width: 100 },
+  ancienne:  { name: 'Ancienne',     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, width:  92 },
+  coupe:     { name: 'Coupé',        plateY: 65.3, plateW: 41.0, ratio: 1.720, size: 0.78, width: 100, sport: 1.5 },
+  supercar:  { name: 'Supercar',     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, width: 100, sport: 2 },
+  citerne:   { name: 'Citerne',      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, width:  78, tank: true },
+};
+var TANK = 'citerne';
+function sportBonus(shape) { return (FLEET[shape] && FLEET[shape].sport) || 1; }
+function sportTag(shape) { return '🏎️ ×' + String(sportBonus(shape)).replace('.', ','); }
+/* le roster d'une partie : cinq silhouettes courantes tirées au sort, plus les sportives.
+   Les modes ne préchargent que celui-là : la variété vient d'une partie à l'autre.    */
+function fleetRoster() {
+  var regular = [], sports = [];
+  Object.keys(FLEET).forEach(function (s) {
+    if (FLEET[s].tank) return;
+    (FLEET[s].sport ? sports : regular).push(s);
+  });
+  return shuffle(regular).slice(0, 5).concat(sports);
+}
 
 function career() { return store.get('career', 0); }
 function rankOf(pts) {
@@ -321,7 +359,7 @@ function bumpStat(key, n, absolute) {
 /* ═══════════ missions du jour ═══════════ */
 var MISSION_TYPES = {
   plates:  { n: [8, 12, 20],   txt: function (n) { return 'Pulvériser ' + n + ' voitures'; } },
-  sport:   { n: [2, 3, 4],     txt: function (n) { return 'Pulvériser ' + n + ' coupés'; } },
+  sport:   { n: [2, 3, 4],     txt: function (n) { return 'Pulvériser ' + n + ' sportives'; } },
   lines:   { n: [1, 2, 3],     txt: function (n) { return n + ' alignement' + (n > 1 ? 's' : '') + ' de couleur en Parking'; } },
   long:    { n: [9, 10, 11],   txt: function (n) { return 'Jouer un mot de ' + n + ' lettres ou plus'; } },
   rare:    { n: [2, 3, 5],     txt: function (n) { return 'Jouer ' + n + ' mots rares'; } },
@@ -577,7 +615,7 @@ function endGame() {
   html += row('Plus longue série', '×' + s.maxCombo);
   if (s.rare) html += row('Vocabulaire', s.rare + ' mot' + (s.rare > 1 ? 's' : '') + ' rare' + (s.rare > 1 ? 's' : '') +
                           (s.expert ? ' dont ' + s.expert + ' d\'expert 🎓' : ''));
-  html += row('Mots · plaques', s.words + ' · ' + s.plates + (s.sport ? ' (dont ' + s.sport + ' coupé' + (s.sport > 1 ? 's' : '') + ')' : ''));
+  html += row('Mots · plaques', s.words + ' · ' + s.plates + (s.sport ? ' (dont ' + s.sport + ' sportive' + (s.sport > 1 ? 's' : '') + ')' : ''));
   if (s.lines) html += row('Alignements de couleur', s.lines);
   if (s.newDeps) html += row('🗺️ Nouveaux départements', s.newDeps + ' — collection ' + collection().length + '/101');
   s.missionsDone.forEach(function (lbl) { html += row('🎯 Mission accomplie', lbl); });
@@ -920,6 +958,7 @@ window.PLAQUE = {
   collection: collection, collect: collect, finishGame: finishGame,
   DIFF: DIFF, MODES: MODES, state: state, newPlate: newPlate, endGame: endGame,
   track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore, guideSay: guideSay,
+  FLEET: FLEET, TANK: TANK, fleetRoster: fleetRoster, sportBonus: sportBonus, sportTag: sportTag,
   tweenNumber: tweenNumber, bump: bump, floatPts: floatPts,
   autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit,
   myCar: function () { return rankSprite(RANKS[rankOf(career())]); },
