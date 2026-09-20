@@ -298,6 +298,12 @@ function wordRule(car, w, mode) {
     return name + ' : même initiale que <b>' + car.used[0].toUpperCase() + '</b> — un mot en <b>' + car.used[0][0].toUpperCase() + '</b>.';
   return null;
 }
+/* un modèle refuse le mot : on le dit haut et fort, et son étiquette clignote */
+function refuse(car, msg, el) {
+  toast('🚫 ' + msg.replace(/<\/?b>/g, ''));
+  var tag = el && el.querySelector('.sport-tag--trait');
+  if (tag) { tag.classList.remove('flash'); void tag.offsetWidth; tag.classList.add('flash'); }
+}
 /* multiplicateur de la cote : sportive, caractère, chargement */
 function carCote(car, mode) {
   var t = trait(car.shape);
@@ -1066,7 +1072,7 @@ window.PLAQUE = {
   track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore, guideSay: guideSay,
   FLEET: FLEET, TANK: TANK, fleetRoster: fleetRoster, sportBonus: sportBonus, sportTag: sportTag,
   TRAITS: TRAITS, trait: trait, carTime: carTime, initCar: initCar, canUse: canUse, hitPair: hitPair,
-  wordRule: wordRule, carCote: carCote, traitLabel: traitLabel,
+  wordRule: wordRule, carCote: carCote, traitLabel: traitLabel, refuse: refuse,
   tweenNumber: tweenNumber, bump: bump, floatPts: floatPts,
   autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit,
   myCar: function () { return rankSprite(RANKS[rankOf(career())]); },

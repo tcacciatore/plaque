@@ -264,20 +264,21 @@ function submit(e) {
   }
   if (w.length < 3) return reject('Trop court — 3 lettres minimum.');
 
-  var best = null, used = false, ruleMsg = null;
+  var best = null, used = false, ruleMsg = null, ruleCar = null;
   alive.forEach(function (c) {
     if (c.used.indexOf(w) !== -1) { used = true; return; }
     var h1 = P.canUse(c, 1) ? P.matchPair(w, c.p1.p) : null;
     var h2 = P.canUse(c, 2) ? P.matchPair(w, c.p2.p) : null;
     if (!h1 && !h2) return;
     var bad = P.wordRule(c, w, 'trafic');                    // le caractère du modèle refuse ce mot
-    if (bad) { if (!ruleMsg || c === T.target) ruleMsg = bad; return; }
+    if (bad) { if (!ruleMsg || c === T.target) { ruleMsg = bad; ruleCar = c; } return; }
     var rank = (c === T.target ? 8 : 0) +                    // la voiture que le joueur a désignée
                (((h1 && h2) || (h1 && c.got2) || (h2 && c.got1)) ? 4 : 0) +   // le mot l'achève
                ((c.got1 || c.got2 || c.n1 || c.n2) ? 2 : 0); // elle est déjà entamée
     if (!best || rank > best.rank) best = { c: c, h1: h1, h2: h2, rank: rank };
   });
   if (!best) {
+    if (ruleMsg) P.refuse(ruleCar, ruleMsg, ruleCar.el);
     return reject(ruleMsg ? '<b>' + w.toUpperCase() + '</b> — ' + ruleMsg
                 : used ? '<b>' + w.toUpperCase() + '</b> — déjà joué sur une de ces voitures.'
                        : '<b>' + w.toUpperCase() + '</b> ne va sur aucune des trois plaques.');

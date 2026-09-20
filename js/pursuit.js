@@ -190,20 +190,21 @@ function submit(e) {
   }
   if (w.length < 3) return reject('Trop court — 3 lettres minimum.');
 
-  var best = null, used = false, ruleMsg = null;
+  var best = null, used = false, ruleMsg = null, ruleCar = null;
   alive.forEach(function (c) {
     if (c.used.indexOf(w) !== -1) { used = true; return; }
     var h1 = c.got1 ? null : P.matchPair(w, c.p1.p);
     var h2 = (c.got2 || c.hidden) ? null : P.matchPair(w, c.p2.p);   // le 4×4 : seule la première paire se lit
     if (!h1 && !h2) return;
     var bad = P.wordRule(c, w, 'poursuite');                 // le caractère du modèle refuse ce mot
-    if (bad) { if (!ruleMsg || c === R.target) ruleMsg = bad; return; }
+    if (bad) { if (!ruleMsg || c === R.target) { ruleMsg = bad; ruleCar = c; } return; }
     var rank = (c === R.target ? 16 : 0) +
                (((h1 && h2) || (h1 && c.got2) || (h2 && c.got1)) ? 8 : 0) +
                (c.lane === MY_LANE ? 4 : 0) +                       // la menace d'abord
                ((c.got1 || c.got2) ? 2 : 0) + (1 - c.z / 20);       // puis la plus proche
     if (!best || rank > best.rank) best = { c: c, h1: h1, h2: h2, rank: rank };
   });
+  if (ruleMsg && !best) P.refuse(ruleCar, ruleMsg, ruleCar.el);
   if (!best) return reject(ruleMsg ? '<b>' + w.toUpperCase() + '</b> — ' + ruleMsg
                          : used ? '<b>' + w.toUpperCase() + '</b> — déjà joué.' : '<b>' + w.toUpperCase() + '</b> ne va sur aucune plaque en vue.');
   if (!P.isWord(w)) return reject('<b>' + w.toUpperCase() + '</b> — inconnu du dictionnaire.');

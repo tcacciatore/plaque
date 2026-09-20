@@ -280,7 +280,7 @@ function submit(e) {
   if (w.length < 3) return reject('Trop court — 3 lettres minimum.');
 
   // la cible : la voiture désignée, sinon une que le mot achève, sinon une entamée, sinon la première
-  var best = null, used = false, ruleMsg = null;
+  var best = null, used = false, ruleMsg = null, ruleCar = null;
   K.spots.forEach(function (c) {
     if (!c) return;
     if (c.used.indexOf(w) !== -1) { used = true; return; }
@@ -288,13 +288,14 @@ function submit(e) {
     var h2 = P.canUse(c, 2) ? P.matchPair(w, c.p2.p) : null;
     if (!h1 && !h2) return;
     var bad = P.wordRule(c, w, 'parking');                   // le caractère du modèle refuse ce mot
-    if (bad) { if (!ruleMsg || c === K.target) ruleMsg = bad; return; }
+    if (bad) { if (!ruleMsg || c === K.target) { ruleMsg = bad; ruleCar = c; } return; }
     var rank = (c === K.target ? 8 : 0) +
                (((h1 && h2) || (h1 && c.got2) || (h2 && c.got1)) ? 4 : 0) +
                ((c.got1 || c.got2 || c.n1 || c.n2) ? 2 : 0);
     if (!best || rank > best.rank) best = { c: c, h1: h1, h2: h2, rank: rank };
   });
   if (!best) {
+    if (ruleMsg) P.refuse(ruleCar, ruleMsg, $('spot' + ruleCar.i));
     return reject(ruleMsg ? '<b>' + w.toUpperCase() + '</b> — ' + ruleMsg
                 : used ? '<b>' + w.toUpperCase() + '</b> — déjà utilisé sur ce parking.'
                        : '<b>' + w.toUpperCase() + '</b> ne va sur aucune plaque.');

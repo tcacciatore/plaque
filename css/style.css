@@ -594,6 +594,8 @@ button.stat:hover{border-color:var(--accent)}
 .sport-tag--tank{border-color:#ff8a3c;color:#ff8a3c;background:rgba(50,25,10,.9)}
 /* le caractère d'un modèle : règle ou effet, en bleu discret */
 .sport-tag--trait{border-color:rgba(120,170,255,.75);color:#b9d4ff;background:rgba(14,22,40,.9);font-weight:600}
+.sport-tag.flash{animation:tagFlash .9s ease-out}
+@keyframes tagFlash{0%,40%{background:#ff6b6b;color:#fff;border-color:#fff;transform:translateX(-50%) scale(1.25)}100%{transform:translateX(-50%) scale(1)}}
 .car--gold .car__body,.spot__car--gold .car__body{filter:drop-shadow(0 0 12px rgba(255,213,74,.75))}
 
 /* ───────── téléphone : tout tient dans l'écran visible, clavier compris ───────── */
