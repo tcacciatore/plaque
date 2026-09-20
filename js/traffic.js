@@ -383,10 +383,15 @@ function loop() {
     });
     // filet de sécurité : une voie vide sans relais programmé se réalimente
     T.lanes.forEach(function (c, lane) { if (!c && !T.timers[lane]) scheduleLane(lane, SPAWN_GAP); });
-    // le soleil descend avec le chrono : à 20 s il touche l'horizon, à 0 il a disparu
+    // le soleil descend avec le chrono, linéairement, jusqu'à passer entièrement sous
+    // l'horizon pile à la fin. Position en pixels : le disque (cœur de 38 px dans un halo
+    // de 82 px) a une taille fixe, la route non. Horizon à 46 % de la hauteur.
     var dusk = 1 - Math.max(0, Math.min(1, T.timeLeft / GAME_TIME));
-    road().style.setProperty('--sunTop', (26 + 27 * dusk).toFixed(1) + '%');
-    road().style.setProperty('--dusk', Math.pow(dusk, 1.6).toFixed(3));
+    var H = road().clientHeight, horizon = 0.46 * H;
+    var top0 = horizon - 60 - 0.16 * H;            // départ : le bas du disque à 16 % au-dessus de l'horizon
+    var top1 = horizon - 22;                       // fin : le haut du disque sous l'horizon
+    road().style.setProperty('--sunTop', Math.round(top0 + (top1 - top0) * dusk) + 'px');
+    road().style.setProperty('--dusk', Math.pow(dusk, 2).toFixed(3));
     // rush final : ciel rouge, tout compte double
     var rush = T.timeLeft <= RUSH;
     if (rush !== T.rush) {
