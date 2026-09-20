@@ -41,6 +41,7 @@ var T = {
 };
 
 var $ = function (id) { return document.getElementById(id); };
+var road = function () { return document.querySelector('#screen-traffic .road'); };   // pas la première .road du document (celle de la Poursuite)
 
 /* ─────────── la scène ─────────── */
 /* Sprites rendus hors ligne par build/render_cars.py : une seule <img> par
@@ -149,7 +150,7 @@ function leaveCar(car, success) {
   el.classList.remove('car--in');
   if (success) {
     el.classList.add('car--boom');
-    P.explode(el.querySelector('.car__fx'), document.querySelector('.road'));
+    P.explode(el.querySelector('.car__fx'), road());
     setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1500);
   } else {
     el.classList.add('car--away');
@@ -178,7 +179,7 @@ function startFever() {
   T.feverUntil = Date.now() + FEVER * 1000;
   T.fevers++;
   P.track.fever();
-  document.querySelector('.road').classList.add('fever');
+  road().classList.add('fever');
   P.toast('🔥 <b>FIÈVRE</b> — pendant ' + FEVER + ' s, un seul mot suffit à lire une plaque');
   P.sfx.win();
 }
@@ -382,16 +383,20 @@ function loop() {
     });
     // filet de sécurité : une voie vide sans relais programmé se réalimente
     T.lanes.forEach(function (c, lane) { if (!c && !T.timers[lane]) scheduleLane(lane, SPAWN_GAP); });
+    // le soleil descend avec le chrono : à 20 s il touche l'horizon, à 0 il a disparu
+    var dusk = 1 - Math.max(0, Math.min(1, T.timeLeft / GAME_TIME));
+    road().style.setProperty('--sunTop', (26 + 27 * dusk).toFixed(1) + '%');
+    road().style.setProperty('--dusk', Math.pow(dusk, 1.6).toFixed(3));
     // rush final : ciel rouge, tout compte double
     var rush = T.timeLeft <= RUSH;
     if (rush !== T.rush) {
       T.rush = rush;
-      document.querySelector('.road').classList.toggle('rush', rush);
+      road().classList.toggle('rush', rush);
       if (rush) { P.toast('🚨 <b>RUSH</b> — dernières secondes, tout compte double'); P.sfx.over(); }
     }
     if (T.feverUntil && !inFever()) {
       T.feverUntil = 0;
-      document.querySelector('.road').classList.remove('fever');
+      road().classList.remove('fever');
       T.combo = 3;                                // on redescend pour pouvoir remonter
     }
     P.ghostSample(played(), T.score);
@@ -420,13 +425,15 @@ function start() {
   // deux voies sur un petit écran : les plaques y restent lisibles
   var two = Math.min(window.innerWidth, screen.width || 9999) < NARROW;
   LANES = two ? LANES2 : LANES3;
-  document.querySelector('.road').classList.toggle('road--two', two);
+  road().classList.toggle('road--two', two);
   var pace = PACE[P.state.diff] || PACE.normal;
   SPAWN_GAP = pace.gap; GAP_MIN = pace.min; GAP_MAX = pace.max;
   T.running = true; T.timeLeft = GAME_TIME; T.score = 0;
   T.done = 0; T.seen = 0; T.combo = 1; T.lanes = LANES.map(function () { return null; }); T.history = []; T.lastSpawn = 0; T.target = null;
   T.t0 = Date.now(); T.feverUntil = 0; T.fevers = 0; T.rush = false; T.feverArmed = true;
-  document.querySelector('.road').classList.remove('rush', 'fever');
+  road().classList.remove('rush', 'fever');
+  road().style.removeProperty('--sunTop');   // le soleil remonte pour la nouvelle partie
+  road().style.removeProperty('--dusk');
   T.timers.forEach(clearTimeout); T.timers = LANES.map(function () { return null; });
   $('tr-cars-layer').innerHTML = '';
   T.roster = P.fleetRoster();
@@ -460,7 +467,7 @@ function stop() {
   T.timers.forEach(clearTimeout);
   T.lanes = LANES.map(function () { return null; });
   $('tr-cars-layer').innerHTML = '';
-  document.querySelector('.road').classList.remove('rush', 'fever');
+  road().classList.remove('rush', 'fever');
 }
 
 window.TRAFFIC = { start: start, stop: stop, submit: submit };

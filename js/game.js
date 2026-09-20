@@ -1016,7 +1016,7 @@ function unfit() {
   fitted = null;
   document.body.classList.remove('fitted');
   Array.prototype.forEach.call(document.querySelectorAll('.screen'), function (s) { s.style.height = ''; });
-  var road = document.querySelector('.road'); if (road) road.style.removeProperty('--roadH');
+  Array.prototype.forEach.call(document.querySelectorAll('.road'), function (r) { r.style.removeProperty('--roadH'); });   // toutes, pas seulement la première
   var lot = $('pk-lot'); if (lot) { lot.style.transform = ''; lot.style.marginBottom = ''; }
 }
 if (window.visualViewport) {
