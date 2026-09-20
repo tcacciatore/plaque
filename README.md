@@ -187,6 +187,17 @@ ce qui fonctionne aussi en `file://` — aucun serveur n'est nécessaire.
 > Les ressources sont référencées avec un `?v=N` dans `index.html` : incrémentez-le
 > après une modification de CSS/JS pour contourner le cache du navigateur.
 
+## Le rétroviseur (Poursuite)
+
+À partir de 18 s, puis toutes les 22 à 34 s, un **poursuivant** apparaît dans le
+rétroviseur et grossit pendant 16 s (10 s en fin de partie). Un mot sur l'une de
+ses paires le sème : sa cote compte **×2**. Sinon il vous percute par l'arrière :
+un pare-chocs de moins. Il est vu **de face** : `render_cars.py … front` rend les
+faces avant (pare-brise, capot, calandre, phares allumés, plaque avant) des
+silhouettes qui peuvent poursuivre — berline, break, citadine, utilitaire,
+pick-up — dans `<forme>-<teinte>-front.webp`, avec leur emplacement de plaque
+dans `layout.json` (`<forme>-front`) repris dans `FLEET[…].front`.
+
 ## Thème « Miami Vice »
 
 `?theme=miami` active un second habillage (mémorisé) : nuit bleu-violet, rose

@@ -18,6 +18,9 @@ var V0 = 0.68, V_RAMP = 0.005, V_MAX = 1.7;          // vitesse en profondeur (z
 var SPAWN0 = 6.0, SPAWN_MIN = 3.6;                    // intervalle entre deux arrivées, au départ et au plus serré
 var CENTER0 = 0.34, CENTER_MAX = 0.50;                // part des voitures qui arrivent sur votre voie
 var REL_THREAT = [0.72, 0.92], REL_OTHER = [0.85, 1.2];   // celles de votre voie freinent devant vous : plus de temps pour elles
+var CHASER_FIRST = 18, CHASER_GAP = [22, 34];         // le poursuivant : première apparition, puis intervalle, en secondes
+var CHASER_TIME0 = 16, CHASER_TIME_MIN = 10;          // temps qu'il met à vous rattraper, au départ et au plus vite
+var CHASER_MULT = 2;                                  // sa cote compte double : il fallait le semer
 var FEVER = 10, MULT_MAX = 5;
 var GOLD_ODDS = 22, GOLD_MULT = 3, TANK_ODDS = 12;
 // le parc (silhouettes, plaques, tailles, bonus) est décrit une fois pour toutes dans js/game.js
@@ -27,6 +30,7 @@ var isSport = function (s) { return !!FLEET[s].sport; };
 
 var R = { running: false, cars: [], lives: LIVES, score: 0, km: 0, done: 0, dodged: 0, hits: 0, combo: 1,
           t0: 0, last: 0, v: V0, nextSpawn: 0, raf: null, target: null, feverUntil: 0, feverArmed: true,
+          chaser: null, nextChaser: CHASER_FIRST, chased: 0,
           invulnUntil: 0, history: [], sceneW: 0, sceneH: 0 };
 var $ = function (id) { return document.getElementById(id); };
 
@@ -108,7 +112,12 @@ function spawn() {
 }
 function placePlate(c) {
   var p = project(c.lane, c.z);
-  var readable = c.z <= Z_READ;
+  // loin, deux voitures de voies voisines à la même hauteur auraient des plaques qui se
+  // recouvrent : la plus lointaine attend que l'autre se soit détachée
+  var masked = c.z > 4 && R.cars.some(function (o) {
+    return o !== c && !o.gone && o.z < c.z && c.z - o.z < 2.2 && Math.abs(o.lane - c.lane) === 1;
+  });
+  var readable = c.z <= Z_READ && !masked;
   var s = Math.max(0.7, Math.min(1, 1.6 / c.z));          // la plaque reste lisible bien avant la voiture
   // loin, les voies convergent et les plaques se recouvriraient : on les écarte
   // latéralement, d'autant plus que la voiture est loin ; l'écart se referme à l'approche
@@ -137,18 +146,109 @@ function removeCar(c, cls) {
 function setTarget(c) {
   R.target = c;
   R.cars.forEach(function (x) { x.el.classList.toggle('car--target', x === c); x.pl.classList.toggle('car--target', x === c); });
+  $('pu-mirror').classList.toggle('mirror--target', !!(c && c.chaser));
   renderTokens();
+}
+
+/* ─────────── le poursuivant : une voiture vous colle, on la voit dans le rétroviseur ───────────
+   Elle grossit dans le miroir pendant CHASER_TIME secondes ; lue avant, elle est semée et sa
+   cote compte double ; sinon elle vous percute par l'arrière — un pare-chocs de moins. */
+function spawnChaser() {
+  var plate = P.newPlate(false);
+  // seules les silhouettes rendues de face (FLEET.front) peuvent apparaître dans le rétro
+  var pool = R.roster.filter(function (s) { return FLEET[s].front; });
+  var shape = P.pick(pool.length ? pool : Object.keys(FLEET).filter(function (s) { return FLEET[s].front; }));
+  var c = {
+    chaser: true, p1: plate.p1, p2: plate.p2, dep: plate.dep, value: plate.value, num: String(plate.value).padStart(3, '0'),
+    shape: shape, color: P.pick(P.colors()), got1: null, got2: null, used: [], need: 1, hidden: false,
+    words: 0, pts: 0, t: 0, dur: Math.max(CHASER_TIME_MIN, CHASER_TIME0 - played() / 180 * (CHASER_TIME0 - CHASER_TIME_MIN))
+  };
+  R.chaser = c;
+  var F = FLEET[shape];
+  $('pu-mirror-car').innerHTML = '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + c.color + '-front.webp">';
+  $('pu-mirror-plate').innerHTML = plateHTML(c);
+  $('pu-mirror-plate').style.setProperty('--plateY', F.front.y + '%');
+  $('pu-mirror').classList.add('mirror--on');
+  placeChaser();
+  renderTokens();
+  if (!R.chased++) P.toast('🪞 <b>Une voiture vous colle</b> — lisez sa plaque dans le rétroviseur avant qu\'elle vous percute');
+  P.sfx.time();
+}
+function placeChaser() {
+  var c = R.chaser; if (!c) return;
+  var k = Math.pow(c.t, 1.5);                       // elle grossit de plus en plus vite
+  var car = $('pu-mirror-car'), pl = $('pu-mirror-plate'), glass = car.parentNode;
+  $('pu-mirror').style.setProperty('--mpw', Math.round(glass.clientWidth * 0.66) + 'px');
+  car.style.width = (16 + 62 * k).toFixed(1) + '%';
+  car.style.bottom = (34 - 30 * k).toFixed(1) + '%';
+  var img = car.firstChild, H = glass.clientHeight, carH = img ? img.offsetHeight : 0;
+  var plateY = H * (1 - (34 - 30 * k) / 100) - carH * (1 - FLEET[c.shape].front.y / 100);
+  var s = 0.5 + 0.5 * k;
+  pl.style.transform = 'scale(' + s.toFixed(3) + ')';
+  pl.style.top = plateY.toFixed(1) + 'px';
+  pl.style.opacity = c.t >= 0.12 ? '1' : '0';
+  $('pu-mirror').classList.toggle('mirror--close', c.t > 0.7);
+}
+function dropChaser() {
+  R.chaser = null;
+  if (R.target && R.target.chaser) R.target = null;
+  $('pu-mirror').classList.remove('mirror--on', 'mirror--close', 'mirror--target');
+  var g = played();
+  R.nextChaser = g + CHASER_GAP[0] + Math.random() * (CHASER_GAP[1] - CHASER_GAP[0]);
+  renderTokens();
+}
+function readChaser(c, w, ws) {
+  var fever = inFever() ? 2 : 1;
+  var pts = Math.round(ws.pts * R.combo * multiplier() * fever);
+  var bonus = Math.round(c.value * CHASER_MULT * multiplier() * fever);
+  c.used.push(w); c.words = 2; c.pts = pts + bonus;
+  R.score += pts + bonus; R.done++;
+  var wasMax = R.combo >= MULT_MAX;
+  R.combo = Math.min(MULT_MAX, R.combo + 1);
+  P.track.word(w, pts, ws.tier, R.combo);
+  P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { dep: c.dep.num, depName: c.dep.nom });
+  R.history.push({ p1: c.p1.p, p2: c.p2.p, dep: c.dep.num, words: 2, pts: c.pts, reached: true });
+  var fx = $('pu-mirror-fx');
+  fx.classList.remove('go'); void fx.offsetWidth; fx.classList.add('go');
+  P.explode(fx, $('pu-mirror'));
+  P.sfx.dbl();
+  P.floatPts($('pu-input'), '+' + (pts + bonus), 'float--win');
+  P.bump($('pu-score').parentNode.parentNode, 'bump--big');
+  feedback('🪞 <b>Semée !</b> <b class="mono">' + c.p1.p + '·' + c.num + '·' + c.p2.p + '</b> — <b>+' + (pts + bonus) + '</b> · cote ×' + CHASER_MULT +
+           (ws.label ? ' · ' + ws.label : '') + (fever > 1 ? ' · 🔥 fièvre ×2' : ''), 'ok');
+  dropChaser();
+  if (R.combo >= MULT_MAX && !wasMax && !inFever() && R.feverArmed) { R.feverArmed = false; startFever(); }
+  renderHud();
+}
+function chaserHit() {
+  var c = R.chaser;
+  R.hits++; R.combo = 1; R.feverArmed = true;
+  P.track.miss({ p1: c.p1.p, p2: c.p2.p, got1: null, got2: null });
+  R.history.push({ p1: c.p1.p, p2: c.p2.p, dep: c.dep.num, words: 0, pts: 0, reached: false });
+  var fx = $('pu-mirror-fx');
+  fx.classList.remove('go'); void fx.offsetWidth; fx.classList.add('go');
+  dropChaser();
+  if (Date.now() < R.invulnUntil) return;
+  R.lives--;
+  R.invulnUntil = Date.now() + 2000;
+  var ck = $('pu-cockpit');
+  ck.classList.remove('cockpit--hit'); void ck.offsetWidth; ck.classList.add('cockpit--hit');
+  P.sfx.over();
+  feedback('💢 <b>Percuté par l\'arrière !</b> ' + (R.lives > 0 ? 'Il vous reste ' + R.lives + ' pare-choc' + (R.lives > 1 ? 's' : '') + (R.lives === 1 ? ' — tout compte double' : '') : 'Plus de pare-chocs…'), 'ko');
+  renderHud();
+  if (R.lives <= 0) setTimeout(finish, 900);
 }
 function renderTokens() {
   var box = $('pu-pairs');
   var vis = R.cars.filter(function (c) { return !c.gone && c.z <= Z_READ + 0.6; }).sort(function (a, b) { return a.z - b.z; });
+  if (R.chaser && R.chaser.t >= 0.12) vis.unshift(R.chaser);
   if (!vis.length) { box.innerHTML = '<span class="tok tok--wait">…</span>'; return; }
   box.innerHTML = vis.map(function (c, i) {
     var sp = isSport(c.shape) ? ' tok--sport' : '';
     var tg = c === R.target ? ' tok--target' : '';
-    var th = c.lane === MY_LANE ? ' tokgroup--threat' : '';
-    return '<span class="tokgroup' + tg + th + '" data-i="' + R.cars.indexOf(c) + '">' +
-           (c.lane === MY_LANE ? '<i class="tok__warn">⚠</i>' : '') +
+    var th = c.lane === MY_LANE || c.chaser ? ' tokgroup--threat' : '';
+    return '<span class="tokgroup' + tg + th + '" data-i="' + (c.chaser ? 'chaser' : R.cars.indexOf(c)) + '">' +
+           (c.chaser ? '<i class="tok__warn">🪞</i>' : c.lane === MY_LANE ? '<i class="tok__warn">⚠</i>' : '') +
            '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + (c.got1 ? '✓' : c.p1.p + (c.used.length ? '½' : '')) + '</span>' +
            '<span class="tok' + sp + (c.got2 ? ' tok--on' : '') + '">' + (c.got2 ? '✓' : c.hidden ? '??' : c.p2.p + (c.used.length ? '½' : '')) + '</span></span>';
   }).join('');
@@ -183,6 +283,7 @@ function submit(e) {
   inp.value = '';
   if (!w) return;
   var alive = R.cars.filter(function (c) { return !c.gone && c.z <= Z_READ + 0.6; });
+  if (R.chaser && R.chaser.t >= 0.12) alive.push(R.chaser);
   if (!alive.length) { feedback('Rien à lire encore…', 'ko'); return; }
   function reject(msg) {
     feedback(msg, 'ko'); R.combo = 1; R.feverArmed = true; P.sfx.ko();
@@ -196,8 +297,13 @@ function submit(e) {
     var h1 = c.got1 ? null : P.matchPair(w, c.p1.p);
     var h2 = (c.got2 || c.hidden) ? null : P.matchPair(w, c.p2.p);   // le 4×4 : seule la première paire se lit
     if (!h1 && !h2) return;
-    var bad = P.wordRule(c, w, 'poursuite');                 // le caractère du modèle refuse ce mot
+    var bad = c.chaser ? null : P.wordRule(c, w, 'poursuite');   // le caractère du modèle refuse ce mot
     if (bad) { if (!ruleMsg || c === R.target) { ruleMsg = bad; ruleCar = c; } return; }
+    if (c.chaser) {                                              // le poursuivant : prioritaire quand il est sur vous
+      var rc = (c === R.target ? 16 : 0) + (c.t > 0.6 ? 6 : 1);
+      if (!best || rc > best.rank) best = { c: c, h1: h1, h2: h2, rank: rc };
+      return;
+    }
     var rank = (c === R.target ? 16 : 0) +
                (((h1 && h2) || (h1 && c.got2) || (h2 && c.got1)) ? 8 : 0) +
                (c.lane === MY_LANE ? 4 : 0) +                       // la menace d'abord
@@ -211,6 +317,7 @@ function submit(e) {
 
   var c = best.c, hit = best.h1 || best.h2;
   var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
+  if (c.chaser) return readChaser(c, w, ws);
   var sport = isSport(c.shape);
   var both = best.h1 && best.h2;                                  // les deux paires dans le même mot : ×2
   var fever = inFever() ? 2 : 1;
@@ -329,6 +436,13 @@ function frame(now) {
   R.v = Math.min(V_MAX, R.v + V_RAMP * dt);
   R.km += R.v * dt * 0.063;      // même kilométrage qu'avant le ralentissement
   R.nextSpawn -= dt;
+  if (R.chaser) {
+    var wasFar = R.chaser.t < 0.12;
+    R.chaser.t += dt / R.chaser.dur;
+    placeChaser();
+    if (wasFar && R.chaser.t >= 0.12) renderTokens();
+    if (R.chaser.t >= 1) chaserHit();
+  } else if (played() >= R.nextChaser && R.lives > 0) spawnChaser();
   if (R.nextSpawn <= 0) {
     spawn();
     var t = played(), gap = Math.max(SPAWN_MIN, SPAWN0 - t / 60 * 0.6);
@@ -366,8 +480,12 @@ function start() {
   R.running = true; R.cars = []; R.lives = LIVES; R.score = 0; R.km = 0; R.done = 0; R.dodged = 0; R.hits = 0;
   R.combo = 1; R.v = V0; R.nextSpawn = 1.2; R.target = null; R.feverUntil = 0; R.feverArmed = true; R.invulnUntil = 0; R.history = [];
   R.roster = P.fleetRoster();
+  R.chaser = null; R.nextChaser = CHASER_FIRST; R.chased = 0;
+  $('pu-mirror').classList.remove('mirror--on', 'mirror--close', 'mirror--target');
+  $('pu-mirror-car').innerHTML = ''; $('pu-mirror-plate').innerHTML = '';
   R.roster.concat([TANK]).forEach(function (s) {      // préchargement du roster de la partie
     P.colors().concat(['or']).forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '.webp'; });
+    if (FLEET[s].front) P.colors().forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '-front.webp'; });
   });
   R.t0 = Date.now(); R.last = performance.now();
   $('pu-cars').innerHTML = '';
@@ -396,14 +514,15 @@ function finish() {
     P.row('Impacts', R.hits, true),
     R.score);
 }
-function stop() { R.running = false; cancelAnimationFrame(R.raf); R.cars = []; $('pu-cars').innerHTML = ''; }
+function stop() { R.running = false; cancelAnimationFrame(R.raf); R.cars = []; R.chaser = null; $('pu-cars').innerHTML = ''; $('pu-mirror').classList.remove('mirror--on', 'mirror--close', 'mirror--target'); }
 
 window.PURSUIT = { start: start, stop: stop, measure: measure };
 
 document.addEventListener('DOMContentLoaded', function () {
   $('pu-form').addEventListener('submit', submit);
   window.PLAQUE.autoSubmit($('pu-input'), $('pu-form'), function (w) {
-    return R.cars.some(function (c) {
+    var ch = R.chaser && R.chaser.t >= 0.12 && (P.matchPair(w, R.chaser.p1.p) || P.matchPair(w, R.chaser.p2.p));
+    return ch || R.cars.some(function (c) {
       return !c.gone && c.z <= Z_READ + 0.6 && w !== c.got1 && w !== c.got2 &&
              ((!c.got1 && P.matchPair(w, c.p1.p)) || (!c.got2 && P.matchPair(w, c.p2.p)));
     });
@@ -411,8 +530,10 @@ document.addEventListener('DOMContentLoaded', function () {
   $('pu-quit').addEventListener('click', function () { finish(); });
   $('pu-pairs').addEventListener('pointerdown', function (e) {
     var g = e.target.closest('.tokgroup'); if (!g) return;
-    var c = R.cars[+g.dataset.i]; if (c && !c.gone) { setTarget(c); $('pu-input').focus(); }
+    var c = g.dataset.i === 'chaser' ? R.chaser : R.cars[+g.dataset.i];
+    if (c && !c.gone) { setTarget(c); $('pu-input').focus(); }
   });
+  $('pu-mirror').addEventListener('pointerdown', function () { if (R.chaser) { setTarget(R.chaser); $('pu-input').focus(); } });
   window.addEventListener('resize', function () { if (R.running) measure(); });
   if (window.visualViewport) window.visualViewport.addEventListener('resize', function () { if (R.running) setTimeout(measure, 50); });
 });

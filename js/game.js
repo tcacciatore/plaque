@@ -221,12 +221,12 @@ var BASE_COLORS = ['rouge', 'bleu', 'blanc', 'noir', 'vert', 'jaune', 'gris', 'o
    size : largeur affichée en Trafic et Poursuite, en fraction de la hauteur de scène ;
    width : largeur dans une place de Parking, en % ; sport : multiplicateur de points.          */
 var FLEET = {
-  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, width:  97 },
-  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, width:  95 },
-  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, width:  92 },
+  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, width:  97, front: { y: 75.4, w: 46.1 } },
+  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, width:  95, front: { y: 76.7, w: 43.0 } },
+  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, width:  92, front: { y: 73.1, w: 46.5 } },
   monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, width:  92 },
-  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, width:  97 },
-  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, width:  82 },
+  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, width:  97, front: { y: 76.1, w: 42.1 } },
+  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, width:  82, front: { y: 80.3, w: 38.9 } },
   camper:    { name: 'Camping-car',  plateY: 73.1, plateW: 38.7, ratio: 1.312, size: 0.60, width:  80 },
   '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, width:  95 },
   camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, width:  76 },
@@ -1110,11 +1110,15 @@ document.addEventListener('DOMContentLoaded', function () {
       modesEl.scrollTo({ left: autoTarget, behavior: 'smooth' });
     }
   }
+  // seul un défilement du joueur (doigt, molette) choisit un mode ; un centrage programmé, jamais
+  var userScroll = false;
+  ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) { modesEl.addEventListener(ev, function () { userScroll = true; }, { passive: true }); });
   modesEl.addEventListener('scroll', function () {
     clearTimeout(scrollT);
     scrollT = setTimeout(function () {
+      if (!userScroll) return;
       if (Date.now() < autoUntil && Math.abs(modesEl.scrollLeft - autoTarget) > 3) return;   // défilement programmé en cours
-      autoUntil = 0;
+      autoUntil = 0; userScroll = false;
       var mid = modesEl.scrollLeft + modesEl.clientWidth / 2, best = null, bd = 1e9;
       Array.prototype.forEach.call(modesEl.querySelectorAll('button'), function (b) {
         var d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - mid);

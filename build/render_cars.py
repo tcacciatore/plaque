@@ -88,7 +88,8 @@ def tyre(p, half, r):
 
 # ─────────────── matériaux ───────────────
 (MAT_PAINT, MAT_GLASS, MAT_TYRE, MAT_RIM, MAT_LAMP, MAT_TRIM, MAT_PLATE,
- MAT_CHROME, MAT_LAMP_W, MAT_LAMP_A, MAT_CANVAS) = range(1, 12)
+ MAT_CHROME, MAT_LAMP_W, MAT_LAMP_A, MAT_CANVAS, MAT_HEAD) = range(1, 13)
+VIEW = 'rear'                                   # 'front' : caméra devant la voiture (le rétroviseur)
 
 def wheels(p, dists, mats, r, x, zs, half=0.13):
     """Roues : pneu sculpté, jante chromée en creux, moyeu."""
@@ -133,6 +134,25 @@ def bulge(shell, p, y_c, z_back, R=2.2):
     """Galbe la face arrière : la tôle devient légèrement convexe, le reflet y balaie l'horizon."""
     return np.maximum(shell, cyl_x(p - [0, y_c, z_back - R], 99.0, R))
 
+def front_face(p, dists, mats, wid, y_low, y_lamp, z_front, hw=0.22, hh=0.085, plate_y=None, grille=0.34):
+    """L'avant d'un véhicule : phares (blanc, clignotant ambre), calandre à lames, logo,
+    pare-chocs avec entrée d'air, antibrouillards, plaque avant. z_front < 0."""
+    for sx in (-1, 1):
+        cx = sx * (wid - 0.06 - hw)
+        dists.append(rbox(p - [cx, y_lamp, z_front + 0.03], [hw, hh, 0.05], 0.025)); mats.append(MAT_HEAD)
+        dists.append(rbox(p - [cx, y_lamp - hh + 0.02, z_front + 0.024], [hw - 0.02, 0.015, 0.05], 0.008)); mats.append(MAT_LAMP_A)
+        dists.append(rbox(p - [cx, y_lamp + hh + 0.012, z_front + 0.035], [hw, 0.012, 0.045], 0.008)); mats.append(MAT_TRIM)
+        dists.append(cyl_z(p - [sx * (wid - 0.22), y_low + 0.085, z_front - 0.005], 0.03, 0.045, 0.01)); mats.append(MAT_LAMP_W)
+    g = rbox(p - [0, y_lamp, z_front + 0.03], [grille, hh + 0.01, 0.03], 0.012)
+    for k in range(-2, 3):
+        g = np.maximum(g, -rbox(p - [0, y_lamp + k * 0.038, z_front - 0.005], [grille - 0.02, 0.008, 0.02], 0.003))
+    dists.append(g); mats.append(MAT_TRIM)
+    dists.append(cyl_z(p - [0, y_lamp, z_front - 0.01], 0.02, 0.05, 0.01)); mats.append(MAT_CHROME)      # logo
+    bumper = rbox(p - [0, y_low + 0.075, z_front + 0.035], [wid + 0.005, 0.105, 0.065], 0.05)
+    bumper = np.maximum(bumper, -rbox(p - [0, y_low + 0.045, z_front - 0.02], [0.30, 0.035, 0.03], 0.01))  # entrée d'air
+    dists.append(bumper); mats.append(MAT_TRIM)
+    dists.append(rbox(p - [0, (plate_y if plate_y else y_low + 0.20), z_front + 0.055], [0.42, 0.115, 0.03], 0.012)); mats.append(MAT_PLATE)
+
 def diffuser(bumper, p, y, z, xs, h=0.05):
     """Diffuseur : lames verticales creusées dans le bas du pare-chocs."""
     for x in xs:
@@ -156,8 +176,8 @@ SHAPES = {
 }
 
 # plaque : (centre y, z, demi-largeur, demi-hauteur) — pour la projection de layout.json
-SHAPES['pickup']  = dict(kind='pickup',  plate=(0.78, 2.20, 0.40, 0.11))
-SHAPES['van']     = dict(kind='van',     plate=(0.72, 2.22, 0.40, 0.11))
+SHAPES['pickup']  = dict(kind='pickup',  plate=(0.78, 2.20, 0.40, 0.11), front_plate=(0.58, -2.28, 0.40, 0.11))
+SHAPES['van']     = dict(kind='van',     plate=(0.72, 2.22, 0.40, 0.11), front_plate=(0.56, -2.22, 0.40, 0.11))
 SHAPES['coupe']   = dict(kind='coupe',   plate=(0.60, 2.14, 0.40, 0.11))
 SHAPES['cabrio']  = dict(kind='cabrio',  plate=(0.56, 2.08, 0.40, 0.11))
 SHAPES['camper']  = dict(kind='camper',  plate=(0.70, 2.43, 0.40, 0.11))
@@ -174,6 +194,11 @@ def scene_pickup(p, dists, mats):
     cab = rbox(p - [0, 1.24, -0.95], [0.86, 0.38, 0.72], 0.10)
     dists.append(smin(chassis, cab, 0.10)); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 0.98, 1.22, -1.55)
+    # l'avant : pare-brise de cabine, capot haut, calandre massive
+    dists.append(rbox(shear_z(p - [0, 1.30, -1.66], 0.35, 0.0), [0.74, 0.28, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 1.30, -1.67], 0.35, 0.0), [0.68, 0.23, 0.05], 0.02)); mats.append(MAT_GLASS)
+    dists.append(rbox(p - [0, 0.90, -1.95], [0.86, 0.06, 0.34], 0.03)); mats.append(MAT_PAINT)     # capot
+    front_face(p, dists, mats, 0.92, 0.38, 0.72, -2.30, hw=0.18, hh=0.10, grille=0.38)
     # benne ouverte : une boîte évidée, ridelles nervurées
     outer = rbox(p - [0, 0.96, 0.85], [0.92, 0.30, 1.36], 0.05)
     inner = rbox(p - [0, 1.06, 0.85], [0.80, 0.30, 1.24], 0.03)
@@ -208,6 +233,10 @@ def scene_van(p, dists, mats):
     body = np.maximum(body, -rbox(p - [0, 1.10, 2.22], [0.012, 0.74, 0.02], 0.004))
     dists.append(body); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 1.00, 1.42, -1.75)
+    # l'avant : grand pare-brise incliné, capot court, façade
+    dists.append(rbox(shear_z(p - [0, 1.50, -2.16], 0.40, 0.0), [0.78, 0.30, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 1.50, -2.17], 0.40, 0.0), [0.72, 0.25, 0.05], 0.02)); mats.append(MAT_GLASS)
+    front_face(p, dists, mats, 0.90, 0.36, 0.86, -2.24, hw=0.16, hh=0.11, grille=0.30)
     # portes arrière : deux vitres verticales, bas de porte, poignées
     for sx in (-1, 1):
         dists.append(rbox(p - [sx * 0.43, 1.44, 2.21], [0.36, 0.31, 0.04], 0.03)); mats.append(MAT_TRIM)
@@ -501,6 +530,15 @@ def scene_car(p, S, dists, mats):
     mats.append(MAT_GLASS)
     dists.append(rbox(shear_z(p - [0, S['roof_y'] + S['roof_h'] - 0.05, gz + 0.02], S['glass_tilt'], 0.0),
                       [0.16, 0.012, 0.03], 0.005)); mats.append(MAT_LAMP)
+    # l'avant : pare-brise (plus grand que la lunette), joint de capot, façade
+    gf = -0.20 - S['roof_len'] + 0.12
+    ws_p = shear_z(p - [0, S['roof_y'], gf], S['glass_tilt'], 0.0)
+    dists.append(rbox(ws_p, [S['roof_wid'] - 0.02, S['roof_h'] - 0.01, 0.045], 0.03)); mats.append(MAT_TRIM)
+    ws_g = shear_z(p - [0, S['roof_y'], gf - 0.012], S['glass_tilt'], 0.0)
+    dists.append(rbox(ws_g, [S['roof_wid'] - 0.08, S['roof_h'] - 0.055, 0.05], 0.02)); mats.append(MAT_GLASS)
+    dists.append(rbox(p - [0, S['body_y'] + S['body_h'] - 0.02, -S['len'] + 0.02],
+                      [S['wid'] - 0.06, 0.012, 0.06], 0.008)); mats.append(MAT_TRIM)
+    front_face(p, dists, mats, S['wid'], S['body_y'] - S['body_h'], S['body_y'] + 0.14, -S['len'] - 0.02)
     if S.get('spoiler'):   # casquette de hayon
         dists.append(rbox(shear_z(p - [0, S['roof_y'] + S['roof_h'] - 0.02, gz + 0.06], S['glass_tilt'], 0.0),
                           [S['roof_wid'] - 0.02, 0.025, 0.10], 0.02)); mats.append(MAT_PAINT)
@@ -657,14 +695,17 @@ TGT = np.array([0.0, 0.85, 0.05], dtype=np.float32)
 FOCAL = 4.3
 
 def camera():
-    fwd = TGT - CAM; fwd /= np.linalg.norm(fwd)
+    cam, tgt = CAM, TGT
+    if VIEW == 'front':                          # devant la voiture, symétrique de la vue arrière
+        cam = CAM * np.array([1, 1, -1], dtype=np.float32); tgt = TGT * np.array([1, 1, -1], dtype=np.float32)
+    fwd = tgt - cam; fwd /= np.linalg.norm(fwd)
     rgt = np.cross(fwd, [0, 1, 0]); rgt /= np.linalg.norm(rgt)
     up = np.cross(rgt, fwd)
-    return fwd, rgt, up
+    return fwd, rgt, up, cam
 
 # ─────────────── rendu d'une silhouette ───────────────
 def render(name, S):
-    fwd, rgt, up = camera()
+    fwd, rgt, up, cam = camera()
     xs = (np.arange(RW, dtype=np.float32) + 0.5) / RW * 2 - 1
     ys = 1 - (np.arange(RH, dtype=np.float32) + 0.5) / RH * 2
     gx, gy = np.meshgrid(xs, ys)
@@ -672,7 +713,7 @@ def render(name, S):
     rd = (fwd + (gx[..., None] * rgt + gy[..., None] * up) / FOCAL).astype(np.float32)
     rd /= np.linalg.norm(rd, axis=-1, keepdims=True)
     rd = rd.reshape(-1, 3)
-    ro = np.broadcast_to(CAM, rd.shape).copy()
+    ro = np.broadcast_to(cam, rd.shape).copy()
 
     # sphère englobante : on n'envoie de rayons que là où il peut y avoir de la matière
     oc = ro - np.array([0, 0.95, 0], dtype=np.float32)
@@ -743,6 +784,7 @@ def render(name, S):
         MAT_LAMP:   shade([0.42, 0.018, 0.012], 0.06, 0.05, emis=np.array([0.95, 0.06, 0.03]) * 0.34),
         MAT_LAMP_W: shade([0.50, 0.50, 0.52], 0.06, 0.05, emis=np.array([0.9, 0.9, 0.92]) * 0.05),
         MAT_LAMP_A: shade([0.70, 0.30, 0.03], 0.06, 0.05, emis=np.array([0.95, 0.45, 0.05]) * 0.22),
+        MAT_HEAD:   shade([0.80, 0.82, 0.86], 0.05, 0.06, emis=np.array([1.0, 0.96, 0.80]) * 0.9),   # phares allumés
         MAT_TRIM:   shade([0.016, 0.017, 0.019], 0.55, 0.04),
         MAT_PLATE:  shade([0.020, 0.020, 0.022], 0.85, 0.03),
         MAT_CANVAS: shade([0.030, 0.026, 0.022], 0.95, 0.02),
@@ -779,8 +821,14 @@ def compose(buf, paint, crop=None, out_w=None):
 
 def plate_box(S):
     """Projette l'emplacement de plaque à l'écran : le jeu y pose sa plaque HTML."""
-    fwd, rgt, up = camera(); aspect = RW / RH
-    if 'plate' in S:
+    fwd, rgt, up, cam = camera(); aspect = RW / RH
+    if VIEW == 'front' and 'front_plate' in S:
+        cy, z, hw, hh = S['front_plate']
+    elif VIEW == 'front':
+        y_low = S['body_y'] - S['body_h']
+        cy, hw, hh = y_low + 0.20, 0.42, 0.115
+        z = -S['len'] - 0.02 + 0.055 - 0.03
+    elif 'plate' in S:
         cy, z, hw, hh = S['plate']
     else:
         y_low = S['body_y'] - S['body_h']
@@ -789,7 +837,7 @@ def plate_box(S):
     pts = [(-hw, cy - hh), (hw, cy - hh), (-hw, cy + hh), (hw, cy + hh)]
     xs, ys = [], []
     for x, y in pts:
-        d = np.array([x, y, z]) - CAM
+        d = np.array([x, y, z]) - cam
         cx_, cy_, cz_ = d @ rgt, d @ up, d @ fwd
         gx = (cx_ / cz_) * FOCAL / aspect
         gy = (cy_ / cz_) * FOCAL
@@ -817,6 +865,11 @@ if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     import time, json
     layout = {}
+    if len(sys.argv) > 4 and sys.argv[4] == 'front':
+        VIEW = 'front'
+        SUN_DIR = SUN_DIR * np.array([-1, 1, -1], dtype=np.float32)   # le couchant est devant vous : il éclaire la face avant
+        RIM_DIR = RIM_DIR * np.array([-1, 1, -1], dtype=np.float32)
+    suffix = '-front' if VIEW == 'front' else ''
     only = sys.argv[2].split(',') if len(sys.argv) > 2 else None
     if only:
         SHAPES = {k: v for k, v in SHAPES.items() if k in only}
@@ -835,7 +888,7 @@ if __name__ == '__main__':
         cw, ch = crop[2] - crop[0], crop[3] - crop[1]
 
         pb = plate_box(S)                       # fractions de l'image PLEINE
-        layout[name] = dict(
+        layout[name + suffix] = dict(
             x=(pb['x'] * ref.width - crop[0]) / cw,
             y=(pb['y'] * ref.height - crop[1]) / ch,
             w=pb['w'] * ref.width / cw,
@@ -844,7 +897,7 @@ if __name__ == '__main__':
 
         for cname, paint in COLORS.items():
             im = compose(buf, paint, crop=crop, out_w=OUT_W)
-            path = os.path.join(OUT, '%s-%s.webp' % (name, cname))
+            path = os.path.join(OUT, '%s-%s%s.webp' % (name, cname, suffix))
             im.save(path, 'WEBP', quality=86, method=6)
             print('   %-28s %5.1f Ko' % (os.path.basename(path), os.path.getsize(path) / 1024), flush=True)
     # layout.json se complète à chaque rendu : les silhouettes non rendues gardent leur entrée
