@@ -109,10 +109,10 @@ function spawn() {
 function placePlate(c) {
   var p = project(c.lane, c.z);
   var readable = c.z <= Z_READ;
-  var s = Math.max(0.62, Math.min(1, 1 / c.z));           // la plaque reste lisible bien avant la voiture
+  var s = Math.max(0.7, Math.min(1, 1.6 / c.z));          // la plaque reste lisible bien avant la voiture
   // loin, les voies convergent et les plaques se recouvriraient : on les écarte
   // latéralement, d'autant plus que la voiture est loin ; l'écart se referme à l'approche
-  var spread = (c.lane - MY_LANE) * 0.15 * Math.max(0, 1 - Z_HIT / c.z);
+  var spread = (c.lane - MY_LANE) * 0.12 * Math.max(0, 1 - Z_HIT / c.z);
   var px = (p.x / 100 + spread) * R.sceneW;
   var F = FLEET[c.shape];
   var carH = F.size * R.sceneH / F.ratio * p.s;            // hauteur affichée de la voiture
@@ -315,6 +315,9 @@ function renderHud() {
 function measure() {
   var r = $('pu-road').getBoundingClientRect();
   R.sceneW = r.width; R.sceneH = r.height;
+  // la plaque garde les proportions d'une vraie plaque (≈ 4,7:1) et ne dépasse jamais
+  // la moitié de la scène : sur un écran haut et étroit, la hauteur ne dicte plus sa taille
+  $('pu-road').style.setProperty('--pw', Math.round(Math.min(R.sceneH * 0.40, R.sceneW * 0.46)) + 'px');
   $('pu-badge').src = P.myCar();
   R.cars.forEach(function (c) { c.el.style.width = (FLEET[c.shape].size * R.sceneH) + 'px'; place(c.el, c.lane, c.z); placePlate(c); });
 }

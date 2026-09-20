@@ -785,11 +785,11 @@ body.fitted .platefield__eu{flex-basis:32px}
 .pcar .car__ride{animation:cruise var(--ride,3.6s) ease-in-out infinite alternate}
 .pcar .car__body{animation:rumble .16s ease-in-out infinite alternate}
 .pplate{position:absolute;left:0;top:0;width:0;height:0;will-change:transform,opacity;transition:opacity .35s;pointer-events:auto;overflow:visible}
-.pplate .plate--pursuit{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:calc(var(--roadH) * .42);margin:0;border-width:2px;z-index:2;
+.pplate .plate--pursuit{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:var(--pw,180px);margin:0;border-width:2px;z-index:2;
   box-shadow:0 2px 8px rgba(0,0,0,.7)}
-.pplate .plate__body{font-size:calc(var(--roadH) * .062);padding:2px 2px;gap:.08em}
-.pplate .plate__eu,.pplate .plate__dep{width:auto;min-width:13%;padding:2px 3px;justify-content:center}
-.pplate .plate__f,.pplate .plate__depnum{font-size:calc(var(--roadH) * .026);white-space:nowrap}
+.pplate .plate__body{font-size:calc(var(--pw,180px) * .15);padding:1px 2px;gap:.08em;line-height:1.15}
+.pplate .plate__eu,.pplate .plate__dep{width:auto;min-width:12%;padding:2px 3px;justify-content:center}
+.pplate .plate__f,.pplate .plate__depnum{font-size:calc(var(--pw,180px) * .06);white-space:nowrap}
 .pplate.car--target .plate--car{box-shadow:0 2px 8px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
 .pcar--threat.pcar--near .car__body{filter:drop-shadow(0 0 12px rgba(255,90,60,.85))}
 .pcar--boom .car__ride{animation:boom .6s cubic-bezier(.2,.75,.4,1) forwards}
@@ -806,10 +806,7 @@ body.fitted .platefield__eu{flex-basis:32px}
 .tokgroup--threat{border-color:rgba(255,90,60,.55)}
 .tok__warn{font-style:normal;color:#ff5a3c;font-size:14px;align-self:center;margin-right:2px}
 .road--pursuit.rush .road__sky{background:linear-gradient(180deg,#2a0b10 0%,#6a1b1b 46%,#a8452a 84%,#d9782f 100%)}
-@media (max-width:700px){
-  .pplate .plate--pursuit{width:calc(var(--roadH) * .5)}
-  .pplate .plate__body{font-size:calc(var(--roadH) * .074)}
-}
+
 
 /* ───────── Poursuite : le cockpit ───────── */
 .cockpit{position:absolute;left:0;right:0;bottom:0;height:30%;z-index:1200;pointer-events:none}
@@ -1121,3 +1118,22 @@ body.theme-miami .rank__fill{background:linear-gradient(90deg,#2ee6d6,#ff4fa3)}
 body.theme-miami .lot{background:linear-gradient(180deg,#2c2070 0%,#1d1450 22%,#150d3a 100%)}
 body.theme-miami .warp{background:repeating-conic-gradient(from 0deg at 50% 46%,transparent 0deg 5deg,rgba(255,79,163,.22) 5deg 6.2deg)}
 body.theme-miami .cockpit__dash,body.theme-miami .wheel svg circle,body.theme-miami .wheel svg path{filter:none}
+
+/* badges et médailles, version Miami : cartes violettes liseré rose, rayons roses, halo cyan */
+body.theme-miami .badge{background:linear-gradient(160deg,#241a5e,#1b1247);border-color:#3d2c85;color:#b3a6d9}
+body.theme-miami .badge:hover{border-color:#ff4fa3;box-shadow:0 0 18px rgba(255,79,163,.35)}
+body.theme-miami .badge b{color:#fff}
+body.theme-miami .modal{background:rgba(12,6,32,.86)}
+body.theme-miami .modal__card{background:linear-gradient(180deg,#2b1c6e,#130b33);border-color:#ff4fa3;box-shadow:0 0 40px rgba(255,79,163,.35),0 30px 60px rgba(0,0,0,.6)}
+body.theme-miami .modal__card h3{background:linear-gradient(180deg,#fff 30%,#ff4fa3);-webkit-background-clip:text;background-clip:text}
+body.theme-miami .medal-stage::before{background:repeating-conic-gradient(from 0deg,rgba(255,79,163,.22) 0deg 6deg,transparent 6deg 18deg)}
+body.theme-miami .medal-stage::after{background:radial-gradient(circle at 50% 55%,rgba(46,230,214,.35) 0%,transparent 60%)}
+body.theme-miami .medal__glint{filter:hue-rotate(300deg)}
+body.theme-miami .medal-state,body.theme-miami .collec__intro{color:#ffd3ea}
+body.theme-miami .stat--fire,body.theme-miami .stat{border-color:#3d2c85}
+body.theme-miami .career__rank{background:linear-gradient(160deg,#241a5e,#1b1247);border-color:#3d2c85}
+body.theme-miami .career__rank--now{border-color:#2ee6d6;box-shadow:0 0 18px rgba(46,230,214,.35)}
+body.theme-miami .collec__reg{background:var(--bg2);border-color:var(--line)}
+body.theme-miami .toast{background:linear-gradient(180deg,#2b1c6e,#1b1247);border:1px solid #ff4fa3;box-shadow:0 0 22px rgba(255,79,163,.4)}
+body.theme-miami .badge__txt u,body.theme-miami .medal-state u{background:linear-gradient(90deg,#2ee6d6,#ff4fa3)}
+body.theme-miami .collec__fill{background:linear-gradient(90deg,#2ee6d6,#ff4fa3)}
