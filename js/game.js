@@ -215,15 +215,90 @@ var FLEET = {
 var TANK = 'citerne';
 function sportBonus(shape) { return (FLEET[shape] && FLEET[shape].sport) || 1; }
 function sportTag(shape) { return '🏎️ ×' + String(sportBonus(shape)).replace('.', ','); }
-/* le roster d'une partie : cinq silhouettes courantes tirées au sort, plus les sportives.
-   Les modes ne préchargent que celui-là : la variété vient d'une partie à l'autre.    */
+
+/* ═══════════ le caractère de chaque silhouette ═══════════
+   Chaque modèle impose une règle ou apporte un effet, et son temps de présence est
+   proportionné : une citadine « 5 lettres max » file vite, un camion « deux mots par
+   paire » reste deux fois plus longtemps. La berline et le break restent neutres.
+   rule : contrainte sur les mots ; cote : multiplicateur de la cote ; time : facteur
+   de temps (Trafic : présence, Poursuite : vitesse d'approche) ; give : secondes rendues
+   quand la plaque est lue ; hidden : deuxième paire cachée tant que la première n'est
+   pas lue ; need : mots nécessaires par paire ; cargo : un bonus tiré au sort.         */
+var TRAITS = {
+  citadine:  { rule: 'court',    tag: '5 lettres max',    time: 0.85 },
+  cabrio:    { rule: 'long',     tag: '7 lettres min',    time: 1.4, cote: 1.5 },
+  ancienne:  { rule: 'rare',     tag: 'mots rares',       time: 1.6, cote: 2 },
+  monospace: { rule: 'initiale', tag: 'même initiale',    time: 1.3, cote: 1.5, noPursuit: true },
+  van:       { give: 5,          tag: '+5 s',             pursuitTag: '🔧 pare-chocs' },
+  '4x4':     { hidden: true,     tag: 'paire cachée',     time: 1.3, cote: 1.5 },
+  camion:    { need: 2,          tag: '2 mots par paire', time: 2.0, cote: 2, pursuitTag: '2 mots' },
+  camper:    {                   tag: 'lent',             time: 2.0, cote: 0.5, noParking: true },
+  pickup:    { cargo: true },
+  coupe:     { time: 0.9 },
+  supercar:  { time: 0.75 }
+};
+var CARGO = { time: '⏱ +8 s', joker: '🎁 paire offerte', x2: '💰 cote ×2', fever: '🔥 fièvre' };
+function trait(shape) { return TRAITS[shape] || {}; }
+function carTime(shape) { return trait(shape).time || 1; }
+/* prépare une voiture fraîchement tirée : compteurs, paire cachée, chargement, étiquette */
+function initCar(car, mode) {
+  var t = trait(car.shape);
+  car.need = t.need || 1; car.n1 = 0; car.n2 = 0; car.used = [];
+  car.hidden = !!t.hidden;
+  car.tag = mode === 'poursuite' ? (t.pursuitTag || (t.noPursuit ? '' : t.tag))
+          : mode === 'parking' && t.noParking ? '' : t.tag;
+  if (t.cargo) {
+    car.cargo = pick(mode === 'poursuite' ? ['x2', 'fever'] : ['time', 'joker', 'x2']);
+    car.tag = CARGO[car.cargo];
+    if (car.cargo === 'joker') car.got2 = '🎁';
+  }
+  car.tag = car.tag || '';
+}
+function canUse(car, which) {                      // la paire est-elle jouable ?
+  if (car['got' + which]) return false;
+  return !(which === 2 && car.hidden && !car.got1);
+}
+/* un mot touche une paire : vrai quand la paire est entièrement lue */
+function hitPair(car, which, w) {
+  car['n' + which]++;
+  if (car['n' + which] >= car.need) { car['got' + which] = w; return true; }
+  return false;
+}
+/* la règle du modèle refuse-t-elle ce mot ? renvoie le message, ou null */
+function wordRule(car, w, mode) {
+  var t = trait(car.shape), name = FLEET[car.shape].name;
+  if (t.rule === 'court' && w.length > 5) return name + ' : <b>5 lettres max</b>.';
+  if (t.rule === 'long' && w.length < 7) return name + ' : <b>7 lettres au moins</b>.';
+  if (t.rule === 'rare' && !(RARITY && RARITY.get(w))) return name + ' : <b>mots rares ou peu courants</b> seulement.';
+  if (t.rule === 'initiale' && mode !== 'poursuite' && car.used.length && w[0] !== car.used[0][0])
+    return name + ' : même initiale que <b>' + car.used[0].toUpperCase() + '</b> — un mot en <b>' + car.used[0][0].toUpperCase() + '</b>.';
+  return null;
+}
+/* multiplicateur de la cote : sportive, caractère, chargement */
+function carCote(car, mode) {
+  var t = trait(car.shape);
+  return sportBonus(car.shape) * (mode === 'parking' && t.noParking ? 1 : (t.cote || 1)) * (car.cargo === 'x2' ? 2 : 1);
+}
+/* ce que le modèle a apporté, pour le message de fin de plaque */
+function traitLabel(car, mode) {
+  var t = trait(car.shape), name = FLEET[car.shape].name, out = [];
+  var cote = mode === 'parking' && t.noParking ? 1 : (t.cote || 1);
+  if (cote !== 1) out.push(name.toLowerCase() + ' ×' + String(cote).replace('.', ','));
+  if (t.give && mode !== 'poursuite') out.push('+' + t.give + ' s');
+  if (car.cargo) out.push('benne : ' + CARGO[car.cargo]);
+  return out.length ? ' · ' + out.join(' · ') : '';
+}
+/* le roster d'une partie : une silhouette neutre, quatre autres tirées au sort, plus les
+   sportives. Les modes ne préchargent que celui-là : la variété vient d'une partie à l'autre. */
 function fleetRoster() {
-  var regular = [], sports = [];
+  var neutral = [], regular = [], sports = [];
   Object.keys(FLEET).forEach(function (s) {
     if (FLEET[s].tank) return;
-    (FLEET[s].sport ? sports : regular).push(s);
+    if (FLEET[s].sport) sports.push(s);
+    else if (TRAITS[s]) regular.push(s);
+    else neutral.push(s);
   });
-  return shuffle(regular).slice(0, 5).concat(sports);
+  return [pick(neutral)].concat(shuffle(regular).slice(0, 4)).concat(sports);
 }
 
 function career() { return store.get('career', 0); }
@@ -959,6 +1034,8 @@ window.PLAQUE = {
   DIFF: DIFF, MODES: MODES, state: state, newPlate: newPlate, endGame: endGame,
   track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore, guideSay: guideSay,
   FLEET: FLEET, TANK: TANK, fleetRoster: fleetRoster, sportBonus: sportBonus, sportTag: sportTag,
+  TRAITS: TRAITS, trait: trait, carTime: carTime, initCar: initCar, canUse: canUse, hitPair: hitPair,
+  wordRule: wordRule, carCote: carCote, traitLabel: traitLabel,
   tweenNumber: tweenNumber, bump: bump, floatPts: floatPts,
   autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit,
   myCar: function () { return rankSprite(RANKS[rankOf(career())]); },

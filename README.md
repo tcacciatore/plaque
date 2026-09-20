@@ -47,6 +47,26 @@ n'est jamais tirée deux fois dans la même partie.
 | **cote** | les trois chiffres de la plaque : ce qu'elle rapporte une fois lue, de 100 (paires riches) à 900 (paires rares) |
 | coupé | ×1,5 sur ses mots et sa cote (une voiture sur huit) |
 | supercar | ×2 sur ses mots et sa cote (aussi rare) |
+
+Chaque modèle a en plus son **caractère** (`TRAITS`, `js/game.js`), affiché au-dessus
+de lui, et un temps de présence proportionné (Trafic : durée à l'écran ; Poursuite :
+vitesse d'approche) :
+
+| modèle | règle ou effet | temps | cote |
+|---|---|---|---|
+| citadine | mots de 5 lettres max | ×0,85 | — |
+| cabriolet | mots de 7 lettres au moins | ×1,4 | ×1,5 |
+| ancienne | mots rares ou peu courants seulement | ×1,6 | ×2 |
+| monospace | les deux mots ont la même initiale (pas en Poursuite) | ×1,3 | ×1,5 |
+| utilitaire | la lire rend 5 s (Poursuite : répare un pare-chocs) | — | — |
+| 4×4 | deuxième paire cachée tant que la première n'est pas lue | ×1,3 | ×1,5 |
+| camion | deux mots par paire | ×2 | ×2 |
+| camping-car | lent (Trafic, Poursuite) | ×2 | ×0,5 |
+| pick-up | sa benne porte un bonus : +8 s, une paire offerte ou cote ×2 (Poursuite : cote ×2 ou fièvre) | — | — |
+| coupé, supercar | — | ×0,9 / ×0,75 | — |
+| berline, break | neutres | — | — |
+
+La première voiture d'une partie est toujours neutre, et le roster en contient une.
 | voiture dorée | ×3 (une sur vingt-cinq) ; en Parking sa marque au sol est un joker de couleur |
 | camion-citerne | (un sur quatorze) quand il explose, ses voisines explosent avec lui, pour la moitié de leur cote |
 | **fièvre** | à ×5, dix secondes pendant lesquelles un seul mot suffit à lire une plaque ; puis la série redescend à ×3 |

@@ -55,6 +55,11 @@ function makeCar(i, shape, color, easy) {
     got1: null, got2: null, words: 0, pts: 0, dead: false
   };
 }
+function newCar(i, shape, color, easy) {          // makeCar + le caractère du modèle
+  var c = makeCar(i, shape, color, easy);
+  P.initCar(c, 'parking');
+  return c;
+}
 
 function carHTML(c) {
   var F = FLEET[c.shape];
@@ -62,7 +67,8 @@ function carHTML(c) {
       '" style="--plateY:' + F.plateY + '%;--plateW:' + F.plateW + '%;width:' + F.width + '%">' +
         (c.gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' :
          c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' :
-         isSport(c.shape) ? '<span class="sport-tag">' + P.sportTag(c.shape) + '</span>' : '') +
+         isSport(c.shape) ? '<span class="sport-tag">' + P.sportTag(c.shape) + '</span>' :
+         c.tag ? '<span class="sport-tag sport-tag--trait">' + c.tag + '</span>' : '') +
         '<img class="car__body" alt="" draggable="false" src="' + SPRITES + c.shape + '-' + c.color + '.webp">' +
         '<div class="car__shadow"></div>' +
         '<div class="plate plate--car plate--park">' +
@@ -71,7 +77,7 @@ function carHTML(c) {
             '<span class="plate__letters" data-pair="1">' + c.p1.p + '</span>' +
             '<span class="plate__sep">·</span><span class="plate__num">' + c.num + '</span>' +
             '<span class="plate__sep">·</span>' +
-            '<span class="plate__letters" data-pair="2">' + c.p2.p + '</span>' +
+            '<span class="plate__letters" data-pair="2">' + (c.hidden ? '??' : c.p2.p) + '</span>' +
           '</div>' +
           '<div class="plate__dep"><div class="plate__depnum">' + c.dep.num + '</div></div>' +
         '</div>' +
@@ -92,11 +98,13 @@ function buildLot() {
   var shapes = K.roster.slice(), extra = K.roster.filter(function (s) { return !isSport(s); });
   while (shapes.length < SPOTS) shapes.push(P.pick(extra));
   P.shuffle(shapes);
+  shapes.splice(shapes.indexOf(K.roster[0]), 1);   // la silhouette neutre en première place :
+  shapes.unshift(K.roster[0]);                     // la première rangée reste abordable
 
   K.spots = []; K.marks = [];
   var html = '';
   for (var i = 0; i < SPOTS; i++) {
-    K.spots.push(makeCar(i, shapes[i], null, i < 3));   // la première rangée est accessible
+    K.spots.push(newCar(i, shapes[i], null, i < 3));   // la première rangée est accessible
     K.marks.push(null);
     html += '<div class="spot" id="spot' + i + '"><div class="spot__mark"></div>' +
             '<div class="spot__slot">' + carHTML(K.spots[i]) + '</div><div class="spot__fx"></div></div>';
@@ -108,7 +116,7 @@ function buildLot() {
 /* ─────────── réoccupation d'une place ─────────── */
 function park(i) {
   if (!K.running || K.spots[i]) return;
-  var c = makeCar(i);
+  var c = newCar(i);
   K.spots[i] = c;
   K.seen++;
   var spot = $('spot' + i);
@@ -230,14 +238,20 @@ function updateTokens() {
     var sp = isSport(c.shape) ? ' tok--sport' : '';
     var tg = c === K.target ? ' tok--target' : '';
     return '<span class="tokgroup' + tg + '" data-i="' + c.i + '">' +
-           '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + c.p1.p + '</span>' +
-           '<span class="tok' + sp + (c.got2 ? ' tok--on' : '') + '">' + c.p2.p + '</span></span>';
+           '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + c.p1.p + (!c.got1 && c.n1 ? '½' : '') + '</span>' +
+           '<span class="tok' + sp + (c.got2 ? ' tok--on' : '') + '">' + (c.got2 || P.canUse(c, 2) ? c.p2.p + (!c.got2 && c.n2 ? '½' : '') : '??') + '</span></span>';
   }).join('');
 }
 function feedback(msg, cls) {
   var f = $('pk-feedback');
   f.innerHTML = msg;
   f.className = 'feedback ' + (cls || '');
+}
+function reveal(c) {                             // la deuxième paire du 4×4 apparaît
+  c.hidden = false;
+  var spot = $('spot' + c.i);
+  var el = spot && spot.querySelector('[data-pair="2"]');
+  if (el) { el.textContent = c.p2.p; el.classList.add('hit'); }
 }
 function flashPair(c, which) {
   var spot = $('spot' + c.i);
@@ -266,20 +280,23 @@ function submit(e) {
   if (w.length < 3) return reject('Trop court — 3 lettres minimum.');
 
   // la cible : la voiture désignée, sinon une que le mot achève, sinon une entamée, sinon la première
-  var best = null, used = false;
+  var best = null, used = false, ruleMsg = null;
   K.spots.forEach(function (c) {
     if (!c) return;
-    if (w === c.got1 || w === c.got2) { used = true; return; }
-    var h1 = c.got1 ? null : P.matchPair(w, c.p1.p);
-    var h2 = c.got2 ? null : P.matchPair(w, c.p2.p);
+    if (c.used.indexOf(w) !== -1) { used = true; return; }
+    var h1 = P.canUse(c, 1) ? P.matchPair(w, c.p1.p) : null;
+    var h2 = P.canUse(c, 2) ? P.matchPair(w, c.p2.p) : null;
     if (!h1 && !h2) return;
+    var bad = P.wordRule(c, w, 'parking');                   // le caractère du modèle refuse ce mot
+    if (bad) { if (!ruleMsg || c === K.target) ruleMsg = bad; return; }
     var rank = (c === K.target ? 8 : 0) +
                (((h1 && h2) || (h1 && c.got2) || (h2 && c.got1)) ? 4 : 0) +
-               ((c.got1 || c.got2) ? 2 : 0);
+               ((c.got1 || c.got2 || c.n1 || c.n2) ? 2 : 0);
     if (!best || rank > best.rank) best = { c: c, h1: h1, h2: h2, rank: rank };
   });
   if (!best) {
-    return reject(used ? '<b>' + w.toUpperCase() + '</b> — déjà utilisé sur ce parking.'
+    return reject(ruleMsg ? '<b>' + w.toUpperCase() + '</b> — ' + ruleMsg
+                : used ? '<b>' + w.toUpperCase() + '</b> — déjà utilisé sur ce parking.'
                        : '<b>' + w.toUpperCase() + '</b> ne va sur aucune plaque.');
   }
   if (!P.isWord(w)) return reject('<b>' + w.toUpperCase() + '</b> — inconnu du dictionnaire.');
@@ -290,10 +307,14 @@ function submit(e) {
   var pts = Math.round(ws.pts * K.combo * P.sportBonus(c.shape) * (c.gold ? GOLD_MULT : 1) * multiplier());
   var both = best.h1 && best.h2;
   if (both) pts *= 2;
-  if (best.h1) { c.got1 = w; flashPair(c, 1); }
-  if (best.h2) { c.got2 = w; flashPair(c, 2); }
+  c.used.push(w);
+  var half = false;                                // le camion : la paire n'est qu'à moitié lue
+  if (best.h1) { half = !P.hitPair(c, 1, w) || half; flashPair(c, 1); }
+  if (best.h2) { half = !P.hitPair(c, 2, w) || half; flashPair(c, 2); }
+  if (c.hidden && c.got1) reveal(c);
   if (inFever() && !(c.got1 && c.got2)) {
     if (!c.got1) { c.got1 = '🔥'; flashPair(c, 1); } else { c.got2 = '🔥'; flashPair(c, 2); }
+    if (c.hidden) reveal(c);
   }
   c.words += both ? 2 : 1; c.pts += pts; K.score += pts;
   var wasMax = K.combo >= 5;
@@ -303,16 +324,16 @@ function submit(e) {
   var who = '<b class="mono">' + c.p1.p + '·' + c.num + '·' + c.p2.p + '</b>';
 
   if (c.got1 && c.got2) {
-    var bonus = Math.round(c.value * P.sportBonus(c.shape) * (c.gold ? GOLD_MULT : 1) * multiplier());
+    var bonus = Math.round(c.value * P.carCote(c, 'parking') * (c.gold ? GOLD_MULT : 1) * multiplier());
     c.pts += bonus; K.score += bonus; K.done++;
-    gainTime(PLATE_TIME);
+    gainTime(PLATE_TIME + (P.trait(c.shape).give || 0) + (c.cargo === 'time' ? 8 : 0));
     P.sfx.dbl();
     P.floatPts(inp, '+' + (pts + bonus), 'float--win');
     P.bump($('pk-score').parentNode.parentNode, 'bump--big');
     P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, tank: c.tank, dep: c.dep.num, depName: c.dep.nom });
     feedback('💥 ' + who + ' pulvérisée ! cote <b>+' + bonus + '</b>' +
-             (sport ? ' (🏎️ coupé ×1,5)' : '') + (c.gold ? ' (✨ dorée ×3)' : '') + (K.rush ? ' (rush ×2)' : '') +
-             ' — ' + c.dep.num + ' ' + c.dep.nom, 'ok');
+             (sport ? ' (' + P.sportTag(c.shape) + ')' : '') + (c.gold ? ' (✨ dorée ×3)' : '') + (K.rush ? ' (rush ×2)' : '') +
+             P.traitLabel(c, 'parking') + ' — ' + c.dep.num + ' ' + c.dep.nom, 'ok');
     leave(c, true);
     P.guideSay(3, '💥 Sa <b>cote</b> — les trois chiffres — tombe dans votre score, et sa place garde sa couleur. Trois places alignées de même couleur : bonus.');
     checkLines(c.i);
@@ -325,8 +346,8 @@ function submit(e) {
     feedback('+' + pts + ' sur ' + who +
              (both ? ' — <b>les deux paires d\'un coup</b> ×2' : '') +
              (ws.label ? ' — ' + ws.label : '') +
-             (sport ? ' · 🏎️ <b>coupé ×1,5</b>' : '') +
-             ' · il manque <b>' + (c.got1 ? c.p2.p : c.p1.p) + '</b>', 'ok');
+             (sport ? ' · <b>' + P.sportTag(c.shape) + '</b>' : '') +
+             (half ? ' · <b>encore un mot</b> sur cette paire' : ' · il manque <b>' + (c.got1 ? c.p2.p : c.p1.p) + '</b>'), 'ok');
     setTarget(c);
     P.guideSay(2, 'Bien joué. Il reste <b>' + (c.got1 ? c.p2.p : c.p1.p) + '</b> sur cette voiture : un deuxième mot et elle explose. Sa place gardera sa couleur — alignez-en trois.');
   }

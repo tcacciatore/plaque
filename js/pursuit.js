@@ -47,13 +47,14 @@ function plateHTML(c) {
         '<span class="plate__letters" data-pair="1">' + c.p1.p + '</span>' +
         '<span class="plate__sep">·</span><span class="plate__num">' + c.num + '</span>' +
         '<span class="plate__sep">·</span>' +
-        '<span class="plate__letters" data-pair="2">' + c.p2.p + '</span>' +
+        '<span class="plate__letters" data-pair="2">' + (c.hidden ? '??' : c.p2.p) + '</span>' +
       '</div>' +
       '<div class="plate__dep"><div class="plate__depnum">' + c.dep.num + '</div></div>' +
     '</div>';
 }
 function pickShape() {
   var present = R.cars.map(function (c) { return c.shape; });
+  if (!R.cars.length && !R.done && !R.dodged) return R.roster[0];   // la première : une silhouette neutre
   if (present.indexOf(TANK) === -1 && R.done + R.dodged > 3 && P.rand(TANK_ODDS) === 0) return TANK;
   var sports = R.roster.filter(function (s) { return isSport(s) && present.indexOf(s) === -1; });
   if (sports.length && P.rand(7) === 0) return P.pick(sports);
@@ -76,12 +77,16 @@ function spawn() {
     shape: shape, lane: lane, z: Z_FAR, rel: 0.85 + Math.random() * 0.35, gold: gold, tank: shape === TANK,
     got1: null, got2: null, words: 0, pts: 0, gone: false, born: Date.now()
   };
+  P.initCar(c, 'poursuite');
+  c.rel /= P.carTime(shape);                       // le camping-car approche lentement, la supercar fond sur vous
+  if (c.cargo === 'joker') c.got2 = null;          // en Poursuite un mot suffit : pas de paire offerte
   var el = document.createElement('div');
   el.className = 'pcar' + (lane === MY_LANE ? ' pcar--threat' : '') + (isSport(shape) ? ' car--sport' : '') +
                  (gold ? ' car--gold' : '') + (c.tank ? ' car--tank' : '');
   el.style.width = (FLEET[shape].size * R.sceneH) + 'px';
   el.innerHTML = '<div class="car__ride">' +
-                   (gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' : c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' : '') +
+                   (gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' : c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' :
+                    c.tag ? '<span class="sport-tag sport-tag--trait">' + c.tag + '</span>' : '') +
                    '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + (gold ? 'or' : P.pick(P.colors())) + '.webp">' +
                    '<div class="car__shadow"></div>' +
                  '</div><div class="car__fx"></div><div class="car__pop"></div>';
@@ -138,8 +143,8 @@ function renderTokens() {
     var th = c.lane === MY_LANE ? ' tokgroup--threat' : '';
     return '<span class="tokgroup' + tg + th + '" data-i="' + R.cars.indexOf(c) + '">' +
            (c.lane === MY_LANE ? '<i class="tok__warn">⚠</i>' : '') +
-           '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + (c.got1 ? '✓' : c.p1.p) + '</span>' +
-           '<span class="tok' + sp + (c.got2 ? ' tok--on' : '') + '">' + (c.got2 ? '✓' : c.p2.p) + '</span></span>';
+           '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + (c.got1 ? '✓' : c.p1.p + (c.used.length ? '½' : '')) + '</span>' +
+           '<span class="tok' + sp + (c.got2 ? ' tok--on' : '') + '">' + (c.got2 ? '✓' : c.hidden ? '??' : c.p2.p + (c.used.length ? '½' : '')) + '</span></span>';
   }).join('');
 }
 function pop(c, txt, cls) {
@@ -179,19 +184,22 @@ function submit(e) {
   }
   if (w.length < 3) return reject('Trop court — 3 lettres minimum.');
 
-  var best = null, used = false;
+  var best = null, used = false, ruleMsg = null;
   alive.forEach(function (c) {
-    if (w === c.got1 || w === c.got2) { used = true; return; }
+    if (c.used.indexOf(w) !== -1) { used = true; return; }
     var h1 = c.got1 ? null : P.matchPair(w, c.p1.p);
-    var h2 = c.got2 ? null : P.matchPair(w, c.p2.p);
+    var h2 = (c.got2 || c.hidden) ? null : P.matchPair(w, c.p2.p);   // le 4×4 : seule la première paire se lit
     if (!h1 && !h2) return;
+    var bad = P.wordRule(c, w, 'poursuite');                 // le caractère du modèle refuse ce mot
+    if (bad) { if (!ruleMsg || c === R.target) ruleMsg = bad; return; }
     var rank = (c === R.target ? 16 : 0) +
                (((h1 && h2) || (h1 && c.got2) || (h2 && c.got1)) ? 8 : 0) +
                (c.lane === MY_LANE ? 4 : 0) +                       // la menace d'abord
                ((c.got1 || c.got2) ? 2 : 0) + (1 - c.z / 20);       // puis la plus proche
     if (!best || rank > best.rank) best = { c: c, h1: h1, h2: h2, rank: rank };
   });
-  if (!best) return reject(used ? '<b>' + w.toUpperCase() + '</b> — déjà joué.' : '<b>' + w.toUpperCase() + '</b> ne va sur aucune plaque en vue.');
+  if (!best) return reject(ruleMsg ? '<b>' + w.toUpperCase() + '</b> — ' + ruleMsg
+                         : used ? '<b>' + w.toUpperCase() + '</b> — déjà joué.' : '<b>' + w.toUpperCase() + '</b> ne va sur aucune plaque en vue.');
   if (!P.isWord(w)) return reject('<b>' + w.toUpperCase() + '</b> — inconnu du dictionnaire.');
 
   var c = best.c, hit = best.h1 || best.h2;
@@ -202,23 +210,37 @@ function submit(e) {
   var pts = Math.round(ws.pts * R.combo * P.sportBonus(c.shape) * (c.gold ? GOLD_MULT : 1) * multiplier() * (both ? 2 : 1) * fever);
   if (best.h1) { c.got1 = w; flashPair(c, 1); }
   if (best.h2) { c.got2 = w; flashPair(c, 2); }
+  c.used.push(w);
   c.words += both ? 2 : 1; c.pts += pts; R.score += pts;
   var wasMax = R.combo >= MULT_MAX;
   R.combo = Math.min(MULT_MAX, R.combo + 1);
   P.track.word(w, pts, tier, R.combo);
   var who = '<b class="mono">' + c.p1.p + '·' + c.num + '·' + c.p2.p + '</b>';
+  if (c.need > 1 && c.used.length < c.need) {      // le camion blindé : il faut un second mot
+    c.got1 = null; c.got2 = null;
+    (tier === 2 && rare) ? P.sfx.rare() : P.sfx.ok(R.combo);
+    P.floatPts(inp, '+' + pts, '');
+    feedback('+' + pts + ' sur ' + who + ' — 🚚 <b>camion blindé</b> : encore un mot, sur l\'une ou l\'autre paire.', 'ok');
+    setTarget(c);
+    renderTokens(); renderHud();
+    return;
+  }
 
   var extremis = c.lane === MY_LANE && c.z < Z_HIT + 0.8;
-  var bonus = Math.round(c.value * P.sportBonus(c.shape) * (c.gold ? GOLD_MULT : 1) * (extremis ? 1.5 : 1) * (both ? 2 : 1) * multiplier() * fever);
+  var bonus = Math.round(c.value * P.carCote(c, 'poursuite') * (c.gold ? GOLD_MULT : 1) * (extremis ? 1.5 : 1) * (both ? 2 : 1) * multiplier() * fever);
   c.pts += bonus; R.score += bonus; R.done++;
   c.words = 2;
+  var extra = '';
+  if (P.trait(c.shape).give && R.lives < LIVES) { R.lives++; extra = ' · 🔧 <b>pare-chocs réparé</b>'; }
+  if (c.cargo === 'fever' && !inFever()) { startFever(); extra += ' · 🔥 la benne était pleine de fièvre'; }
   P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, tank: c.tank, dep: c.dep.num, depName: c.dep.nom });
   pop(c, (extremis ? 'IN EXTREMIS ' : 'COTE ') + '+' + bonus, 'win');
   P.floatPts(inp, '+' + (pts + bonus), 'float--win');
   P.bump($('pu-score').parentNode.parentNode, 'bump--big');
   feedback('💥 <b>Dégommée !</b> ' + who + ' — <b>+' + (pts + bonus) + '</b>' +
            (ws.label ? ' · ' + ws.label : '') + (both ? ' · les deux paires ×2' : '') +
-           (extremis ? ' · 🫀 in extremis ×1,5' : '') + (sport ? ' · 🏎️ coupé ×1,5' : '') + (c.gold ? ' · ✨ dorée ×3' : '') +
+           (extremis ? ' · 🫀 in extremis ×1,5' : '') + (sport ? ' · ' + P.sportTag(c.shape) : '') + (c.gold ? ' · ✨ dorée ×3' : '') +
+           P.traitLabel(c, 'poursuite') + extra +
            (fever > 1 ? ' · 🔥 fièvre ×2' : '') + (R.lives === 1 ? ' · dernier pare-chocs ×2' : ''), 'ok');
   P.guideSay(2, '💥 Dégommée ! Un seul mot suffit, sur l\'une ou l\'autre paire. Sa <b>cote</b> tombe dans votre score. Les voitures sur <b>votre voie</b> (⚠) doivent sauter avant l\'impact.');
   explodeCar(c);
