@@ -1049,3 +1049,75 @@ body.fitted .hud--scene .hud__v{font-size:17px}
 .screen.active{animation:arrive .38s cubic-bezier(.2,.7,.2,1)}
 @keyframes arrive{from{opacity:0;transform:scale(.965) translateY(16px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.warp{display:none}.screen.active{animation:none}.hero__car{animation:none}}
+
+
+/* ═══════════ thème « Miami Vice » ═══════════
+   Nuit bleu-violet, rose flamant pour l'action, turquoise pour l'info, cartes blanc
+   cassé, soleil rayé, skyline de palmiers, grille néon au sol, scanlines discrètes. */
+body.theme-miami{
+  --bg:#130b33;--bg2:#1b1247;--bg3:#241a5e;--line:#3d2c85;--txt:#f6f1ff;--dim:#b3a6d9;
+  --accent:#ff4fa3;--ok:#2ee6d6;--ko:#ff7070;--rare:#7ad7ff;
+  background:radial-gradient(120% 80% at 50% -10%,#3a1a6e 0%,#130b33 55%,#0b0620 100%) fixed;
+}
+body.theme-miami::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:4000;opacity:.5;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.14) 0 2px,transparent 2px 4px)}
+/* titre chrome rose → cyan, police d'enseigne lumineuse */
+body.theme-miami .logo{font-family:'Monoton',var(--cond);font-weight:400;letter-spacing:.06em;font-size:clamp(50px,13vw,84px);
+  background:linear-gradient(180deg,#fff 0%,#ffd3ea 38%,#ff4fa3 50%,#8fe3ff 52%,#2ee6d6 100%);-webkit-background-clip:text;background-clip:text;
+  filter:drop-shadow(0 0 10px rgba(255,79,163,.55)) drop-shadow(0 0 22px rgba(46,230,214,.35))}
+body.theme-miami .tagline{color:#ffd3ea}
+body.theme-miami h2{background:linear-gradient(180deg,#fff,#ff4fa3);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* le décor : ciel violet-rose, soleil rayé, skyline, sol néon, chaussée sombre aux bords cyan */
+body.theme-miami .road{background:#0b0620;border-color:#3d2c85}
+body.theme-miami .road__sky{background:linear-gradient(180deg,#120a3a 0%,#3b1a78 40%,#a5307f 75%,#ff6a9e 100%)}
+body.theme-miami .road__sky::before{content:'';position:absolute;left:0;right:0;bottom:0;height:22%;
+  background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMTEwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48ZyBmaWxsPSIjMGQwNjI2Ij4KPHJlY3QgeD0iMCIgeT0iNzAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNDAiLz4KPHJlY3QgeD0iMzAiIHk9IjUyIiB3aWR0aD0iMzQiIGhlaWdodD0iNjAiLz48cmVjdCB4PSI0MSIgeT0iNDAiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxNCIvPgo8cmVjdCB4PSI5MCIgeT0iMzAiIHdpZHRoPSIyNiIgaGVpZ2h0PSI4MCIvPjxyZWN0IHg9Ijk4IiB5PSIxOCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjE0Ii8+PHJlY3QgeD0iMTAxIiB5PSI2IiB3aWR0aD0iNCIgaGVpZ2h0PSIxNCIvPgo8cmVjdCB4PSIxNTAiIHk9IjYwIiB3aWR0aD0iNDAiIGhlaWdodD0iNTAiLz48cmVjdCB4PSIxNjAiIHk9IjQ4IiB3aWR0aD0iMjAiIGhlaWdodD0iMTQiLz4KPHJlY3QgeD0iMjMwIiB5PSI0NCIgd2lkdGg9IjIyIiBoZWlnaHQ9IjcwIi8+PHJlY3QgeD0iMjM2IiB5PSIzNCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEyIi8+CjxyZWN0IHg9IjUyMCIgeT0iNTYiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIvPjxyZWN0IHg9IjUyOCIgeT0iNDQiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIvPgo8cmVjdCB4PSI1OTAiIHk9IjI2IiB3aWR0aD0iMjgiIGhlaWdodD0iOTAiLz48cmVjdCB4PSI1OTgiIHk9IjE0IiB3aWR0aD0iMTIiIGhlaWdodD0iMTQiLz48cmVjdCB4PSI2MDIiIHk9IjIiIHdpZHRoPSI0IiBoZWlnaHQ9IjE0Ii8+CjxyZWN0IHg9IjY2MCIgeT0iNjIiIHdpZHRoPSI0NCIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9IjY3MiIgeT0iNTAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIxNCIvPgo8cmVjdCB4PSI3NDAiIHk9IjQwIiB3aWR0aD0iMjQiIGhlaWdodD0iNzAiLz4KPC9nPjxnIGZpbGw9IiMwZDA2MjYiPgo8cGF0aCBkPSJNMzMwIDExMCBMMzM0IDYwIEwzMzggMTEwWiIvPjxwYXRoIGQ9Ik0zMzYgNjIgQzMyMCA0MCAzMDAgNDYgMjk2IDU4IEMzMTIgNTIgMzI2IDU2IDMzNiA2MloiLz48cGF0aCBkPSJNMzM2IDYyIEMzNTAgMzggMzcyIDQyIDM3OCA1NiBDMzYyIDUwIDM0NiA1NCAzMzYgNjJaIi8+PHBhdGggZD0iTTMzNiA2MiBDMzI4IDQyIDMxMiAzNCAzMDAgMzggQzMxNiA0MCAzMjggNDggMzM2IDYyWiIvPjxwYXRoIGQ9Ik0zMzYgNjIgQzM0NiA0MCAzNjQgMzIgMzc2IDM2IEMzNjAgMzggMzQ2IDQ4IDMzNiA2MloiLz4KPHBhdGggZD0iTTQyMCAxMTAgTDQyMyA1MiBMNDI2IDExMFoiLz48cGF0aCBkPSJNNDI0IDU0IEM0MDYgMzAgMzg2IDM2IDM4MiA1MCBDMzk4IDQyIDQxMiA0OCA0MjQgNTRaIi8+PHBhdGggZD0iTTQyNCA1NCBDNDQwIDI4IDQ2MiAzNCA0NjggNDggQzQ1MiA0MCA0MzYgNDYgNDI0IDU0WiIvPjxwYXRoIGQ9Ik00MjQgNTQgQzQxNiAzNCA0MDAgMjYgMzg4IDMwIEM0MDQgMzAgNDE2IDQwIDQyNCA1NFoiLz48cGF0aCBkPSJNNDI0IDU0IEM0MzQgMzIgNDUyIDI0IDQ2NCAyOCBDNDQ4IDMwIDQzNCA0MCA0MjQgNTRaIi8+CjxwYXRoIGQ9Ik00NzAgMTEwIEw0NzIgNzAgTDQ3NCAxMTBaIi8+PHBhdGggZD0iTTQ3MyA3MiBDNDYwIDU2IDQ0NiA2MCA0NDQgNjggQzQ1NiA2MyA0NjYgNjcgNDczIDcyWiIvPjxwYXRoIGQ9Ik00NzMgNzIgQzQ4NCA1NCA1MDAgNTggNTA0IDY4IEM0OTIgNjIgNDgwIDY2IDQ3MyA3MloiLz4KPC9nPjwvc3ZnPg==") center bottom / 100% 100% no-repeat;z-index:1}
+body.theme-miami .road__sun{width:150px;height:150px;margin-left:-75px;opacity:1;filter:none;
+  background:linear-gradient(180deg,#fff2a8 0%,#ffb84a 30%,#ff4fa3 70%,#c23a9f 100%);
+  -webkit-mask:radial-gradient(circle,#000 68%,transparent 70%) ,linear-gradient(#000 0 0);
+  -webkit-mask-composite:source-in;mask:radial-gradient(circle,#000 68%,transparent 70%);
+  box-shadow:0 0 40px rgba(255,79,163,.45)}
+body.theme-miami .road__sun::after{content:'';position:absolute;inset:50% 0 0 0;
+  background:repeating-linear-gradient(180deg,transparent 0 9px,#3b1a78 9px 13px)}
+body.theme-miami .hero__road .road__sun{width:190px;height:190px;margin-left:-95px}
+body.theme-miami .road__ground{background:linear-gradient(180deg,#2a1560 0%,#180d3d 30%,#0e0826 100%);box-shadow:none;overflow:hidden}
+body.theme-miami .road__ground::before{content:'';position:absolute;inset:0;
+  /* grille néon en perspective : rayons depuis le point de fuite + lignes de plus en plus espacées */
+  background:
+    repeating-conic-gradient(from 180deg at 50% 0,rgba(46,230,214,.55) 0 .35deg,transparent .35deg 7deg),
+    linear-gradient(180deg,transparent 0 4%,rgba(46,230,214,.5) 4% calc(4% + 1px),transparent calc(4% + 1px) 9%,
+      rgba(46,230,214,.5) 9% calc(9% + 1px),transparent calc(9% + 1px) 16%,rgba(46,230,214,.5) 16% calc(16% + 1px),
+      transparent calc(16% + 1px) 26%,rgba(46,230,214,.5) 26% calc(26% + 2px),transparent calc(26% + 2px) 40%,
+      rgba(46,230,214,.5) 40% calc(40% + 2px),transparent calc(40% + 2px) 60%,rgba(46,230,214,.5) 60% calc(60% + 2px),
+      transparent calc(60% + 2px) 86%,rgba(46,230,214,.5) 86% calc(86% + 3px),transparent calc(86% + 3px));
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.25),#000 40%);-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.25),#000 40%)}
+body.theme-miami .road__tarmac{background:linear-gradient(180deg,#221650 0%,#150d36 48%,#0c0722 100%)}
+body.theme-miami .road__edge{background:#2ee6d6;box-shadow:0 0 6px #2ee6d6}
+body.theme-miami .road__lane{background:rgba(255,79,163,.55)}
+body.theme-miami .post{background:linear-gradient(180deg,#ff4fa3 0 28%,#4a3a8a 28% 100%);box-shadow:0 0 8px rgba(255,79,163,.9)}
+body.theme-miami .road.rush .road__sky{background:linear-gradient(180deg,#3a0a2e 0%,#8a1560 46%,#ff2d7a 84%,#ff8a5c 100%)}
+/* cartes de mode en blanc cassé, texte sombre */
+body.theme-miami .modecard{background:linear-gradient(160deg,#fff8f3,#f1e8ff)!important;border-color:transparent!important;color:#1a1040}
+body.theme-miami .modecard b{color:#1a1040}
+body.theme-miami .modecard em{color:#5b4d8a!important}
+body.theme-miami .modecard__best{color:#8a7bb8}
+body.theme-miami .modecard.on{border-color:#ff4fa3!important;box-shadow:0 0 0 2px #ff4fa3,0 0 28px rgba(255,79,163,.45),0 14px 34px rgba(0,0,0,.45)}
+body.theme-miami .modecard.on b{color:#ff2d8f}
+body.theme-miami .modecard.on .modecard__best{color:#ff2d8f}
+body.theme-miami .modes__dots i.on{background:#ff4fa3}
+/* boutons, segments, jetons, HUD, plaque de saisie */
+body.theme-miami .btn--big,body.theme-miami .segmented button.on{background:linear-gradient(180deg,#ff7cc0,#ff2d8f);color:#fff;
+  box-shadow:0 0 22px rgba(255,79,163,.45),0 10px 26px rgba(0,0,0,.35)}
+body.theme-miami .segmented button.on em{color:#ffd3ea}
+body.theme-miami .btn--share{background:var(--bg3);color:var(--txt);box-shadow:none}
+body.theme-miami .tok--on{background:#2ee6d6;color:#0b0620}
+body.theme-miami .hud--scene .hud__v{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85)}
+body.theme-miami .hud--scene .hud__item{border-color:rgba(46,230,214,.35);background:rgba(10,6,32,.5)}
+body.theme-miami .hud--lot{background:linear-gradient(180deg,#241a5e,#1b1247)}
+body.theme-miami .hud--lot::after{background:repeating-linear-gradient(90deg,#ff4fa3 0 14px,transparent 14px 24px)}
+body.theme-miami .platefield:focus-within{box-shadow:0 0 0 3px rgba(255,79,163,.55),0 8px 24px rgba(0,0,0,.5)}
+body.theme-miami .rank,body.theme-miami .missions,body.theme-miami .stat{background:var(--bg2)}
+body.theme-miami .rank__fill{background:linear-gradient(90deg,#2ee6d6,#ff4fa3)}
+body.theme-miami .lot{background:linear-gradient(180deg,#2c2070 0%,#1d1450 22%,#150d3a 100%)}
+body.theme-miami .warp{background:repeating-conic-gradient(from 0deg at 50% 46%,transparent 0deg 5deg,rgba(255,79,163,.22) 5deg 6.2deg)}
+body.theme-miami .cockpit__dash,body.theme-miami .wheel svg circle,body.theme-miami .wheel svg path{filter:none}

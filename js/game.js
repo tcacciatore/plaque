@@ -1096,6 +1096,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (audio.on) sfx.time();
   });
   $('btn-play').addEventListener('click', launch);
+  // thème « Miami Vice » : ?theme=miami l'active (mémorisé), ?theme=nuit revient au thème d'origine
+  var qt = (location.search.match(/[?&]theme=([a-z]+)/) || [])[1];
+  if (qt) store.set('theme', qt);
+  document.body.classList.toggle('theme-miami', store.get('theme', 'nuit') === 'miami');
   // le carrousel des modes : la carte centrée devient le mode choisi, et le mode choisi se centre
   var modesEl = $('opt-mode'), scrollT = null, autoTarget = null, autoUntil = 0;
   function centerMode() {

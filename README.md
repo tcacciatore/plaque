@@ -186,3 +186,11 @@ ce qui fonctionne aussi en `file://` — aucun serveur n'est nécessaire.
 
 > Les ressources sont référencées avec un `?v=N` dans `index.html` : incrémentez-le
 > après une modification de CSS/JS pour contourner le cache du navigateur.
+
+## Thème « Miami Vice »
+
+`?theme=miami` active un second habillage (mémorisé) : nuit bleu-violet, rose
+flamant pour l'action, turquoise pour l'info, soleil rayé, skyline de palmiers,
+grille néon au sol, cartes blanc cassé, titre en Monoton. `?theme=nuit` revient au
+thème d'origine. Tout est dans `body.theme-miami` (`css/style.css`) : les sprites
+sont partagés.
