@@ -11,15 +11,22 @@
 
 var P = null;
 var LIVES = 3;
-var LANES = [-30, 0, 30], MY_LANE = 1;
+var LANES3 = [-30, 0, 30], LANES2 = [0, 30];        // trois voies ; deux sur un petit écran (la vôtre et une de dépassement)
+var LANES = LANES3, MY_LANE = 1;
+var NARROW = 700;
 var HERO_Z = 1.3, HERO_K = 0.5;                      // votre voiture : bas dans le cadre, et dessinée à moitié
                                                      // de son échelle, sinon elle cacherait ceux qui vous suivent
-var Z_FAR = 10, Z_READ = 9.2, Z_HIT = HERO_Z + 0.55, Z_PASS = 1.0;   // la plaque se lit dès l'horizon ; l'impact au contact de votre pare-chocs
-var V0 = 0.68, V_RAMP = 0.005, V_MAX = 1.7;          // vitesse en profondeur (z/s), sa montée par seconde, son plafond
-                                                     // → ~11 s pour lire une plaque au départ, ~6 s après deux minutes
-var SPAWN0 = 6.0, SPAWN_MIN = 3.6;                    // intervalle entre deux arrivées, au départ et au plus serré
-var CENTER0 = 0.34, CENTER_MAX = 0.50;                // part des voitures qui arrivent sur votre voie
-var REL_THREAT = [0.72, 0.92], REL_OTHER = [0.85, 1.2];   // celles de votre voie freinent devant vous : plus de temps pour elles
+var Z_FAR = 10, Z_HIT = HERO_Z + 0.55, Z_PASS = 1.0;  // l'impact au contact de votre pare-chocs ; le dépassement sort du cadre
+/* Une voiture arrive vite de l'horizon, se cale derrière vous à Z_HOLD — plaque nette, taille
+   fixe, un emplacement par voie — y reste HOLD secondes, puis fonce : sur vous si elle est
+   sur votre voie, sinon elle vous double. Pas de zoom pendant la lecture.                  */
+var Z_HOLD = 3.4, V_IN = 5.0, V_RUSH = 2.2;           // profondeur d'attente ; vitesses d'approche et de charge (z/s)
+var HOLD0 = 10, HOLD_MIN = 6;                         // temps d'attente au départ, puis au plus court (après 3 min)
+var HOLD_DIFF = { facile: 1.3, normal: 1, expert: 0.75 };
+var V0 = 0.68, V_RAMP = 0.005, V_MAX = 1.7;          // vitesse affichée au compteur et kilométrage
+var SPAWN0 = 5.5, SPAWN_MIN = 3.4;                    // intervalle entre deux arrivées, au départ et au plus serré
+var CENTER0 = 0.40, CENTER_MAX = 0.55;                // part des voitures qui arrivent sur votre voie
+var PLATE_SLOTS3 = [0.22, 0.50, 0.78], PLATE_SLOTS2 = [0.36, 0.72];   // où se posent les plaques, en fraction de la largeur
 var FEVER = 10, MULT_MAX = 5;
 var GOLD_ODDS = 22, GOLD_MULT = 3, TANK_ODDS = 12;
 // le parc (silhouettes, plaques, tailles, bonus) est décrit une fois pour toutes dans js/game.js
@@ -77,22 +84,23 @@ function pickShape() {
 function spawn() {
   var t = played();
   var centerShare = Math.min(CENTER_MAX, CENTER0 + t / 240 * (CENTER_MAX - CENTER0));
-  var lane = Math.random() < centerShare ? MY_LANE : (Math.random() < 0.5 ? 0 : 2);
-  // pas deux voitures trop proches sur la même voie : leurs plaques se chevaucheraient
-  var free = function (l) { return !R.cars.some(function (c) { return c.lane === l && c.z > Z_FAR - 5.5; }); };
-  if (!free(lane)) { lane = [0, 2, 1].filter(free)[0]; }
+  var others = LANES.map(function (_, i) { return i; }).filter(function (i) { return i !== MY_LANE; });
+  var lane = Math.random() < centerShare ? MY_LANE : P.pick(others);
+  // une voie n'accueille qu'une voiture à la fois tant qu'elle n'a pas chargé
+  var free = function (l) { return !R.cars.some(function (c) { return c.lane === l && !c.gone && c.phase !== 'rush'; }); };
+  if (!free(lane)) { lane = others.concat([MY_LANE]).filter(free)[0]; }
   if (lane == null) return;
 
   var plate = P.newPlate(R.cars.length === 0 && R.done === 0), shape = pickShape();
   var gold = shape !== TANK && P.rand(GOLD_ODDS) === 0;
   var c = {
     p1: plate.p1, p2: plate.p2, dep: plate.dep, value: plate.value, num: String(plate.value).padStart(3, '0'),
-    shape: shape, lane: lane, z: Z_FAR, gold: gold, tank: shape === TANK,
-    rel: (function (r) { return r[0] + Math.random() * (r[1] - r[0]); })(lane === MY_LANE ? REL_THREAT : REL_OTHER),
+    shape: shape, lane: lane, z: Z_FAR, gold: gold, tank: shape === TANK, phase: 'in',
+    hold: Math.max(HOLD_MIN, HOLD0 - t / 180 * (HOLD0 - HOLD_MIN)) * (HOLD_DIFF[P.state.diff] || 1) * (0.9 + Math.random() * 0.2),
     got1: null, got2: null, words: 0, pts: 0, gone: false, born: Date.now()
   };
   P.initCar(c, 'poursuite');
-  c.rel /= P.carTime(shape);                       // le camping-car approche lentement, la supercar fond sur vous
+  c.hold *= P.carTime(shape);                      // le camping-car traîne derrière vous, la supercar charge vite
   if (c.cargo === 'joker') c.got2 = null;          // en Poursuite un mot suffit : pas de paire offerte
   var el = document.createElement('div');
   el.className = 'pcar' + (lane === MY_LANE ? ' pcar--threat' : '') + (isSport(shape) ? ' car--sport' : '') +
@@ -117,24 +125,17 @@ function spawn() {
   placePlate(c);
   renderTokens();
 }
+function readable(c) { return !c.gone && c.phase !== 'in'; }
 function placePlate(c) {
   var p = project(c.lane, c.z);
-  // loin, deux voitures de voies voisines à la même hauteur auraient des plaques qui se
-  // recouvrent : la plus lointaine attend que l'autre se soit détachée
-  var masked = c.z > 4 && R.cars.some(function (o) {
-    return o !== c && !o.gone && o.z < c.z && c.z - o.z < 2.2 && Math.abs(o.lane - c.lane) === 1;
-  });
-  var readable = c.z <= Z_READ && !masked;
-  var s = Math.max(0.7, Math.min(1, 1.6 / c.z));          // la plaque reste lisible bien avant la voiture
-  // loin, les voies convergent et les plaques se recouvriraient : on les écarte
-  // latéralement, d'autant plus que la voiture est loin ; l'écart se referme à l'approche
-  var spread = (c.lane - MY_LANE) * 0.12 * Math.max(0, 1 - Z_HIT / c.z);
-  var px = (p.x / 100 + spread) * R.sceneW;
+  // la plaque a une taille fixe et son emplacement par voie : jamais de zoom, jamais de chevauchement
+  var slots = LANES === LANES2 ? PLATE_SLOTS2 : PLATE_SLOTS3;
+  var px = slots[c.lane] * R.sceneW;
   var F = FLEET[c.shape];
   var carH = F.size * R.sceneH / F.front.ratio * p.s;      // hauteur affichée de la voiture (vue de face)
   var py = p.y / 100 * R.sceneH - carH * (1 - F.front.y / 100);
-  c.pl.style.transform = 'translate3d(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px,0) translate(-50%,-50%) scale(' + s.toFixed(3) + ')';
-  c.pl.style.opacity = readable ? '1' : '0';
+  c.pl.style.transform = 'translate3d(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px,0) translate(-50%,-50%)';
+  c.pl.style.opacity = readable(c) ? '1' : '0';
   c.pl.style.zIndex = String(Math.round(1001 - c.z * 50));
 }
 function removeCar(c, cls) {
@@ -158,13 +159,13 @@ function setTarget(c) {
 
 function livePairs() {                           // les paires lisibles, rétro compris, pour les suggestions
   var out = [];
-  R.cars.forEach(function (c) { if (c.gone || c.z > Z_READ + 0.6) return; if (!c.got1) out.push(c.p1.p); if (!c.got2 && !c.hidden) out.push(c.p2.p); });
+  R.cars.forEach(function (c) { if (!readable(c)) return; if (!c.got1) out.push(c.p1.p); if (!c.got2 && !c.hidden) out.push(c.p2.p); });
   return out;
 }
 function renderTokens() {
   if (R.suggest) R.suggest();
   var box = $('pu-pairs');
-  var vis = R.cars.filter(function (c) { return !c.gone && c.z <= Z_READ + 0.6; }).sort(function (a, b) { return a.z - b.z; });
+  var vis = R.cars.filter(readable).sort(function (a, b) { return a.lane - b.lane; });
   if (!vis.length) { box.innerHTML = '<span class="tok tok--wait">…</span>'; return; }
   box.innerHTML = vis.map(function (c, i) {
     var sp = isSport(c.shape) ? ' tok--sport' : '';
@@ -205,7 +206,7 @@ function submit(e) {
   var inp = $('pu-input'), w = P.norm(inp.value.trim());
   inp.value = '';
   if (!w) return;
-  var alive = R.cars.filter(function (c) { return !c.gone && c.z <= Z_READ + 0.6; });
+  var alive = R.cars.filter(readable);
   if (!alive.length) { feedback('Rien à lire encore…', 'ko'); return; }
   function reject(msg) {
     feedback(msg, 'ko'); R.combo = 1; R.feverArmed = true; P.sfx.ko();
@@ -224,7 +225,7 @@ function submit(e) {
     var rank = (c === R.target ? 16 : 0) +
                (((h1 && h2) || (h1 && c.got2) || (h2 && c.got1)) ? 8 : 0) +
                (c.lane === MY_LANE ? 4 : 0) +                       // la menace d'abord
-               ((c.got1 || c.got2) ? 2 : 0) + (1 - c.z / 20);       // puis la plus proche
+               ((c.got1 || c.got2) ? 2 : 0) + (c.phase === 'rush' ? 3 : 0) + (1 - c.z / 20);   // puis celle qui charge, puis la plus proche
     if (!best || rank > best.rank) best = { c: c, h1: h1, h2: h2, rank: rank };
   });
   if (ruleMsg && !best) P.refuse(ruleCar, ruleMsg, ruleCar.el);
@@ -256,7 +257,7 @@ function submit(e) {
     return;
   }
 
-  var extremis = c.lane === MY_LANE && c.z < Z_HIT + 0.8;
+  var extremis = c.lane === MY_LANE && c.phase === 'rush';
   var bonus = Math.round(c.value * P.carCote(c, 'poursuite') * (c.gold ? GOLD_MULT : 1) * (extremis ? 1.5 : 1) * (both ? 2 : 1) * multiplier() * fever);
   c.pts += bonus; R.score += bonus; R.done++;
   c.words = 2;
@@ -341,7 +342,7 @@ function measure() {
   R.sceneW = r.width; R.sceneH = r.height;
   // la plaque garde les proportions d'une vraie plaque (≈ 4,7:1) et ne dépasse jamais
   // la moitié de la scène : sur un écran haut et étroit, la hauteur ne dicte plus sa taille
-  $('pu-road').style.setProperty('--pw', Math.round(Math.min(R.sceneH * 0.40, R.sceneW * 0.46)) + 'px');
+  $('pu-road').style.setProperty('--pw', Math.round(Math.min(R.sceneH * 0.36, R.sceneW * 0.34)) + 'px');
   R.myShape = (P.myCar().match(/cars\/([a-z0-9]+)-/) || [])[1] || 'berline';
   $('pu-me').style.width = Math.round(FLEET[R.myShape].size * R.sceneH * HERO_K) + 'px';   // scale(1/z) fait le reste
   placeHero(performance.now());
@@ -362,10 +363,15 @@ function frame(now) {
   }
   R.cars.slice().forEach(function (c) {
     if (c.gone) return;
-    var wasFar = c.z > Z_READ;
-    c.z -= R.v * c.rel * dt;
+    if (c.phase === 'in') {                          // elle arrive vite et se cale
+      c.z = Math.max(Z_HOLD, c.z - V_IN * dt);
+      if (c.z <= Z_HOLD) { c.phase = 'hold'; c.until = played() + c.hold; renderTokens(); if (c.lane === MY_LANE) c.el.classList.add('pcar--near'); }
+    } else if (c.phase === 'hold') {                 // elle attend, plaque nette, puis charge
+      if (played() >= c.until) { c.phase = 'rush'; c.el.classList.add('pcar--rush'); }
+    } else {
+      c.z -= V_RUSH * dt;
+    }
     place(c.el, c.lane, c.z); placePlate(c);
-    if (wasFar && c.z <= Z_READ) { renderTokens(); if (c.lane === MY_LANE) c.el.classList.add('pcar--near'); }
     if (c.lane === MY_LANE) {
       if (c.z <= Z_HIT) crash(c);
     } else if (c.z <= Z_PASS) {
@@ -389,6 +395,8 @@ function start() {
   R.running = true; R.cars = []; R.lives = LIVES; R.score = 0; R.km = 0; R.done = 0; R.dodged = 0; R.hits = 0;
   R.combo = 1; R.v = V0; R.nextSpawn = 1.2; R.target = null; R.feverUntil = 0; R.feverArmed = true; R.invulnUntil = 0; R.history = [];
   R.roster = P.fleetRoster();
+  var two = Math.min(window.innerWidth, screen.width || 9999) < NARROW;   // petit écran : deux voies
+  LANES = two ? LANES2 : LANES3; MY_LANE = two ? 0 : 1;
   $('pu-me-img').src = P.myCar().replace('.webp', '-front.webp');   // votre véhicule de rang, vu de face
   R.roster.concat([TANK]).forEach(function (s) {      // préchargement du roster de la partie
     P.colors().concat(['or']).forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '.webp'; });
@@ -431,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function () {
   R.suggest = window.PLAQUE.attachSuggest($('pu-input'), $('pu-form'), $('pu-suggest'), livePairs);
   window.PLAQUE.autoSubmit($('pu-input'), $('pu-form'), function (w) {
     return R.cars.some(function (c) {
-      return !c.gone && c.z <= Z_READ + 0.6 && w !== c.got1 && w !== c.got2 &&
+      return readable(c) && w !== c.got1 && w !== c.got2 &&
              ((!c.got1 && P.matchPair(w, c.p1.p)) || (!c.got2 && P.matchPair(w, c.p2.p)));
     });
   });

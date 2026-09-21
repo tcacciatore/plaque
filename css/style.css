@@ -1154,3 +1154,6 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
 /* Poursuite : la caméra est devant votre voiture et regarde vers l'arrière — le décor
    s'éloigne vers l'horizon (balises à rebours), seules les voitures qui vous rattrapent grossissent */
 .road--pursuit .post{animation-direction:reverse}
+
+/* Poursuite : la voiture qui charge s'illumine */
+.pcar--rush .car__body{filter:brightness(1.25) drop-shadow(0 0 14px rgba(255,90,60,.8))}
