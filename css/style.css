@@ -784,13 +784,6 @@ body.fitted .platefield__eu{flex-basis:32px}
 .pcar{position:absolute;left:0;top:0;transform-origin:50% 100%;will-change:transform;pointer-events:auto}
 .pcar .car__ride{animation:cruise var(--ride,3.6s) ease-in-out infinite alternate}
 .pcar .car__body{animation:rumble .16s ease-in-out infinite alternate}
-.pplate{position:absolute;left:0;top:0;width:0;height:0;will-change:transform,opacity;transition:opacity .35s;pointer-events:auto;overflow:visible}
-.pplate .plate--pursuit{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:var(--pw,180px);margin:0;border-width:2px;z-index:2;
-  box-shadow:0 2px 8px rgba(0,0,0,.7)}
-.pplate .plate__body{font-size:calc(var(--pw,180px) * .15);padding:1px 2px;gap:.08em;line-height:1.15}
-.pplate .plate__eu,.pplate .plate__dep{width:auto;min-width:12%;padding:2px 3px;justify-content:center}
-.pplate .plate__f,.pplate .plate__depnum{font-size:calc(var(--pw,180px) * .06);white-space:nowrap}
-.pplate.car--target .plate--car{box-shadow:0 2px 8px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
 .pcar--threat.pcar--near .car__body{filter:drop-shadow(0 0 12px rgba(255,90,60,.85))}
 .pcar--boom .car__ride{animation:boom .6s cubic-bezier(.2,.75,.4,1) forwards}
 .pcar--boom .car__body{animation:none}
@@ -1157,3 +1150,11 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
 
 /* Poursuite : la voiture qui charge s'illumine */
 .pcar--rush .car__body{filter:brightness(1.25) drop-shadow(0 0 14px rgba(255,90,60,.8))}
+
+/* Poursuite : la plaque avant est dans la voiture, rivée à son pare-chocs (tangue et grossit avec elle) */
+.pcar .plate--pursuit{position:absolute;left:50%;top:var(--plateY,75%);width:var(--pw,180px);transform:translate(-50%,-50%);margin:0;
+  border-width:2px;border-radius:4px;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.7);transition:opacity .3s;pointer-events:none}
+.pcar .plate--pursuit .plate__body{font-size:calc(var(--pw,180px) * .15);padding:1px 2px;gap:.08em;line-height:1.15}
+.pcar .plate--pursuit .plate__eu,.pcar .plate--pursuit .plate__dep{width:auto;min-width:12%;padding:2px 3px;justify-content:center}
+.pcar .plate--pursuit .plate__f,.pcar .plate--pursuit .plate__depnum{font-size:calc(var(--pw,180px) * .06);white-space:nowrap}
+.pcar.car--target .plate--pursuit{box-shadow:0 2px 8px rgba(0,0,0,.7),0 0 0 3px var(--accent)}

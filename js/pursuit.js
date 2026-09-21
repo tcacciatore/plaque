@@ -11,22 +11,24 @@
 
 var P = null;
 var LIVES = 3;
-var LANES3 = [-30, 0, 30], LANES2 = [0, 30];        // trois voies ; deux sur un petit écran (la vôtre et une de dépassement)
+var LANES3 = [-50, 0, 50], LANES2 = [0, 50];        // trois voies bien écartées ; deux sur un petit écran (la vôtre et une de dépassement)
 var LANES = LANES3, MY_LANE = 1;
 var NARROW = 700;
-var HERO_Z = 1.3, HERO_K = 0.5;                      // votre voiture : bas dans le cadre, et dessinée à moitié
-                                                     // de son échelle, sinon elle cacherait ceux qui vous suivent
+var HERO_Z = 1.15, HERO_K = 0.55;                    // votre voiture : bas dans le cadre, réduite juste assez pour
+                                                     // laisser voir la plaque de celle qui vous suit
 var Z_FAR = 10, Z_HIT = HERO_Z + 0.55, Z_PASS = 1.0;  // l'impact au contact de votre pare-chocs ; le dépassement sort du cadre
 /* Une voiture arrive vite de l'horizon, se cale derrière vous à Z_HOLD — plaque nette, taille
    fixe, un emplacement par voie — y reste HOLD secondes, puis fonce : sur vous si elle est
    sur votre voie, sinon elle vous double. Pas de zoom pendant la lecture.                  */
-var Z_HOLD = 3.4, V_IN = 5.0, V_RUSH = 2.2;           // profondeur d'attente ; vitesses d'approche et de charge (z/s)
+var Z_HOLD_MINE = 3.0, Z_HOLD_SIDE = 2.4;             // profondeur d'attente : derrière vous sur votre voie ; sur les côtés, un peu plus près, aux bords
+var V_IN = 5.0, V_RUSH = 2.2;                         // vitesses d'approche et de charge (z/s)
+var PLATE_K = 1.9;                                    // la plaque, posée sur la voiture, est grossie d'autant pour rester lisible
+function holdZ(lane) { return lane === MY_LANE ? Z_HOLD_MINE : Z_HOLD_SIDE; }
 var HOLD0 = 10, HOLD_MIN = 6;                         // temps d'attente au départ, puis au plus court (après 3 min)
 var HOLD_DIFF = { facile: 1.3, normal: 1, expert: 0.75 };
 var V0 = 0.68, V_RAMP = 0.005, V_MAX = 1.7;          // vitesse affichée au compteur et kilométrage
 var SPAWN0 = 5.5, SPAWN_MIN = 3.4;                    // intervalle entre deux arrivées, au départ et au plus serré
 var CENTER0 = 0.40, CENTER_MAX = 0.55;                // part des voitures qui arrivent sur votre voie
-var PLATE_SLOTS3 = [0.22, 0.50, 0.78], PLATE_SLOTS2 = [0.36, 0.72];   // où se posent les plaques, en fraction de la largeur
 var FEVER = 10, MULT_MAX = 5;
 var GOLD_ODDS = 22, GOLD_MULT = 3, TANK_ODDS = 12;
 // le parc (silhouettes, plaques, tailles, bonus) est décrit une fois pour toutes dans js/game.js
@@ -110,42 +112,31 @@ function spawn() {
                    (gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' : c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' :
                     c.tag ? '<span class="sport-tag sport-tag--trait">' + c.tag + '</span>' : '') +
                    '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + (gold ? 'or' : P.pick(P.colors())) + '-front.webp">' +
-                   '<div class="car__shadow"></div>' +
+                   '<div class="car__shadow"></div>' + plateHTML(c) +
                  '</div><div class="car__fx"></div><div class="car__pop"></div>';
-  var pl = document.createElement('div');
-  pl.className = 'pplate';
-  pl.innerHTML = plateHTML(c);
-  c.el = el; c.pl = pl;
+  // la plaque est rivée au pare-chocs avant : elle tangue, grossit et s'éloigne avec la voiture
+  var F = FLEET[shape];
+  el.style.setProperty('--plateY', F.front.y + '%');
+  el.style.setProperty('--pw', Math.round(F.size * R.sceneH * F.front.w / 100 * PLATE_K) + 'px');
+  c.el = el; c.pl = el.querySelector('.plate');
   el.addEventListener('pointerdown', function () { if (!c.gone) { setTarget(c); $('pu-input').focus(); } });
-  pl.addEventListener('pointerdown', function () { if (!c.gone) { setTarget(c); $('pu-input').focus(); } });
   $('pu-cars').appendChild(el);
-  $('pu-cars').appendChild(pl);
   R.cars.push(c);
   place(el, lane, c.z, 0);
   placePlate(c);
   renderTokens();
 }
 function readable(c) { return !c.gone && c.phase !== 'in'; }
-function placePlate(c) {
-  var p = project(c.lane, c.z);
-  // la plaque a une taille fixe et son emplacement par voie : jamais de zoom, jamais de chevauchement
-  var slots = LANES === LANES2 ? PLATE_SLOTS2 : PLATE_SLOTS3;
-  var px = slots[c.lane] * R.sceneW;
-  var F = FLEET[c.shape];
-  var carH = F.size * R.sceneH / F.front.ratio * p.s;      // hauteur affichée de la voiture (vue de face)
-  var py = p.y / 100 * R.sceneH - carH * (1 - F.front.y / 100);
-  c.pl.style.transform = 'translate3d(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px,0) translate(-50%,-50%)';
+function placePlate(c) {                          // la plaque n'apparaît qu'une fois la voiture calée
   c.pl.style.opacity = readable(c) ? '1' : '0';
-  c.pl.style.zIndex = String(Math.round(1001 - c.z * 50));
 }
 function removeCar(c, cls) {
   c.gone = true;
   R.cars = R.cars.filter(function (x) { return x !== c; });
   if (R.target === c) R.target = null;
-  var el = c.el, pl = c.pl;
+  var el = c.el;
   if (cls) el.classList.add(cls);
-  pl.style.opacity = '0';
-  setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); if (pl.parentNode) pl.parentNode.removeChild(pl); }, cls === 'pcar--boom' ? 1400 : 700);
+  setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, cls === 'pcar--boom' ? 1400 : 700);
   R.history.push({ p1: c.p1.p, p2: c.p2.p, dep: c.dep.num, words: c.words, pts: c.pts, reached: c.words >= 2 });
   renderTokens();
 }
@@ -153,7 +144,7 @@ function removeCar(c, cls) {
 /* ─────────── ciblage, jetons ─────────── */
 function setTarget(c) {
   R.target = c;
-  R.cars.forEach(function (x) { x.el.classList.toggle('car--target', x === c); x.pl.classList.toggle('car--target', x === c); });
+  R.cars.forEach(function (x) { x.el.classList.toggle('car--target', x === c); });
   renderTokens();
 }
 
@@ -342,11 +333,15 @@ function measure() {
   R.sceneW = r.width; R.sceneH = r.height;
   // la plaque garde les proportions d'une vraie plaque (≈ 4,7:1) et ne dépasse jamais
   // la moitié de la scène : sur un écran haut et étroit, la hauteur ne dicte plus sa taille
-  $('pu-road').style.setProperty('--pw', Math.round(Math.min(R.sceneH * 0.36, R.sceneW * 0.34)) + 'px');
   R.myShape = (P.myCar().match(/cars\/([a-z0-9]+)-/) || [])[1] || 'berline';
   $('pu-me').style.width = Math.round(FLEET[R.myShape].size * R.sceneH * HERO_K) + 'px';   // scale(1/z) fait le reste
   placeHero(performance.now());
-  R.cars.forEach(function (c) { c.el.style.width = (FLEET[c.shape].size * R.sceneH) + 'px'; place(c.el, c.lane, c.z); placePlate(c); });
+  R.cars.forEach(function (c) {
+    var F = FLEET[c.shape];
+    c.el.style.width = (F.size * R.sceneH) + 'px';
+    c.el.style.setProperty('--pw', Math.round(F.size * R.sceneH * F.front.w / 100 * PLATE_K) + 'px');
+    place(c.el, c.lane, c.z); placePlate(c);
+  });
 }
 
 /* ─────────── boucle ─────────── */
@@ -364,8 +359,9 @@ function frame(now) {
   R.cars.slice().forEach(function (c) {
     if (c.gone) return;
     if (c.phase === 'in') {                          // elle arrive vite et se cale
-      c.z = Math.max(Z_HOLD, c.z - V_IN * dt);
-      if (c.z <= Z_HOLD) { c.phase = 'hold'; c.until = played() + c.hold; renderTokens(); if (c.lane === MY_LANE) c.el.classList.add('pcar--near'); }
+      var zh = holdZ(c.lane);
+      c.z = Math.max(zh, c.z - V_IN * dt);
+      if (c.z <= zh) { c.phase = 'hold'; c.until = played() + c.hold; renderTokens(); if (c.lane === MY_LANE) c.el.classList.add('pcar--near'); }
     } else if (c.phase === 'hold') {                 // elle attend, plaque nette, puis charge
       if (played() >= c.until) { c.phase = 'rush'; c.el.classList.add('pcar--rush'); }
     } else {
