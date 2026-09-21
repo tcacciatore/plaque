@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;700&family=Monoton&display=swap">
-<link rel="stylesheet" href="css/style.css?v=89">
+<link rel="stylesheet" href="css/style.css?v=92">
 </head>
 <body>
 
@@ -70,7 +70,7 @@
         </button>
         <button data-v="poursuite" class="modecard modecard--poursuite" role="radio">
           <img src="assets/cars/supercar-noir.webp" alt="">
-          <span><b>Poursuite</b><em>au volant, un mot par plaque — trois pare-chocs, sans fin</em><i class="modecard__best" data-best="poursuite"></i></span>
+          <span><b>Poursuite</b><em>en fuite — elles arrivent de derrière, un mot par plaque, trois pare-chocs, sans fin</em><i class="modecard__best" data-best="poursuite"></i></span>
         </button>
       </div>
       <div class="modes__dots" id="modes-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
@@ -120,7 +120,7 @@
         <span class="ex"><b>PL</b>·123·<b>MT</b> → <b>P</b>o<b>L</b>ogne, <b>M</b>a<b>T</b>raque, <b>PL</b>ongeon, <b>P</b>a<b>L</b>udisme, ex<b>pL</b>oser</span></li>
         <li>Une plaque est <strong>lue</strong> quand ses deux paires ont chacune leur mot — et la voiture explose.</li>
         <li>En <strong>Trafic</strong>, vous êtes au volant : les voitures vous doublent sur trois voies (deux sur un petit écran), chacune à son heure, toujours de modèles différents, et restent 18 s devant vous — 12 s en fin de partie (plus en Facile, moins en Expert). Chaque mot trouvé rallonge la partie de 1 s et la voiture visée de 3 s ; une plaque lue ajoute 2 s de plus.</li>
-        <li>En <strong>Poursuite</strong>, vous roulez plus vite que tout le monde : les voitures arrivent de l'horizon et grossissent. Celles de <strong>votre voie</strong> doivent être dégommées avant l'impact — il n'y a pas d'esquive, seulement les mots ; un seul mot, sur l'une ou l'autre paire, suffit ; celles des voies voisines vous frôlent, autant de points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin. Vue de l'intérieur, votre véhicule de rang en insigne sur le volant. De temps en temps, une voiture vous <strong>colle</strong> : on la voit grossir dans le <strong>rétroviseur</strong> — lisez sa plaque (un mot) avant qu'elle vous percute par l'arrière, et sa cote compte double.</li>
+        <li>En <strong>Poursuite</strong>, vous êtes en fuite, votre véhicule de rang vu de face au premier plan : les voitures arrivent de l'horizon <strong>derrière vous</strong> et grossissent. Celles de <strong>votre voie</strong> doivent être dégommées avant qu'elles vous percutent — il n'y a pas d'esquive, seulement les mots ; un seul mot, sur l'une ou l'autre paire, suffit ; celles des voies voisines vous dépassent, autant de points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin.</li>
         <li>En <strong>Parking</strong>, neuf voitures sont garées sur trois rangées ; chaque voiture pulvérisée est remplacée. Chaque place <strong>garde la couleur</strong> de la dernière voiture qu'on y a fait sauter : trois places alignées de la même couleur — ligne, colonne ou diagonale — rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge un peu.</li>
         <li>Tapez un mot : il se valide tout seul après une demi-seconde de pause (Entrée ou espace pour aller plus vite). Dans les deux modes, n'importe quel mot va sur n'importe quelle plaque affichée : le jeu trouve la cible et vous dit laquelle. <strong>Touchez une voiture</strong> (ou ses jetons) pour la désigner : vos mots iront à elle en priorité. Un mot qui porte les deux paires lit la plaque d'un coup, en double. Les <strong>coupés</strong> valent ×1,5, les <strong>supercars</strong> ×2.</li>
         <li>Chaque modèle a son <strong>caractère</strong>, affiché au-dessus de lui, et un temps de présence à sa mesure. <strong>Citadine</strong> : 5 lettres max, elle file vite. <strong>Cabriolet</strong> : 7 lettres au moins, cote ×1,5. <strong>Ancienne</strong> : mots rares ou peu courants seulement, cote ×2. <strong>Monospace</strong> : les deux mots ont la même initiale, cote ×1,5. <strong>Utilitaire</strong> : la lire rend 5 s (en Poursuite : répare un pare-chocs). <strong>4×4</strong> : sa deuxième paire est cachée tant que la première n'est pas lue, cote ×1,5. <strong>Camion</strong> : deux mots par paire, il reste deux fois plus longtemps, cote ×2. <strong>Camping-car</strong> : lent, cote ×0,5. <strong>Pick-up</strong> : sa benne transporte un bonus (+8 s, une paire offerte ou cote ×2). Berline et break restent neutres — et en Facile, les modèles à règle restent au garage.</li>
@@ -178,39 +178,17 @@
         <i class="post post--r" style="animation-delay:-.11s"></i><i class="post post--r" style="animation-delay:-.33s"></i><i class="post post--r" style="animation-delay:-.55s"></i><i class="post post--r" style="animation-delay:-.77s"></i><i class="post post--r" style="animation-delay:-.99s"></i><i class="post post--r" style="animation-delay:-1.21s"></i>
       </div>
       <div class="road__cars" id="pu-cars"></div>
-      <div class="mirror" id="pu-mirror" aria-hidden="true">
-        <div class="mirror__glass">
-          <div class="mirror__sky"></div><div class="mirror__ground"></div>
-          <div class="mirror__car" id="pu-mirror-car"></div>
-          <div class="mirror__plate" id="pu-mirror-plate"></div>
-          <div class="mirror__fx" id="pu-mirror-fx"></div>
-        </div>
+      <!-- votre véhicule de rang, vu de face, en fuite : les autres arrivent de l'horizon derrière lui -->
+      <div class="me" id="pu-me" aria-hidden="true">
+        <img class="car__body" id="pu-me-img" alt="" src="assets/cars/citadine-bronze-front.webp">
+        <div class="car__fx" id="pu-me-fx"></div>
       </div>
+      <div class="speedo" id="pu-speedo" aria-hidden="true"><b><span id="pu-speed">0</span></b><i>km/h</i></div>
       <div class="road__glass"></div>
-      <div class="cockpit" id="pu-cockpit" aria-hidden="true">
-        <div class="cockpit__dash">
-          <div class="gauge">
-            <svg viewBox="0 0 100 60"><path d="M8 52 A42 42 0 0 1 92 52" fill="none" stroke="#2a3244" stroke-width="6" stroke-linecap="round"/>
-              <path d="M8 52 A42 42 0 0 1 92 52" fill="none" stroke="url(#gg)" stroke-width="6" stroke-linecap="round" stroke-dasharray="132" stroke-dashoffset="0"/>
-              <defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#3ddc84"/><stop offset=".6" stop-color="#ffcf3f"/><stop offset="1" stop-color="#ff5a3c"/></linearGradient></defs>
-              <g id="pu-needle" style="transform-origin:50px 52px"><path d="M50 52 L50 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></g>
-              <circle cx="50" cy="52" r="4" fill="#e8edf5"/></svg>
-            <b><span id="pu-speed">0</span> <i>km/h</i></b>
-          </div>
-        </div>
-        <div class="wheel" id="pu-wheel">
-          <svg viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="88" fill="none" stroke="#1b1f27" stroke-width="22"/>
-            <circle cx="100" cy="100" r="88" fill="none" stroke="#2c3240" stroke-width="16"/>
-            <path d="M22 100 H78 M122 100 H178 M100 122 V182" stroke="#232834" stroke-width="16" stroke-linecap="round"/>
-            <circle cx="100" cy="100" r="34" fill="#1a1e26" stroke="#2c3240" stroke-width="4"/>
-          </svg>
-          <img class="wheel__badge" id="pu-badge" alt="" src="assets/cars/citadine-bronze.webp">
-        </div>
-      </div>
     </div>
 
     <div class="tr-pairs" id="pu-pairs"></div>
+    <div class="suggest suggest--off" id="pu-suggest"></div>
     <form id="pu-form" class="platefield" autocomplete="off">
       <span class="platefield__eu">F</span>
       <input id="pu-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
@@ -231,6 +209,7 @@
     <div class="lot" id="pk-lot"></div>
     <div class="tr-pairs pk-tokens" id="pk-tokens"></div>
 
+    <div class="suggest suggest--off" id="pk-suggest"></div>
     <form id="pk-form" class="platefield" autocomplete="off">
       <span class="platefield__eu">F</span>
       <input id="pk-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
@@ -288,6 +267,7 @@
 
     <div class="tr-pairs" id="tr-pairs"></div>
 
+    <div class="suggest suggest--off" id="tr-suggest"></div>
     <form id="tr-form" class="platefield" autocomplete="off">
       <span class="platefield__eu">F</span>
       <input id="tr-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
@@ -299,12 +279,12 @@
 
 </div>
 
-<script src="js/pairs.js?v=89"></script>
-<script src="js/departements.js?v=89"></script>
-<script src="js/dict.js?v=89"></script>
-<script src="js/game.js?v=89"></script>
-<script src="js/traffic.js?v=89"></script>
-<script src="js/parking.js?v=89"></script>
-<script src="js/pursuit.js?v=89"></script>
+<script src="js/pairs.js?v=92"></script>
+<script src="js/departements.js?v=92"></script>
+<script src="js/dict.js?v=92"></script>
+<script src="js/game.js?v=92"></script>
+<script src="js/traffic.js?v=92"></script>
+<script src="js/parking.js?v=92"></script>
+<script src="js/pursuit.js?v=92"></script>
 </body>
 </html>

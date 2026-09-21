@@ -20,7 +20,7 @@ fois lue. Le **numéro de département** rejoint votre collection à chaque plaq
 | Mode | Boucle |
 |---|---|
 | **Trafic** | Au volant sur trois voies (deux sur un écran de moins de 560 px, pour garder les plaques lisibles) : chaque voie a sa voiture, qui arrive à son heure (6 s d'écart en Normal, 8 en Facile, 4,5 en Expert) et reste 18 s devant vous (×1,25 en Facile, ×0,8 en Expert) ; les trois modèles sont toujours différents. Deux mots par voiture, un par paire. Une plaque lue fait **exploser** la voiture ; une plaque ratée la laisse filer, et la voie se réalimente après 5 à 7 s. La partie dure 2 minutes, mais chaque mot rallonge la partie de 1 s et la voiture visée de 3 s, et une plaque lue ajoute 2 s de plus (plafond 2 min 15). |
-| **Poursuite** | Vue de l'intérieur, au volant — tableau de bord, compteur qui suit la vraie vitesse, votre véhicule de rang en insigne. Vous roulez plus vite que tout le monde : les voitures surgissent à l'horizon et se rapprochent. **Un seul mot**, sur l'une ou l'autre paire, dégomme une plaque (les deux paires dans un mot : ×2). Celles de votre voie sont des menaces à faire sauter avant le capot ; il n'y a pas d'esquive, seulement les mots. Celles des voies voisines vous frôlent : des points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin. *In extremis* ×1,5, dernier pare-chocs ×2, fièvre ×2. |
+| **Poursuite** | Vue à la troisième personne : votre véhicule de rang, **vu de face**, en fuite au premier plan ; les voitures arrivent de l'horizon **derrière lui** (elles aussi vues de face) et grossissent. **Un seul mot**, sur l'une ou l'autre paire, dégomme une plaque (les deux paires dans un mot : ×2). Celles de votre voie sont des menaces à faire sauter avant qu'elles vous percutent ; il n'y a pas d'esquive, seulement les mots. Celles des voies voisines vous frôlent : des points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin. *In extremis* ×1,5, dernier pare-chocs ×2, fièvre ×2. |
 | **Parking** | Neuf places sur trois rangées, tous les modèles présents, trois couleurs par parking. Les deux mots d'une plaque et la voiture explose ; une autre vient se garer. Chaque place garde la couleur de la dernière voiture pulvérisée : trois places alignées de même couleur (ligne, colonne, diagonale) rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge de 1 s (+2 s par plaque lue et par alignement, plafond 2 min 15). |
 
 La saisie n'a pas de bouton : un mot se valide tout seul après une demi-seconde de pause de frappe
@@ -187,16 +187,13 @@ ce qui fonctionne aussi en `file://` — aucun serveur n'est nécessaire.
 > Les ressources sont référencées avec un `?v=N` dans `index.html` : incrémentez-le
 > après une modification de CSS/JS pour contourner le cache du navigateur.
 
-## Le rétroviseur (Poursuite)
+## Les vues de face
 
-À partir de 18 s, puis toutes les 22 à 34 s, un **poursuivant** apparaît dans le
-rétroviseur et grossit pendant 16 s (10 s en fin de partie). Un mot sur l'une de
-ses paires le sème : sa cote compte **×2**. Sinon il vous percute par l'arrière :
-un pare-chocs de moins. Il est vu **de face** : `render_cars.py … front` rend les
-faces avant (pare-brise, capot, calandre, phares allumés, plaque avant) des
-silhouettes qui peuvent poursuivre — berline, break, citadine, utilitaire,
-pick-up — dans `<forme>-<teinte>-front.webp`, avec leur emplacement de plaque
-dans `layout.json` (`<forme>-front`) repris dans `FLEET[…].front`.
+`render_cars.py … front` rend les faces avant (pare-brise, capot, calandre à lames,
+logo, phares allumés, clignotants, antibrouillards, entrée d'air, plaque avant) de
+toutes les silhouettes, dans `<forme>-<teinte>-front.webp`, avec l'emplacement de
+la plaque avant dans `layout.json` (`<forme>-front`) repris dans `FLEET[…].front`.
+La Poursuite n'utilise que ces vues : votre voiture comme celles qui vous rattrapent.
 
 ## Thème « Miami Vice »
 

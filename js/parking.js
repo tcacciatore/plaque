@@ -232,7 +232,13 @@ function setTarget(c) {
   });
   updateTokens();
 }
+function livePairs() {                           // les paires encore à lire, pour les suggestions
+  var out = [];
+  K.spots.forEach(function (c) { if (!c) return; if (P.canUse(c, 1)) out.push(c.p1.p); if (P.canUse(c, 2)) out.push(c.p2.p); });
+  return out;
+}
 function updateTokens() {
+  if (K.suggest) K.suggest();
   $('pk-tokens').innerHTML = K.spots.map(function (c) {
     if (!c) return '<span class="tokgroup tokgroup--empty"><span class="tok tok--wait">…</span></span>';
     var sp = isSport(c.shape) ? ' tok--sport' : '';
@@ -431,7 +437,8 @@ function start() {
   P.guideSay(1, 'Neuf voitures, neuf plaques. Tapez un mot qui contient les deux lettres d\'une paire, dans l\'ordre — par exemple <b>' +
     K.spots[0].p1.p[0] + '</b> puis <b>' + K.spots[0].p1.p[1] + '</b> pour <b>' + K.spots[0].p1.p + '</b>. Il se valide tout seul.');
   P.screen('screen-parking');
-  P.fitViewport('screen-parking', '#pk-lot', '.hud, #pk-lot, .pk-tokens, #pk-form, .feedback, .hint-line');
+  P.fitViewport('screen-parking', '#pk-lot', '.hud, #pk-lot, .pk-tokens, .suggest, #pk-form, .feedback, .hint-line');
+  if (K.suggest) K.suggest();
   $('pk-input').focus();
   loop();
 }
@@ -463,6 +470,7 @@ window.PARKING = { start: start, stop: stop };
 
 document.addEventListener('DOMContentLoaded', function () {
   $('pk-form').addEventListener('submit', submit);
+  K.suggest = window.PLAQUE.attachSuggest($('pk-input'), $('pk-form'), $('pk-suggest'), livePairs);
   window.PLAQUE.autoSubmit($('pk-input'), $('pk-form'), function (w) {
     return K.spots.some(function (c) {
       return c && w !== c.got1 && w !== c.got2 &&

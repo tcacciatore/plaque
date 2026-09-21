@@ -207,7 +207,13 @@ function renderHud() {
   $('tr-cars').innerHTML = T.done + (T.combo > 1 ? ' <i class="combo combo--' + T.combo + '">×' + T.combo + '</i>' : '');
   $('tr-timebox').classList.toggle('low', T.timeLeft <= 15);
 }
+function livePairs() {                           // les paires encore à lire, pour les suggestions
+  var out = [];
+  T.lanes.forEach(function (c) { if (!c || c.gone) return; if (P.canUse(c, 1)) out.push(c.p1.p); if (P.canUse(c, 2)) out.push(c.p2.p); });
+  return out;
+}
 function renderPairs() {
+  if (T.suggest) T.suggest();
   var alive = T.lanes.filter(function (c) { return c && !c.gone; });
   var box = $('tr-pairs');
   if (!alive.length) { box.innerHTML = '<span class="tok tok--wait">…</span>'; return; }
@@ -449,7 +455,8 @@ function start() {
   feedback('&nbsp;', '');
   renderHud(); renderPairs();
   P.screen('screen-traffic');
-  P.fitViewport('screen-traffic', '.road', '.road, .tr-pairs, #tr-form, .feedback, .hint-line');
+  P.fitViewport('screen-traffic', '.road', '.road, .tr-pairs, .suggest, #tr-form, .feedback, .hint-line');
+  if (T.suggest) T.suggest();
   $('tr-input').focus();
   loop();
   // les trois voies s'amorcent à des instants différents
@@ -481,6 +488,7 @@ window.TRAFFIC = { start: start, stop: stop, submit: submit };
 
 document.addEventListener('DOMContentLoaded', function () {
   $('tr-form').addEventListener('submit', submit);
+  T.suggest = window.PLAQUE.attachSuggest($('tr-input'), $('tr-form'), $('tr-suggest'), livePairs);
   window.PLAQUE.autoSubmit($('tr-input'), $('tr-form'), function (w) {
     return T.lanes.some(function (c) {
       return c && !c.gone && w !== c.got1 && w !== c.got2 &&

@@ -221,20 +221,20 @@ var BASE_COLORS = ['rouge', 'bleu', 'blanc', 'noir', 'vert', 'jaune', 'gris', 'o
    size : largeur affichée en Trafic et Poursuite, en fraction de la hauteur de scène ;
    width : largeur dans une place de Parking, en % ; sport : multiplicateur de points.          */
 var FLEET = {
-  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, width:  97, front: { y: 75.4, w: 46.1 } },
-  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, width:  95, front: { y: 76.7, w: 43.0 } },
-  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, width:  92, front: { y: 73.1, w: 46.5 } },
-  monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, width:  92 },
-  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, width:  97, front: { y: 76.1, w: 42.1 } },
-  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, width:  82, front: { y: 80.3, w: 38.9 } },
-  camper:    { name: 'Camping-car',  plateY: 73.1, plateW: 38.7, ratio: 1.312, size: 0.60, width:  80 },
-  '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, width:  95 },
-  camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, width:  76 },
-  cabrio:    { name: 'Cabriolet',    plateY: 71.0, plateW: 41.7, ratio: 1.579, size: 0.76, width: 100 },
-  ancienne:  { name: 'Ancienne',     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, width:  92 },
-  coupe:     { name: 'Coupé',        plateY: 65.3, plateW: 41.0, ratio: 1.720, size: 0.78, width: 100, sport: 1.5 },
-  supercar:  { name: 'Supercar',     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, width: 100, sport: 2 },
-  citerne:   { name: 'Citerne',      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, width:  78, tank: true },
+  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, width:  97, front: { y: 75.4, w: 46.1, ratio: 1.414 } },
+  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, width:  95, front: { y: 76.7, w: 43.0, ratio: 1.295 } },
+  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, width:  92, front: { y: 73.1, w: 46.5, ratio: 1.353 } },
+  monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, width:  92, front: { y: 80.3, w: 40.1, ratio: 1.340 } },
+  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, width:  97, front: { y: 76.1, w: 42.1, ratio: 1.381 } },
+  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, width:  82, front: { y: 80.3, w: 38.9, ratio: 1.200 } },
+  camper:    { name: 'Camping-car',  plateY: 73.1, plateW: 38.7, ratio: 1.312, size: 0.60, width:  80, front: { y: 77.3, w: 33.8, ratio: 1.371 } },
+  '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, width:  95, front: { y: 66.6, w: 39.4, ratio: 1.198 } },
+  camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, width:  76, front: { y: 67.8, w: 37.2, ratio: 1.534 } },
+  cabrio:    { name: 'Cabriolet',    plateY: 71.0, plateW: 41.7, ratio: 1.579, size: 0.76, width: 100, front: { y: 70.6, w: 42.7, ratio: 1.579 } },
+  ancienne:  { name: 'Ancienne',     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, width:  92, front: { y: 68.5, w: 46.3, ratio: 1.338 } },
+  coupe:     { name: 'Coupé',        plateY: 65.3, plateW: 41.0, ratio: 1.720, size: 0.78, width: 100, sport: 1.5, front: { y: 66.8, w: 41.3, ratio: 1.764 } },
+  supercar:  { name: 'Supercar',     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, width: 100, sport: 2, front: { y: 75.3, w: 38.5, ratio: 1.832 } },
+  citerne:   { name: 'Citerne',      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, width:  78, tank: true, front: { y: 72.6, w: 39.5, ratio: 1.490 } },
 };
 var TANK = 'citerne';
 function sportBonus(shape) { return (FLEET[shape] && FLEET[shape].sport) || 1; }
@@ -1011,6 +1011,53 @@ function autoSubmit(input, form, canAccept) {
   });
 }
 
+/* ═══════════ suggestions (Facile) : des mots courants au-dessus du clavier ═══════════
+   Trois mots au plus, qui commencent par ce qui est tapé et contiennent une paire encore
+   à lire. Jamais de mot rare : ceux-là restent à trouver soi-même.                    */
+var COMMON = null;
+function buildCommon() {
+  COMMON = [];
+  DICT.forEach(function (w) { if (w.length >= 4 && w.length <= 10 && !(RARITY && RARITY.get(w))) COMMON.push(w); });
+  COMMON.sort();
+}
+function suggest(prefix, pairs, n) {
+  if (!DICT || !pairs.length) return [];
+  if (!COMMON) buildCommon();
+  prefix = norm(prefix);
+  if (!prefix) return [];
+  var lo = 0, hi = COMMON.length;
+  while (lo < hi) { var m = (lo + hi) >> 1; if (COMMON[m] < prefix) lo = m + 1; else hi = m; }
+  var out = [];
+  for (var i = lo; i < COMMON.length && COMMON[i].slice(0, prefix.length) === prefix; i++) {
+    var w = COMMON[i];
+    for (var k = 0; k < pairs.length; k++) if (matchPair(w, pairs[k])) { out.push(w); break; }
+    if (out.length >= 60) break;
+  }
+  out.sort(function (a, b) { return a.length - b.length || (a < b ? -1 : 1); });
+  return out.slice(0, n || 3);
+}
+/* branche la barre sur un champ : pairsFn() renvoie les paires encore jouables du mode */
+function attachSuggest(input, form, box, pairsFn) {
+  function render() {
+    if (state.diff !== 'facile') { box.classList.add('suggest--off'); return; }
+    box.classList.remove('suggest--off');
+    var typed = input.value.trim();
+    var words = suggest(typed, pairsFn(), 3);
+    box.innerHTML = words.length
+      ? words.map(function (w) { return '<button type="button" class="sug">' + w + '</button>'; }).join('')
+      : '<span class="sug sug--empty">' + (typed.length ? 'aucun mot courant en « ' + typed + ' »' : 'tapez une lettre : des mots vous seront proposés') + '</span>';
+  }
+  input.addEventListener('input', render);
+  box.addEventListener('pointerdown', function (e) {
+    var b = e.target.closest('button.sug'); if (!b) return;
+    e.preventDefault();                                   // le champ garde le focus, le clavier reste ouvert
+    input.value = b.textContent;
+    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    render();
+  });
+  return render;
+}
+
 /* ═══════════ mise en page au viewport visible ═══════════
    Sur téléphone, le clavier prend la moitié de l'écran : la scène se redimensionne
    pour que tout — compteurs, scène, jetons, champ — tienne dans ce qui reste,
@@ -1077,7 +1124,7 @@ window.PLAQUE = {
   TRAITS: TRAITS, trait: trait, carTime: carTime, initCar: initCar, canUse: canUse, hitPair: hitPair,
   wordRule: wordRule, carCote: carCote, traitLabel: traitLabel, refuse: refuse,
   tweenNumber: tweenNumber, bump: bump, floatPts: floatPts,
-  autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit,
+  autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit, attachSuggest: attachSuggest,
   myCar: function () { return rankSprite(RANKS[rankOf(career())]); },
   ghostSample: ghostSample, paintGhost: paintGhost,
   isWord:  function (w) { return DICT ? DICT.has(w) : false; },

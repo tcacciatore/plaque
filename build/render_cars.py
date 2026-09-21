@@ -178,14 +178,14 @@ SHAPES = {
 # plaque : (centre y, z, demi-largeur, demi-hauteur) — pour la projection de layout.json
 SHAPES['pickup']  = dict(kind='pickup',  plate=(0.78, 2.20, 0.40, 0.11), front_plate=(0.58, -2.28, 0.40, 0.11))
 SHAPES['van']     = dict(kind='van',     plate=(0.72, 2.22, 0.40, 0.11), front_plate=(0.56, -2.22, 0.40, 0.11))
-SHAPES['coupe']   = dict(kind='coupe',   plate=(0.60, 2.14, 0.40, 0.11))
-SHAPES['cabrio']  = dict(kind='cabrio',  plate=(0.56, 2.08, 0.40, 0.11))
-SHAPES['camper']  = dict(kind='camper',  plate=(0.70, 2.43, 0.40, 0.11))
-SHAPES['4x4']     = dict(kind='4x4',     plate=(0.66, 2.02, 0.40, 0.11))
-SHAPES['citerne'] = dict(kind='citerne', plate=(0.62, 2.36, 0.40, 0.11))
-SHAPES['supercar'] = dict(kind='supercar', plate=(0.58, 2.18, 0.40, 0.11))
-SHAPES['ancienne'] = dict(kind='ancienne', plate=(0.62, 2.02, 0.40, 0.11))
-SHAPES['camion']   = dict(kind='camion',   plate=(0.66, 2.36, 0.40, 0.11))
+SHAPES['coupe']   = dict(kind='coupe',   plate=(0.60, 2.14, 0.40, 0.11), front_plate=(0.58, -2.14, 0.40, 0.11))
+SHAPES['cabrio']  = dict(kind='cabrio',  plate=(0.56, 2.08, 0.40, 0.11), front_plate=(0.56, -2.07, 0.40, 0.11))
+SHAPES['camper']  = dict(kind='camper',  plate=(0.70, 2.43, 0.40, 0.11), front_plate=(0.56, -2.04, 0.40, 0.11))
+SHAPES['4x4']     = dict(kind='4x4',     plate=(0.66, 2.02, 0.40, 0.11), front_plate=(0.75, -1.97, 0.40, 0.11))
+SHAPES['citerne'] = dict(kind='citerne', plate=(0.62, 2.36, 0.40, 0.11), front_plate=(0.80, -2.97, 0.40, 0.11))
+SHAPES['supercar'] = dict(kind='supercar', plate=(0.58, 2.18, 0.40, 0.11), front_plate=(0.50, -2.18, 0.40, 0.11))
+SHAPES['ancienne'] = dict(kind='ancienne', plate=(0.62, 2.02, 0.40, 0.11), front_plate=(0.62, -2.01, 0.40, 0.11))
+SHAPES['camion']   = dict(kind='camion',   plate=(0.66, 2.36, 0.40, 0.11), front_plate=(0.88, -3.00, 0.40, 0.11))
 
 def scene_pickup(p, dists, mats):
     wheels(p, dists, mats, 0.38, 0.86, (1.50, -1.40), 0.15)
@@ -262,6 +262,10 @@ def scene_coupe(p, dists, mats):
     shell = np.maximum(shell, -rbox(p - [0, 0.75, 2.12], [0.72, 0.005, 0.02], 0.002))   # joint de coffre
     dists.append(shell); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 1.02, 1.00, -1.20)
+    # l'avant : pare-brise couché, capot plongeant, façade basse
+    dists.append(rbox(shear_z(p - [0, 1.00, -1.12], 0.95, 0.0), [0.70, 0.14, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 1.00, -1.13], 0.95, 0.0), [0.64, 0.105, 0.05], 0.02)); mats.append(MAT_GLASS)
+    front_face(p, dists, mats, 0.95, 0.38, 0.70, -2.14, hw=0.24, hh=0.06, grille=0.30)
     # lunette très couchée + troisième feu stop
     dists.append(rbox(shear_z(p - [0, 1.00, 0.48], 0.95, 0.0), [0.68, 0.135, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 1.00, 0.49], 0.95, 0.0), [0.62, 0.10, 0.05], 0.02)); mats.append(MAT_GLASS)
@@ -298,6 +302,7 @@ def scene_cabrio(p, dists, mats):
     # pare-brise, incliné vers l'avant, vu à travers l'habitacle
     dists.append(rbox(shear_z(p - [0, 1.10, -0.75], -0.55, 0.0), [0.76, 0.24, 0.03], 0.025)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 1.10, -0.74], -0.55, 0.0), [0.70, 0.20, 0.035], 0.02)); mats.append(MAT_GLASS)
+    front_face(p, dists, mats, 0.92, 0.36, 0.70, -2.07, hw=0.22, hh=0.07, grille=0.30)
     for sx in (-1, 1):
         lamp_cluster(p, dists, mats, sx, 0.60, 0.72, 2.06, 0.25, 0.07)
     bumper = rbox(p - [0, 0.43, 2.09], [0.95, 0.09, 0.07], 0.05)
@@ -314,6 +319,11 @@ def scene_camper(p, dists, mats):
     cell = np.maximum(cell, -rbox(p - [-0.52, 1.10, 2.42], [0.008, 0.58, 0.02], 0.003))   # porte
     dists.append(cell); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 1.12, 1.40, -1.75)
+    # l'avant : pare-brise panoramique, casquette, façade
+    dists.append(rbox(shear_z(p - [0, 1.42, -1.96], 0.30, 0.0), [0.86, 0.34, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 1.42, -1.97], 0.30, 0.0), [0.80, 0.29, 0.05], 0.02)); mats.append(MAT_GLASS)
+    dists.append(rbox(p - [0, 1.84, -2.02], [0.90, 0.03, 0.10], 0.02)); mats.append(MAT_PAINT)      # casquette
+    front_face(p, dists, mats, 1.02, 0.36, 0.84, -2.04, hw=0.18, hh=0.10, grille=0.34)
     # fenêtre haute, bande décorative, échelle à droite, lanterneau
     dists.append(rbox(p - [0.10, 1.52, 2.41], [0.34, 0.22, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(p - [0.10, 1.52, 2.42], [0.29, 0.17, 0.05], 0.02)); mats.append(MAT_GLASS)
@@ -338,6 +348,13 @@ def scene_4x4(p, dists, mats):
     cab = rbox(p - [0, 1.55, -0.10], [0.84, 0.28, 1.35], 0.06)
     dists.append(smin(body, cab, 0.05)); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 0.98, 1.50, -1.35)
+    # l'avant : pare-brise droit, capot plat, façade et pare-buffle
+    dists.append(rbox(p - [0, 1.60, -1.45], [0.72, 0.22, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(p - [0, 1.60, -1.46], [0.66, 0.17, 0.05], 0.02)); mats.append(MAT_GLASS)
+    front_face(p, dists, mats, 0.90, 0.55, 1.05, -1.97, hw=0.16, hh=0.10, grille=0.36)
+    dists.append(rbox(p - [0, 0.86, -2.06], [0.70, 0.025, 0.025], 0.012)); mats.append(MAT_CHROME)  # pare-buffle
+    for sx in (-1, 1):
+        dists.append(rbox(p - [sx * 0.55, 0.70, -2.06], [0.025, 0.18, 0.025], 0.012)); mats.append(MAT_CHROME)
     # élargisseurs d'ailes
     for z in (1.35, -1.32):
         for sx in (-1, 1):
@@ -378,6 +395,10 @@ def scene_citerne(p, dists, mats):
     cab = rbox(p - [0, 1.18, -2.55], [0.86, 0.58, 0.40], 0.08)
     dists.append(cab); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 0.98, 1.45, -2.60)
+    # l'avant de la cabine : pare-brise haut, façade
+    dists.append(rbox(p - [0, 1.42, -2.94], [0.74, 0.28, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(p - [0, 1.42, -2.95], [0.68, 0.23, 0.05], 0.02)); mats.append(MAT_GLASS)
+    front_face(p, dists, mats, 0.86, 0.60, 0.94, -2.97, hw=0.16, hh=0.09, grille=0.32)
     # échelle à gauche, passerelle, vanne, feux, pare-chocs, plaque
     for i in range(5):
         dists.append(rbox(p - [-0.70, 0.66 + i * 0.26, 2.20], [0.11, 0.016, 0.02], 0.008)); mats.append(MAT_CHROME)
@@ -409,6 +430,10 @@ def scene_supercar(p, dists, mats):
         shell = np.maximum(shell, -rbox(p - [x + 0.05, 0.74, 1.35], [0.05, 0.02, 0.32], 0.006))
     dists.append(shell); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 1.06, 0.88, -1.30)
+    # l'avant : pare-brise couché, capot plongeant, phares effilés, grande bouche
+    dists.append(rbox(shear_z(p - [0, 0.86, -1.22], 1.10, 0.0), [0.62, 0.12, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 0.86, -1.23], 1.10, 0.0), [0.56, 0.09, 0.05], 0.02)); mats.append(MAT_GLASS)
+    front_face(p, dists, mats, 0.98, 0.30, 0.60, -2.18, hw=0.26, hh=0.045, grille=0.36)
     dists.append(rbox(shear_z(p - [0, 0.86, 0.10], 1.10, 0.0), [0.60, 0.12, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 0.86, 0.11], 1.10, 0.0), [0.54, 0.09, 0.05], 0.02)); mats.append(MAT_GLASS)
     # aileron sur deux pylônes, feu stop central
@@ -450,6 +475,20 @@ def scene_ancienne(p, dists, mats):
     for sx in (-1, 1):
         dists.append(rbox(p - [sx * 0.82, 0.40, 0.0], [0.10, 0.02, 0.80], 0.015)); mats.append(MAT_TRIM)
     mirrors(p, dists, mats, 0.84, 1.10, -1.10)
+    # l'avant : pare-brise presque droit, phares ronds chromés sur les ailes, calandre verticale
+    dists.append(rbox(shear_z(p - [0, 1.16, -1.22], 0.55, 0.0), [0.50, 0.19, 0.04], 0.10)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 1.16, -1.23], 0.55, 0.0), [0.45, 0.15, 0.05], 0.08)); mats.append(MAT_GLASS)
+    for sx in (-1, 1):
+        dists.append(cyl_z(p - [sx * 0.62, 0.94, -1.86], 0.08, 0.13, 0.02)); mats.append(MAT_CHROME)
+        dists.append(cyl_z(p - [sx * 0.62, 0.94, -1.92], 0.03, 0.10, 0.03)); mats.append(MAT_HEAD)
+    g = rbox(p - [0, 0.78, -1.87], [0.22, 0.28, 0.04], 0.06)
+    for k in range(-3, 4):
+        g = np.maximum(g, -rbox(p - [k * 0.055, 0.78, -1.92], [0.01, 0.24, 0.02], 0.003))
+    dists.append(g); mats.append(MAT_CHROME)
+    dists.append(rbox(p - [0, 0.46, -2.00], [0.86, 0.05, 0.05], 0.04)); mats.append(MAT_CHROME)
+    for sx in (-1, 1):
+        dists.append(rbox(p - [sx * 0.50, 0.48, -2.04], [0.05, 0.08, 0.04], 0.03)); mats.append(MAT_CHROME)
+    dists.append(rbox(p - [0, 0.62, -2.01], [0.40, 0.11, 0.03], 0.012)); mats.append(MAT_PLATE)
     # lunette ovale, feux ronds, pare-chocs chromé à butoirs, roue de secours sur la malle
     dists.append(rbox(shear_z(p - [0, 1.16, 0.53], 0.55, 0.0), [0.44, 0.15, 0.04], 0.12)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 1.16, 0.54], 0.55, 0.0), [0.39, 0.11, 0.05], 0.10)); mats.append(MAT_GLASS)
@@ -488,6 +527,10 @@ def scene_camion(p, dists, mats):
     cab = rbox(p - [0, 1.24, -2.62], [0.92, 0.56, 0.36], 0.08)
     dists.append(cab); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 1.04, 1.50, -2.66)
+    # l'avant de la cabine : pare-brise haut, façade
+    dists.append(rbox(p - [0, 1.46, -2.97], [0.78, 0.28, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(p - [0, 1.46, -2.98], [0.72, 0.23, 0.05], 0.02)); mats.append(MAT_GLASS)
+    front_face(p, dists, mats, 0.92, 0.68, 1.00, -3.00, hw=0.17, hh=0.09, grille=0.34)
     # feux bas, barre anti-encastrement, plaque
     for sx in (-1, 1):
         dists.append(rbox(p - [sx * 0.78, 0.62, 2.33], [0.16, 0.06, 0.04], 0.015)); mats.append(MAT_LAMP)
