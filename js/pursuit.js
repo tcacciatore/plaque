@@ -113,6 +113,7 @@ function spawn() {
                     c.tag ? '<span class="sport-tag sport-tag--trait">' + c.tag + '</span>' : '') +
                    '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + (gold ? 'or' : P.pick(P.colors())) + '-front.webp">' +
                    '<div class="car__shadow"></div>' + plateHTML(c) +
+                   '<div class="car__timer"><i></i></div>' +
                  '</div><div class="car__fx"></div><div class="car__pop"></div>';
   // la plaque est rivée au pare-chocs avant : elle tangue, grossit et s'éloigne avec la voiture
   var F = FLEET[shape];
@@ -129,6 +130,11 @@ function spawn() {
 function readable(c) { return !c.gone && c.phase !== 'in'; }
 function placePlate(c) {                          // la plaque n'apparaît qu'une fois la voiture calée
   c.pl.style.opacity = readable(c) ? '1' : '0';
+  // la barre de temps : ce qu'il reste avant qu'elle charge
+  var bar = c.el.querySelector('.car__timer');
+  if (!bar) return;
+  bar.style.opacity = c.phase === 'hold' ? '1' : '0';
+  if (c.phase === 'hold') bar.firstChild.style.transform = 'scaleX(' + Math.max(0, Math.min(1, (c.until - played()) / c.hold)).toFixed(3) + ')';
 }
 function removeCar(c, cls) {
   c.gone = true;

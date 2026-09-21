@@ -1158,3 +1158,6 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
 .pcar .plate--pursuit .plate__eu,.pcar .plate--pursuit .plate__dep{width:auto;min-width:12%;padding:2px 3px;justify-content:center}
 .pcar .plate--pursuit .plate__f,.pcar .plate--pursuit .plate__depnum{font-size:calc(var(--pw,180px) * .06);white-space:nowrap}
 .pcar.car--target .plate--pursuit{box-shadow:0 2px 8px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
+
+/* Poursuite : la barre de temps sous la plaque — ce qu'il reste avant la charge */
+.pcar .car__timer{top:calc(var(--plateY,75%) + 12%);width:var(--pw,180px);height:calc(var(--pw,180px) * .045);transition:opacity .3s;opacity:0}

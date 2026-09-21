@@ -134,24 +134,64 @@ def bulge(shell, p, y_c, z_back, R=2.2):
     """Galbe la face arrière : la tôle devient légèrement convexe, le reflet y balaie l'horizon."""
     return np.maximum(shell, cyl_x(p - [0, y_c, z_back - R], 99.0, R))
 
-def front_face(p, dists, mats, wid, y_low, y_lamp, z_front, hw=0.22, hh=0.085, plate_y=None, grille=0.34):
-    """L'avant d'un véhicule : phares (blanc, clignotant ambre), calandre à lames, logo,
-    pare-chocs avec entrée d'air, antibrouillards, plaque avant. z_front < 0."""
+def front_face(p, dists, mats, wid, y_low, y_lamp, z_front, hw=0.22, hh=0.085, plate_y=None, grille=0.34, style='car'):
+    """L'avant d'un véhicule, soigné : blocs optiques à lentille (projecteur rond dans un
+    boîtier chromé, feu de jour en bandeau, clignotant ambre), calandre cerclée de chrome
+    à lames fines, logo, pli de capot, pare-chocs à jupe avec prise d'air en nid d'abeille
+    et antibrouillards enchâssés, plaque avant. z_front < 0.
+    style : 'car' (calandre horizontale), 'van' (calandre haute), 'sport' (bouche large)."""
+    zf = z_front
     for sx in (-1, 1):
         cx = sx * (wid - 0.06 - hw)
-        dists.append(rbox(p - [cx, y_lamp, z_front + 0.03], [hw, hh, 0.05], 0.025)); mats.append(MAT_HEAD)
-        dists.append(rbox(p - [cx, y_lamp - hh + 0.02, z_front + 0.024], [hw - 0.02, 0.015, 0.05], 0.008)); mats.append(MAT_LAMP_A)
-        dists.append(rbox(p - [cx, y_lamp + hh + 0.012, z_front + 0.035], [hw, 0.012, 0.045], 0.008)); mats.append(MAT_TRIM)
-        dists.append(cyl_z(p - [sx * (wid - 0.22), y_low + 0.085, z_front - 0.005], 0.03, 0.045, 0.01)); mats.append(MAT_LAMP_W)
-    g = rbox(p - [0, y_lamp, z_front + 0.03], [grille, hh + 0.01, 0.03], 0.012)
-    for k in range(-2, 3):
-        g = np.maximum(g, -rbox(p - [0, y_lamp + k * 0.038, z_front - 0.005], [grille - 0.02, 0.008, 0.02], 0.003))
+        # boîtier chromé en creux, projecteur rond, feu de jour LED en bandeau, clignotant
+        housing = rbox(p - [cx, y_lamp, zf + 0.03], [hw, hh, 0.05], 0.03)
+        housing = np.maximum(housing, -rbox(p - [cx, y_lamp, zf - 0.03], [hw - 0.015, hh - 0.015, 0.03], 0.02))
+        dists.append(housing); mats.append(MAT_CHROME)
+        dists.append(rbox(p - [cx, y_lamp, zf + 0.005], [hw - 0.015, hh - 0.015, 0.02], 0.02)); mats.append(MAT_LAMP_W)   # fond du bloc
+        px = cx + sx * (hw * 0.35)
+        dists.append(cyl_z(p - [px, y_lamp + 0.005, zf - 0.005], 0.025, min(hh, hw * 0.5) * 0.85, 0.01)); mats.append(MAT_HEAD)   # projecteur
+        dists.append(cyl_z(p - [px, y_lamp + 0.005, zf - 0.02], 0.02, min(hh, hw * 0.5) * 0.45, 0.01)); mats.append(MAT_CHROME)  # lentille
+        dists.append(rbox(p - [cx - sx * (hw * 0.25), y_lamp + hh - 0.028, zf - 0.008], [hw * 0.55, 0.008, 0.02], 0.004)); mats.append(MAT_HEAD)   # feu de jour
+        dists.append(rbox(p - [cx - sx * (hw * 0.25), y_lamp - hh + 0.024, zf - 0.006], [hw * 0.5, 0.012, 0.02], 0.006)); mats.append(MAT_LAMP_A)  # clignotant
+        # antibrouillard enchâssé dans la jupe
+        dists.append(cyl_z(p - [sx * (wid - 0.20), y_low + 0.085, zf + 0.02], 0.04, 0.055, 0.01)); mats.append(MAT_TRIM)
+        dists.append(cyl_z(p - [sx * (wid - 0.20), y_low + 0.085, zf - 0.006], 0.025, 0.04, 0.01)); mats.append(MAT_LAMP_W)
+    # calandre : cadre chromé, fond sombre, lames fines
+    gh = hh + 0.012 if style != 'van' else hh + 0.06
+    gy = y_lamp if style != 'van' else y_lamp + 0.02
+    frame = rbox(p - [0, gy, zf + 0.02], [grille + 0.02, gh + 0.015, 0.03], 0.02)
+    frame = np.maximum(frame, -rbox(p - [0, gy, zf - 0.02], [grille, gh, 0.03], 0.012))
+    dists.append(frame); mats.append(MAT_CHROME)
+    g = rbox(p - [0, gy, zf + 0.035], [grille, gh, 0.03], 0.012)
+    n = int(round(gh / 0.024))
+    for k in range(-n, n + 1):
+        y = gy + k * (gh * 2 / max(1, 2 * n))
+        if abs(y - gy) < gh - 0.01:
+            g = np.maximum(g, -rbox(p - [0, y, zf], [grille - 0.01, 0.005, 0.02], 0.002))
     dists.append(g); mats.append(MAT_TRIM)
-    dists.append(cyl_z(p - [0, y_lamp, z_front - 0.01], 0.02, 0.05, 0.01)); mats.append(MAT_CHROME)      # logo
-    bumper = rbox(p - [0, y_low + 0.075, z_front + 0.035], [wid + 0.005, 0.105, 0.065], 0.05)
-    bumper = np.maximum(bumper, -rbox(p - [0, y_low + 0.045, z_front - 0.02], [0.30, 0.035, 0.03], 0.01))  # entrée d'air
+    dists.append(cyl_z(p - [0, gy, zf - 0.012], 0.02, 0.055, 0.012)); mats.append(MAT_CHROME)       # logo
+    dists.append(cyl_z(p - [0, gy, zf - 0.03], 0.012, 0.03, 0.008)); mats.append(MAT_TRIM)
+    # pli de capot, au-dessus de la calandre
+    dists.append(rbox(p - [0, y_lamp + hh + 0.05, zf + 0.06], [wid - 0.10, 0.006, 0.08], 0.003)); mats.append(MAT_TRIM)
+    # pare-chocs : jupe, prise d'air en nid d'abeille, lame chromée
+    bumper = rbox(p - [0, y_low + 0.075, zf + 0.035], [wid + 0.005, 0.105, 0.065], 0.05)
+    mouth_w = 0.34 if style != 'sport' else 0.50
+    bumper = np.maximum(bumper, -rbox(p - [0, y_low + 0.05, zf - 0.02], [mouth_w, 0.04, 0.03], 0.012))
     dists.append(bumper); mats.append(MAT_TRIM)
-    dists.append(rbox(p - [0, (plate_y if plate_y else y_low + 0.20), z_front + 0.055], [0.42, 0.115, 0.03], 0.012)); mats.append(MAT_PLATE)
+    mesh = rbox(p - [0, y_low + 0.05, zf + 0.01], [mouth_w - 0.01, 0.035, 0.01], 0.004)
+    for kx in np.arange(-mouth_w + 0.03, mouth_w, 0.06):
+        mesh = np.maximum(mesh, -cyl_z(p - [kx, y_low + 0.05, zf + 0.01], 0.05, 0.02))
+    dists.append(mesh); mats.append(MAT_RIM)
+    dists.append(rbox(p - [0, y_low + 0.002, zf + 0.03], [wid - 0.02, 0.008, 0.07], 0.004)); mats.append(MAT_CHROME)    # lame
+    dists.append(rbox(p - [0, (plate_y if plate_y else y_low + 0.20), zf - 0.045], [0.42, 0.115, 0.03], 0.012)); mats.append(MAT_PLATE)
+
+def wipers(p, dists, mats, y, z, wid, tilt):
+    """Deux essuie-glaces couchés au bas du pare-brise."""
+    for sx, ang in ((-1, 0.35), (1, 0.25)):
+        q = p - [sx * wid * 0.45, y, z]
+        c, s_ = math.cos(ang * sx), math.sin(ang * sx)
+        r = q.copy(); r[..., 0] = q[..., 0] * c - q[..., 1] * s_; r[..., 1] = q[..., 0] * s_ + q[..., 1] * c
+        dists.append(rbox(shear_z(r, tilt, 0.0), [wid * 0.28, 0.006, 0.012], 0.004)); mats.append(MAT_TRIM)
 
 def diffuser(bumper, p, y, z, xs, h=0.05):
     """Diffuseur : lames verticales creusées dans le bas du pare-chocs."""
@@ -236,7 +276,7 @@ def scene_van(p, dists, mats):
     # l'avant : grand pare-brise incliné, capot court, façade
     dists.append(rbox(shear_z(p - [0, 1.50, -2.16], 0.40, 0.0), [0.78, 0.30, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 1.50, -2.17], 0.40, 0.0), [0.72, 0.25, 0.05], 0.02)); mats.append(MAT_GLASS)
-    front_face(p, dists, mats, 0.90, 0.36, 0.86, -2.24, hw=0.16, hh=0.11, grille=0.30)
+    front_face(p, dists, mats, 0.90, 0.36, 0.86, -2.24, hw=0.16, hh=0.11, grille=0.30, style='van')
     # portes arrière : deux vitres verticales, bas de porte, poignées
     for sx in (-1, 1):
         dists.append(rbox(p - [sx * 0.43, 1.44, 2.21], [0.36, 0.31, 0.04], 0.03)); mats.append(MAT_TRIM)
@@ -323,7 +363,7 @@ def scene_camper(p, dists, mats):
     dists.append(rbox(shear_z(p - [0, 1.42, -1.96], 0.30, 0.0), [0.86, 0.34, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 1.42, -1.97], 0.30, 0.0), [0.80, 0.29, 0.05], 0.02)); mats.append(MAT_GLASS)
     dists.append(rbox(p - [0, 1.84, -2.02], [0.90, 0.03, 0.10], 0.02)); mats.append(MAT_PAINT)      # casquette
-    front_face(p, dists, mats, 1.02, 0.36, 0.84, -2.04, hw=0.18, hh=0.10, grille=0.34)
+    front_face(p, dists, mats, 1.02, 0.36, 0.84, -2.04, hw=0.18, hh=0.10, grille=0.34, style='van')
     # fenêtre haute, bande décorative, échelle à droite, lanterneau
     dists.append(rbox(p - [0.10, 1.52, 2.41], [0.34, 0.22, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(p - [0.10, 1.52, 2.42], [0.29, 0.17, 0.05], 0.02)); mats.append(MAT_GLASS)
@@ -398,7 +438,7 @@ def scene_citerne(p, dists, mats):
     # l'avant de la cabine : pare-brise haut, façade
     dists.append(rbox(p - [0, 1.42, -2.94], [0.74, 0.28, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(p - [0, 1.42, -2.95], [0.68, 0.23, 0.05], 0.02)); mats.append(MAT_GLASS)
-    front_face(p, dists, mats, 0.86, 0.60, 0.94, -2.97, hw=0.16, hh=0.09, grille=0.32)
+    front_face(p, dists, mats, 0.86, 0.60, 0.94, -2.97, hw=0.16, hh=0.09, grille=0.32, style='van')
     # échelle à gauche, passerelle, vanne, feux, pare-chocs, plaque
     for i in range(5):
         dists.append(rbox(p - [-0.70, 0.66 + i * 0.26, 2.20], [0.11, 0.016, 0.02], 0.008)); mats.append(MAT_CHROME)
@@ -433,7 +473,7 @@ def scene_supercar(p, dists, mats):
     # l'avant : pare-brise couché, capot plongeant, phares effilés, grande bouche
     dists.append(rbox(shear_z(p - [0, 0.86, -1.22], 1.10, 0.0), [0.62, 0.12, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 0.86, -1.23], 1.10, 0.0), [0.56, 0.09, 0.05], 0.02)); mats.append(MAT_GLASS)
-    front_face(p, dists, mats, 0.98, 0.30, 0.60, -2.18, hw=0.26, hh=0.045, grille=0.36)
+    front_face(p, dists, mats, 0.98, 0.30, 0.60, -2.18, hw=0.26, hh=0.045, grille=0.36, style='sport')
     dists.append(rbox(shear_z(p - [0, 0.86, 0.10], 1.10, 0.0), [0.60, 0.12, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 0.86, 0.11], 1.10, 0.0), [0.54, 0.09, 0.05], 0.02)); mats.append(MAT_GLASS)
     # aileron sur deux pylônes, feu stop central
@@ -530,7 +570,7 @@ def scene_camion(p, dists, mats):
     # l'avant de la cabine : pare-brise haut, façade
     dists.append(rbox(p - [0, 1.46, -2.97], [0.78, 0.28, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(p - [0, 1.46, -2.98], [0.72, 0.23, 0.05], 0.02)); mats.append(MAT_GLASS)
-    front_face(p, dists, mats, 0.92, 0.68, 1.00, -3.00, hw=0.17, hh=0.09, grille=0.34)
+    front_face(p, dists, mats, 0.92, 0.68, 1.00, -3.00, hw=0.17, hh=0.09, grille=0.34, style='van')
     # feux bas, barre anti-encastrement, plaque
     for sx in (-1, 1):
         dists.append(rbox(p - [sx * 0.78, 0.62, 2.33], [0.16, 0.06, 0.04], 0.015)); mats.append(MAT_LAMP)
@@ -582,6 +622,7 @@ def scene_car(p, S, dists, mats):
     dists.append(rbox(p - [0, S['body_y'] + S['body_h'] - 0.02, -S['len'] + 0.02],
                       [S['wid'] - 0.06, 0.012, 0.06], 0.008)); mats.append(MAT_TRIM)
     front_face(p, dists, mats, S['wid'], S['body_y'] - S['body_h'], S['body_y'] + 0.14, -S['len'] - 0.02)
+    wipers(p, dists, mats, S['roof_y'] - S['roof_h'] + 0.03, gf - 0.02 + S['glass_tilt'] * (-S['roof_h'] + 0.03), S['roof_wid'], S['glass_tilt'])
     if S.get('spoiler'):   # casquette de hayon
         dists.append(rbox(shear_z(p - [0, S['roof_y'] + S['roof_h'] - 0.02, gz + 0.06], S['glass_tilt'], 0.0),
                           [S['roof_wid'] - 0.02, 0.025, 0.10], 0.02)); mats.append(MAT_PAINT)
@@ -870,7 +911,7 @@ def plate_box(S):
     elif VIEW == 'front':
         y_low = S['body_y'] - S['body_h']
         cy, hw, hh = y_low + 0.20, 0.42, 0.115
-        z = -S['len'] - 0.02 + 0.055 - 0.03
+        z = -S['len'] - 0.02 - 0.045 - 0.03
     elif 'plate' in S:
         cy, z, hw, hh = S['plate']
     else:
