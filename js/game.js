@@ -328,7 +328,10 @@ function fleetRoster() {
     else if (TRAITS[s]) regular.push(s);
     else neutral.push(s);
   });
-  return [pick(neutral)].concat(shuffle(regular).slice(0, 4)).concat(sports);
+  // Facile : les modèles à règle restent au garage ; Normal : deux neutres sur cinq ; Expert : une seule
+  if (state.diff === 'facile') regular = regular.filter(function (s) { return !TRAITS[s].rule && !TRAITS[s].need && !TRAITS[s].hidden; });
+  var nNeutral = state.diff === 'expert' ? 1 : 2;
+  return shuffle(neutral).slice(0, nNeutral).concat(shuffle(regular).slice(0, 5 - nNeutral)).concat(sports);
 }
 
 function career() { return store.get('career', 0); }

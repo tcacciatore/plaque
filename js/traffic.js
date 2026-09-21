@@ -10,21 +10,22 @@
 
 var P = null;                       // passerelle vers le moteur (window.PLAQUE)
 var GAME_TIME = 120;                // durée d'une partie, en secondes
-var CAR_TIME  = 14;                 // temps de présence d'une voiture au départ…
-var CAR_TIME_END = 9;               // …et en fin de partie (la rampe)
+var CAR_TIME  = 18;                 // temps de présence d'une voiture au départ…
+var CAR_TIME_END = 12;              // …et en fin de partie (la rampe)
+var CAR_TIME_DIFF = { facile: 1.25, normal: 1, expert: 0.8 };   // …modulé par la difficulté
 var RUSH      = 20;                 // les dernières secondes : tout compte double
 var FEVER     = 10;                 // durée de la fièvre déclenchée à ×5 : un mot suffit
 var GOLD_ODDS = 25, GOLD_MULT = 3;  // voiture dorée : une sur 25, ×3
 var TANK_ODDS = 14;                 // camion-citerne : un sur 14, explosion en chaîne
 var WORD_TIME = 1;                  // secondes de partie gagnées par mot valide
 var PLATE_TIME = 2;                 // secondes de partie gagnées en plus par plaque lue
-var CAR_BONUS = 2;                  // secondes rendues à la voiture visée par mot valide
+var CAR_BONUS = 3;                  // secondes rendues à la voiture visée par mot valide
 // rythme d'arrivée selon la difficulté : écart minimal entre deux apparitions,
 // toutes voies confondues, puis délai avant qu'une voie libre se réalimente (ms)
 var PACE = {
-  facile: { gap: 7000, min: 6000, max: 8000 },
-  normal: { gap: 5500, min: 4500, max: 6500 },
-  expert: { gap: 4000, min: 3500, max: 5000 }
+  facile: { gap: 8000, min: 6500, max: 8500 },
+  normal: { gap: 6000, min: 5000, max: 7000 },
+  expert: { gap: 4500, min: 3500, max: 5500 }
 };
 var SPAWN_GAP = 5500, GAP_MIN = 4500, GAP_MAX = 6500;   // réglés au démarrage d'après PACE
 var TIME_CAP  = 135;                // la partie ne dépasse jamais 2 min 15
@@ -170,7 +171,7 @@ function leaveCar(car, success) {
 function played() { return (Date.now() - T.t0) / 1000; }
 function carTime() {                             // la rampe : de 18 s à 12 s sur deux minutes de jeu
   var k = Math.min(1, played() / 120);
-  return CAR_TIME + (CAR_TIME_END - CAR_TIME) * k;
+  return (CAR_TIME + (CAR_TIME_END - CAR_TIME) * k) * (CAR_TIME_DIFF[P.state.diff] || 1);
 }
 function multiplier() {                          // rush ×2, dorée ×3, coupé ×1,5
   return T.rush ? 2 : 1;
