@@ -12,7 +12,9 @@
 var P = null;
 var LIVES = 3;
 var LANES = [-30, 0, 30], MY_LANE = 1;
-var Z_FAR = 10, Z_READ = 9.2, Z_HIT = 1.8, Z_PASS = 1.2;   // la plaque se lit dès l'horizon ; l'impact a lieu au bord du capot
+var HERO_Z = 1.3, HERO_K = 0.5;                      // votre voiture : bas dans le cadre, et dessinée à moitié
+                                                     // de son échelle, sinon elle cacherait ceux qui vous suivent
+var Z_FAR = 10, Z_READ = 9.2, Z_HIT = HERO_Z + 0.55, Z_PASS = 1.0;   // la plaque se lit dès l'horizon ; l'impact au contact de votre pare-chocs
 var V0 = 0.68, V_RAMP = 0.005, V_MAX = 1.7;          // vitesse en profondeur (z/s), sa montée par seconde, son plafond
                                                      // → ~11 s pour lire une plaque au départ, ~6 s après deux minutes
 var SPAWN0 = 6.0, SPAWN_MIN = 3.6;                    // intervalle entre deux arrivées, au départ et au plus serré
@@ -33,6 +35,15 @@ var $ = function (id) { return document.getElementById(id); };
 /* ─────────── projection : la même que la route du Trafic ─────────── */
 function project(lane, z) {
   return { x: 50 + LANES[lane] / z, y: 46 + 48 / z, s: 1 / z };   // x, y en % de la scène ; y = bas de la voiture
+}
+/* votre voiture : projetée comme les autres, à HERO_Z sur la voie du milieu ; elle louvoie un peu */
+function placeHero(now) {
+  var p = project(MY_LANE, HERO_Z);
+  var sway = Math.sin(now / 900) * 2.2 + Math.sin(now / 173) * 0.5;
+  var px = p.x / 100 * R.sceneW + sway, py = p.y / 100 * R.sceneH;
+  var el = $('pu-me');
+  el.style.transform = 'translate3d(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px,0) translate(-50%,-100%) scale(' + p.s.toFixed(4) + ') rotate(' + (sway * 0.15).toFixed(2) + 'deg)';
+  el.style.zIndex = String(Math.round(1000 - HERO_Z * 50));
 }
 function place(el, lane, z, w) {
   var p = project(lane, z);
@@ -331,7 +342,9 @@ function measure() {
   // la plaque garde les proportions d'une vraie plaque (≈ 4,7:1) et ne dépasse jamais
   // la moitié de la scène : sur un écran haut et étroit, la hauteur ne dicte plus sa taille
   $('pu-road').style.setProperty('--pw', Math.round(Math.min(R.sceneH * 0.40, R.sceneW * 0.46)) + 'px');
-  $('pu-me').style.width = Math.round(Math.min(R.sceneH * 0.55, R.sceneW * 0.58)) + 'px';   // ni plus haut que la scène, ni plus large que la route
+  R.myShape = (P.myCar().match(/cars\/([a-z0-9]+)-/) || [])[1] || 'berline';
+  $('pu-me').style.width = Math.round(FLEET[R.myShape].size * R.sceneH * HERO_K) + 'px';   // scale(1/z) fait le reste
+  placeHero(performance.now());
   R.cars.forEach(function (c) { c.el.style.width = (FLEET[c.shape].size * R.sceneH) + 'px'; place(c.el, c.lane, c.z); placePlate(c); });
 }
 
@@ -363,9 +376,7 @@ function frame(now) {
   if (R.feverUntil && !inFever()) { R.feverUntil = 0; $('pu-road').classList.remove('fever'); R.combo = 3; R.feverArmed = true; }
   $('pu-road').classList.toggle('rush', R.lives === 1);
   $('pu-me').classList.toggle('me--blink', Date.now() < R.invulnUntil);
-  // votre voiture vit : elle louvoie un peu, et le compteur suit la vraie vitesse
-  var sway = Math.sin(now / 900) * 2.2 + Math.sin(now / 173) * 0.5;
-  $('pu-me').style.transform = 'translateX(calc(-50% + ' + sway.toFixed(2) + 'px)) rotate(' + (sway * 0.15).toFixed(2) + 'deg)';
+  placeHero(now);
   $('pu-speed').textContent = Math.round(R.v * 78);
   if (Math.floor(now / 200) !== Math.floor((now - dt * 1000) / 200)) {
     P.ghostSample(played(), R.score); P.paintGhost($('pu-ghost'), played(), R.score); renderHud();

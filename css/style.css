@@ -1138,7 +1138,7 @@ body.theme-miami .sug{border-color:#3d2c85}
 body.theme-miami .sug:active{background:#ff4fa3;color:#fff;border-color:#ff4fa3}
 
 /* ═══════════ Poursuite : votre véhicule vu de face, au premier plan ═══════════ */
-#pu-road .me{left:50%;top:auto;bottom:-3%;width:calc(var(--roadH) * .6);transform:translateX(-50%);z-index:1200;opacity:1;pointer-events:none;will-change:transform}
+#pu-road .me{left:0;top:0;transform-origin:50% 100%;opacity:1;pointer-events:none;will-change:transform}
 #pu-road .me .car__body{display:block;width:100%;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.75));animation:rumble .14s ease-in-out infinite alternate}
 #pu-road .me .car__fx{position:absolute;left:50%;top:38%;width:1px;height:1px;z-index:5;overflow:visible}
 #pu-road .me .car__fx .flash,#pu-road .me .car__fx .ring,#pu-road .me .car__fx .frag,#pu-road .me .car__fx .smoke{left:0;top:0}
