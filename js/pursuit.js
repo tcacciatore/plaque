@@ -157,7 +157,7 @@ function setTarget(c) {
 
 function livePairs() {                           // les paires lisibles, rétro compris, pour les suggestions
   var out = [];
-  R.cars.forEach(function (c) { if (!readable(c)) return; if (!c.got1) out.push(c.p1.p); if (!c.got2 && !c.hidden) out.push(c.p2.p); });
+  R.cars.forEach(function (c) { if (!readable(c)) return; if (!c.got1) out.push(c.p1.p); if (!c.got2 && !c.onlyRare) out.push(c.p2.p); });
   return out;
 }
 function renderTokens() {
@@ -172,7 +172,7 @@ function renderTokens() {
     return '<span class="tokgroup' + tg + th + '" data-i="' + R.cars.indexOf(c) + '">' +
            (c.lane === MY_LANE ? '<i class="tok__warn">⚠</i>' : '') +
            '<span class="tok' + sp + (c.got1 ? ' tok--on' : '') + '">' + (c.got1 ? '✓' : c.p1.p + (c.used.length ? '½' : '')) + '</span>' +
-           '<span class="tok' + sp + (c.got2 ? ' tok--on' : '') + '">' + (c.got2 ? '✓' : c.hidden ? '??' : c.p2.p + (c.used.length ? '½' : '')) + '</span></span>';
+           '<span class="tok' + sp + (c.got2 ? ' tok--on' : '') + (c.onlyRare ? ' tok--off' : '') + '">' + (c.got2 ? '✓' : c.p2.p + (c.used.length ? '½' : '')) + '</span></span>';
   }).join('');
 }
 function pop(c, txt, cls) {
@@ -216,7 +216,7 @@ function submit(e) {
   alive.forEach(function (c) {
     if (c.used.indexOf(w) !== -1) { used = true; return; }
     var h1 = c.got1 ? null : P.matchPair(w, c.p1.p);
-    var h2 = (c.got2 || c.hidden) ? null : P.matchPair(w, c.p2.p);   // le 4×4 : seule la première paire se lit
+    var h2 = (c.got2 || c.onlyRare) ? null : P.matchPair(w, c.p2.p);   // le 4×4 : seule sa paire rare compte
     if (!h1 && !h2) return;
     var bad = P.wordRule(c, w, 'poursuite');                 // le caractère du modèle refuse ce mot
     if (bad) { if (!ruleMsg || c === R.target) { ruleMsg = bad; ruleCar = c; } return; }
@@ -341,6 +341,9 @@ function measure() {
   // la plaque garde les proportions d'une vraie plaque (≈ 4,7:1) et ne dépasse jamais
   // la moitié de la scène : sur un écran haut et étroit, la hauteur ne dicte plus sa taille
   R.myShape = (P.myCar().match(/cars\/([a-z0-9]+)-/) || [])[1] || 'berline';
+  var MF = FLEET[R.myShape].front;                 // votre plaque : XXX, à sa place sur votre pare-chocs
+  $('pu-me').style.setProperty('--plateY', MF.y + '%');
+  $('pu-me').style.setProperty('--pw', Math.round(FLEET[R.myShape].size * R.sceneH * HERO_K * MF.w / 100) + 'px');
   $('pu-me').style.width = Math.round(FLEET[R.myShape].size * R.sceneH * HERO_K) + 'px';   // scale(1/z) fait le reste
   placeHero(performance.now());
   R.cars.forEach(function (c) {

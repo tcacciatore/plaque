@@ -1167,3 +1167,12 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
 /* Poursuite : trop loin pour lire — la plaque est là, mais brouillée ; elle se fait nette à portée */
 .pcar .plate--pursuit{transition:opacity .3s,filter .45s ease-out}
 .pcar .plate--far{filter:blur(calc(var(--pw,180px) * .022)) contrast(.7) brightness(.85)}
+/* une paire qui ne compte pas (4×4 en Poursuite) : présente, mais en retrait */
+.tok--off{opacity:.4}
+
+/* Poursuite : votre plaque à vous, marquée XXX */
+#pu-road .me .plate--me{position:absolute;left:50%;top:var(--plateY,75%);width:var(--pw,120px);transform:translate(-50%,-50%);margin:0;
+  border-width:2px;border-radius:4px;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.7);pointer-events:none}
+#pu-road .me .plate--me .plate__body{font-size:calc(var(--pw,120px) * .17);padding:1px 2px;letter-spacing:.06em;line-height:1.15}
+#pu-road .me .plate--me .plate__eu,#pu-road .me .plate--me .plate__dep{width:auto;min-width:12%;padding:2px 3px;justify-content:center}
+#pu-road .me .plate--me .plate__f,#pu-road .me .plate--me .plate__depnum{font-size:calc(var(--pw,120px) * .07);white-space:nowrap}

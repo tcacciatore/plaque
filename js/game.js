@@ -254,7 +254,7 @@ var TRAITS = {
   ancienne:  { rule: 'rare',     tag: 'mots rares',       time: 1.6, cote: 2 },
   monospace: { rule: 'initiale', tag: 'même initiale',    time: 1.3, cote: 1.5, noPursuit: true },
   van:       { give: 5,          tag: '+5 s',             pursuitTag: '🔧 pare-chocs' },
-  '4x4':     { hidden: true,     tag: 'paire cachée',     time: 1.3, cote: 1.5 },
+  '4x4':     { hidden: true,     tag: 'paire cachée',     time: 1.3, cote: 1.5, pursuitTag: 'la paire rare' },
   camion:    { need: 2,          tag: '2 mots par paire', time: 2.0, cote: 2, pursuitTag: '2 mots' },
   camper:    {                   tag: 'lent',             time: 2.0, cote: 0.5, noParking: true },
   pickup:    { cargo: true },
@@ -268,7 +268,11 @@ function carTime(shape) { return trait(shape).time || 1; }
 function initCar(car, mode) {
   var t = trait(car.shape);
   car.need = t.need || 1; car.n1 = 0; car.n2 = 0; car.used = [];
-  car.hidden = !!t.hidden;
+  // la paire cachée n'a pas de sens en Poursuite, où un seul mot suffit : le 4×4 y
+  // montre ses deux paires, mais seule la plus rare est jouable (cote ×1,5 méritée)
+  car.hidden = !!t.hidden && mode !== 'poursuite';
+  car.onlyRare = !!t.hidden && mode === 'poursuite';
+  if (car.onlyRare && car.p1.n < car.p2.n) { var sw = car.p1; car.p1 = car.p2; car.p2 = sw; }
   car.tag = mode === 'poursuite' ? (t.pursuitTag || (t.noPursuit ? '' : t.tag))
           : mode === 'parking' && t.noParking ? '' : t.tag;
   if (t.cargo) {

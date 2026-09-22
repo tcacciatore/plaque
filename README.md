@@ -59,7 +59,7 @@ vitesse d'approche) :
 | ancienne | mots rares ou peu courants seulement | ×1,6 | ×2 |
 | monospace | les deux mots ont la même initiale (pas en Poursuite) | ×1,3 | ×1,5 |
 | utilitaire | la lire rend 5 s (Poursuite : répare un pare-chocs) | — | — |
-| 4×4 | deuxième paire cachée tant que la première n'est pas lue | ×1,3 | ×1,5 |
+| 4×4 | deuxième paire cachée tant que la première n'est pas lue ; en Poursuite, les deux sont visibles mais seule la plus rare compte | ×1,3 | ×1,5 |
 | camion | deux mots par paire | ×2 | ×2 |
 | camping-car | lent (Trafic, Poursuite) | ×2 | ×0,5 |
 | pick-up | sa benne porte un bonus : +8 s, une paire offerte ou cote ×2 (Poursuite : cote ×2 ou fièvre) | — | — |
