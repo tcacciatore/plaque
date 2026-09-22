@@ -1160,4 +1160,6 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
 .pcar.car--target .plate--pursuit{box-shadow:0 2px 8px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
 
 /* Poursuite : la barre de temps sous la plaque — ce qu'il reste avant la charge */
-.pcar .car__timer{top:calc(var(--plateY,75%) + 12%);width:var(--pw,180px);height:calc(var(--pw,180px) * .045);transition:opacity .3s;opacity:0}
+.pcar .car__timer{top:var(--plateY,75%);width:var(--pw,180px);height:calc(var(--pw,180px) * .045);transition:opacity .3s;opacity:0;
+  /* sous la plaque, quelle que soit la hauteur de la voiture : l'écart se mesure sur la plaque, pas sur la carrosserie */
+  transform:translate(-50%,calc(var(--pw,180px) * .135))}
