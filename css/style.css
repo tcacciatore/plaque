@@ -231,9 +231,17 @@ button.stat:hover{border-color:var(--accent)}
   background:linear-gradient(180deg,#3a3b2c 0%,#252c1e 12%,#1a2118 40%,#111610 100%);
   box-shadow:inset 0 7px 16px -7px rgba(196,160,124,.5)}
 .road__tarmac{position:absolute;inset:46% 0 0 0;
-  background:linear-gradient(180deg,#3d444e 0%,#282e35 48%,#1c2027 100%);
+  background:
+    /* rustines d'enrobé, réparations plus sombres */
+    radial-gradient(30% 7% at 31% 76%,rgba(0,0,0,.17),transparent 70%),
+    radial-gradient(20% 5% at 69% 88%,rgba(0,0,0,.15),transparent 70%),
+    radial-gradient(16% 4% at 54% 63%,rgba(0,0,0,.11),transparent 70%),
+    /* bombement : la chaussée est plus claire en son milieu, ses rives plongent dans l'ombre */
+    linear-gradient(90deg,rgba(0,0,0,.30) 0 5%,rgba(0,0,0,.10) 18%,transparent 34% 66%,rgba(0,0,0,.10) 82%,rgba(0,0,0,.30) 95%),
+    linear-gradient(180deg,#3d444e 0%,#282e35 48%,#1c2027 100%);
   clip-path:polygon(46.2% 0,53.8% 0,150% 100%,-50% 100%)}
-.road__edge{position:absolute;inset:46% 0 0 0;background:rgba(236,232,216,.62)}
+.road__edge{position:absolute;inset:46% 0 0 0;
+  background:linear-gradient(180deg,rgba(222,216,196,.5) 0 12%,rgba(236,232,216,.66) 45%,rgba(214,206,184,.6) 100%)}
 .road__edge--r{clip-path:polygon(53.3% 0,54% 0,150% 100%,143% 100%)}
 .road__edge--l{clip-path:polygon(46% 0,46.7% 0,-43% 100%,-50% 100%)}
 
@@ -425,7 +433,7 @@ button.stat:hover{border-color:var(--accent)}
 /* ───────── Trafic : trois voies qui roulent ───────── */
 /* séparations de voies : continues et discrètes, elles convergent vers le point de fuite
    (voies à −30 / 0 / +30 % au premier plan → séparations à ±15 %) */
-.road__lane{position:absolute;inset:46% 0 0 0;background:rgba(236,232,216,.30)}
+.road__lane{position:absolute;inset:46% 0 0 0;background:rgba(8,10,14,.42)}
 .road__lane--l{clip-path:polygon(49.75% 0,50.05% 0,34.6% 100%,33.8% 100%)}
 .road__lane--r{clip-path:polygon(49.95% 0,50.25% 0,66.2% 100%,65.4% 100%)}
 /* deux voies : une seule séparation, au centre, et des voitures plus larges */
@@ -1219,7 +1227,7 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
     repeating-linear-gradient(115deg,rgba(255,255,255,.012) 0 2px,transparent 2px 5px);
   mask-image:linear-gradient(180deg,transparent 0 6%,#000 40%);-webkit-mask-image:linear-gradient(180deg,transparent 0 6%,#000 40%)}
 .road__tarmac::after{content:'';position:absolute;left:0;right:0;top:0;height:26%;pointer-events:none;
-  background:linear-gradient(180deg,rgba(224,166,104,.34),rgba(224,166,104,0))}
+  background:linear-gradient(180deg,rgba(226,190,150,.55) 0 4%,rgba(224,166,104,.3) 30%,rgba(224,166,104,0))}
 /* vignette : les bords de la scène s'assombrissent, le regard va à la route */
 .road::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1100;
   background:radial-gradient(130% 95% at 50% 48%,transparent 55%,rgba(0,0,0,.42) 100%)}
@@ -1228,3 +1236,9 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
 body.theme-miami .road__ground::before{opacity:1}
 body.theme-miami .road__tarmac::after{background:linear-gradient(180deg,rgba(255,79,163,.22),transparent)}
 body.theme-miami .road::after{background:radial-gradient(130% 95% at 50% 48%,transparent 58%,rgba(9,4,26,.5) 100%)}
+
+body.theme-miami .road__lane{background:rgba(255,79,163,.5)}
+body.theme-miami .road__tarmac{background:
+  radial-gradient(30% 7% at 31% 76%,rgba(0,0,0,.2),transparent 70%),
+  linear-gradient(90deg,rgba(0,0,0,.35) 0 5%,transparent 34% 66%,rgba(0,0,0,.35) 95%),
+  linear-gradient(180deg,#221650 0%,#150d36 48%,#0c0722 100%)}
