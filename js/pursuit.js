@@ -93,7 +93,7 @@ function spawn() {
   if (!free(lane)) { lane = others.concat([MY_LANE]).filter(free)[0]; }
   if (lane == null) return;
 
-  var plate = P.newPlate(R.cars.length === 0 && R.done === 0), shape = pickShape();
+  var shape = pickShape(), plate = P.newPlate(R.cars.length === 0 && R.done === 0, shape);
   var gold = shape !== TANK && P.rand(GOLD_ODDS) === 0;
   var c = {
     p1: plate.p1, p2: plate.p2, dep: plate.dep, value: plate.value, num: String(plate.value).padStart(3, '0'),

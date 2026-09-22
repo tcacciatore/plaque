@@ -16,8 +16,13 @@ var MODES = {
 var DIFF = {
   facile: { nMin: 1200, nMax: 4200, label: 'Facile' },
   normal: { nMin: 400,  nMax: 1250, label: 'Normal' },
-  expert: { nMin: 40,   nMax: 420,  label: 'Expert' }
+  expert: { nMin: 150,  nMax: 480,  label: 'Expert' }
 };
+// plancher absolu : sous ce nombre de mots courants, une paire est trop ingrate pour le jeu
+var PAIR_FLOOR = 150;
+// un modèle qui impose une règle (5 lettres max, mots rares, même initiale…) exige une
+// paire riche : sinon la contrainte croisée rend la plaque impossible à lire
+var PAIR_RULE_MIN = 900;
 
 var state = { mode: 'trafic', diff: 'normal', total: 0, history: [], rng: Math.random, usedPairs: {} };
 
@@ -151,12 +156,15 @@ function matchPair(word, pair) {
 }
 
 /* ═══════════ tirage d'une plaque ═══════════ */
-function pairPool() {
+function pairPool(minN) {
   var d = DIFF[state.diff];
   var f = Math.pow(1.5, state.skill || 0);            // > 1 : plus rare ; < 1 : plus riche
-  var lo = d.nMin / f, hi = d.nMax / f;
-  var pool = window.PAIRS.filter(function (p) { return p.n >= lo && p.n <= hi && p.ex.length >= 8; });
-  return pool.length >= 8 ? pool : window.PAIRS.filter(function (p) { return p.n >= d.nMin && p.n <= d.nMax && p.ex.length >= 8; });
+  var lo = Math.max(minN || PAIR_FLOOR, d.nMin / f), hi = Math.max(lo * 2, d.nMax / f);
+  var ok = function (p) { return p.ex.length >= 8; };
+  var pool = window.PAIRS.filter(function (p) { return p.n >= lo && p.n <= hi && ok(p); });
+  if (pool.length >= 8) return pool;
+  pool = window.PAIRS.filter(function (p) { return p.n >= (minN || PAIR_FLOOR) && ok(p); });
+  return pool.length >= 8 ? pool : window.PAIRS.filter(ok);
 }
 function pickDepartement() {
   var all = window.DEPARTEMENTS, have = collection();
@@ -164,10 +172,13 @@ function pickDepartement() {
   // deux fois sur trois, un département encore absent de la collection
   return (missing.length && state.rng() < 0.66) ? pick(missing) : pick(all);
 }
-function newPlate(easy) {
+function newPlate(easy, shape) {
   // une paire de lettres n'est tirée qu'une seule fois par partie, quelle que soit la plaque
   var fresh = function (list) { return list.filter(function (p) { return !state.usedPairs[p.p]; }); };
-  var pool = fresh(pairPool());
+  // un modèle à règle reçoit des paires riches : sa contrainte suffit à la difficulté
+  var t = shape ? trait(shape) : {};
+  var minN = (t.rule || t.need > 1 || t.hidden) ? PAIR_RULE_MIN : PAIR_FLOOR;
+  var pool = fresh(pairPool(minN));
   if (easy) {                      // une première cible accessible, quelle que soit la difficulté
     var rich = fresh(window.PAIRS.filter(function (p) { return p.n >= 1200 && p.ex.length >= 8; }));
     if (rich.length >= 8) pool = rich;

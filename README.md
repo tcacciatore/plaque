@@ -66,6 +66,11 @@ vitesse d'approche) :
 | coupé, supercar | — | ×0,9 / ×0,75 | — |
 | berline, break | neutres | — | — |
 
+Aucune paire n'est tirée sous **150 mots courants** (`PAIR_FLOOR`), et un modèle qui
+impose une règle — 5 lettres max, mots rares, même initiale, deux mots, paire cachée —
+ne reçoit que des paires **riches** (≥ 900 mots, `PAIR_RULE_MIN`) : sa contrainte suffit
+à la difficulté, inutile d'y ajouter une paire ingrate.
+
 La première voiture d'une partie est toujours neutre. Le roster en contient deux en Normal, une en Expert ; en Facile, les modèles à règle (citadine, cabriolet, ancienne, monospace, 4×4, camion) restent au garage.
 | voiture dorée | ×3 (une sur vingt-cinq) ; en Parking sa marque au sol est un joker de couleur |
 | camion-citerne | (un sur quatorze) quand il explose, ses voisines explosent avec lui, pour la moitié de leur cote |

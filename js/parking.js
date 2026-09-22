@@ -44,8 +44,8 @@ function pickShape() {
 }
 
 function makeCar(i, shape, color, easy) {
-  var plate = P.newPlate(easy);
   shape = shape || pickShape();
+  var plate = P.newPlate(easy, shape);
   var gold = shape !== TANK && K.seen >= SPOTS && P.rand(GOLD_ODDS) === 0;
   return {
     i: i, p1: plate.p1, p2: plate.p2, dep: plate.dep,

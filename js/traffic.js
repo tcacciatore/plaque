@@ -92,7 +92,7 @@ function spawnLane(lane) {
   var since = Date.now() - T.lastSpawn;
   if (since < SPAWN_GAP) { scheduleLane(lane, SPAWN_GAP - since + 30); return; }   // jamais deux arrivées rapprochées
   T.lastSpawn = Date.now();
-  var plate = P.newPlate(T.seen === 0), shape = pickShape();
+  var shape = pickShape(), plate = P.newPlate(T.seen === 0, shape);
   var gold = shape !== TANK && P.rand(GOLD_ODDS) === 0;
   var car = {
     p1: plate.p1, p2: plate.p2, dep: plate.dep, shape: shape, lane: lane,
