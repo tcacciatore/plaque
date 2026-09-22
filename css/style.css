@@ -1195,47 +1195,28 @@ body.theme-miami .road__tarmac{background:
   linear-gradient(90deg,rgba(0,0,0,.35) 0 5%,transparent 34% 66%,rgba(0,0,0,.35) 95%),
   linear-gradient(180deg,#221650 0%,#150d36 48%,#0c0722 100%)}
 
-/* ═══════════ marquage : traits discontinus, dans la perspective de la route ═══════════
-   Même projection que les balises (y = 46 + 54/z, échelle 1/z), mais sur les séparations
-   de voies : x = 50 ± 15/z. Les traits naissent à l'horizon et filent vers le bas.     */
-.road__dashes{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
-.dash{position:absolute;width:calc(var(--roadH) * .022);height:calc(var(--roadH) * .13);border-radius:2px;
-  background:linear-gradient(180deg,rgba(236,231,214,.62),rgba(216,210,190,.5));
-  transform:translate(-50%,-100%) scale(.167);opacity:0;
-  animation:dash-run-l 2.6s linear infinite;will-change:top,left,transform}
-.dash--r{animation-name:dash-run-r}
-@keyframes dash-run-l{
-  0%   {top:55%;   left:47.50%;transform:translate(-50%,-100%) scale(.167);opacity:0}
-  14%  {opacity:.9}
-  37.9%{top:59.5%; left:46.25%;transform:translate(-50%,-100%) scale(.25)}
-  56.8%{top:64%;   left:45.00%;transform:translate(-50%,-100%) scale(.333)}
-  72%  {top:70.55%;left:43.18%;transform:translate(-50%,-100%) scale(.455)}
-  83.3%{top:79.75%;left:40.63%;transform:translate(-50%,-100%) scale(.625)}
-  100% {top:91%;   left:37.50%;transform:translate(-50%,-100%) scale(.833);opacity:.9}
-}
-@keyframes dash-run-r{
-  0%   {top:55%;   left:52.50%;transform:translate(-50%,-100%) scale(.167);opacity:0}
-  14%  {opacity:.9}
-  37.9%{top:59.5%; left:53.75%;transform:translate(-50%,-100%) scale(.25)}
-  56.8%{top:64%;   left:55.00%;transform:translate(-50%,-100%) scale(.333)}
-  72%  {top:70.55%;left:56.82%;transform:translate(-50%,-100%) scale(.455)}
-  83.3%{top:79.75%;left:59.37%;transform:translate(-50%,-100%) scale(.625)}
-  100% {top:91%;   left:62.50%;transform:translate(-50%,-100%) scale(.833);opacity:.9}
-}
-/* deux voies : une seule ligne, au milieu */
-@keyframes dash-run-c{
-  0%   {top:55%;   left:50%;transform:translate(-50%,-100%) scale(.167);opacity:0}
-  14%  {opacity:.9}
-  37.9%{top:59.5%; left:50%;transform:translate(-50%,-100%) scale(.25)}
-  56.8%{top:64%;   left:50%;transform:translate(-50%,-100%) scale(.333)}
-  72%  {top:70.55%;left:50%;transform:translate(-50%,-100%) scale(.455)}
-  83.3%{top:79.75%;left:50%;transform:translate(-50%,-100%) scale(.625)}
-  100% {top:91%;   left:50%;transform:translate(-50%,-100%) scale(.833);opacity:.9}
-}
-.road--two .dash--r{display:none}
-.road--two .dash--l{animation-name:dash-run-c}
-/* en Poursuite la caméra regarde vers l'arrière : le marquage s'éloigne vers l'horizon */
-.road--pursuit .dash{animation-direction:reverse}
-/* l'accueil : marquage plus lent, comme les balises */
-.hero__road .dash{animation-duration:3.2s}
-body.theme-miami .dash{background:linear-gradient(180deg,rgba(255,79,163,.75),rgba(255,79,163,.45));box-shadow:0 0 6px rgba(255,79,163,.6)}
+
+/* ═══════════ police ═══════════
+   Trafic : vous êtes au volant d'une voiture de police — sa rampe de gyrophares entre
+   dans le bas du cadre et ses éclats bleu-rouge balaient la route.
+   Poursuite : ce sont les voitures de police qui vous rattrapent, gyrophares allumés. */
+.copbar{position:absolute;left:50%;bottom:1.5%;width:min(24%,160px);height:4.4%;transform:translateX(-50%);z-index:1150;pointer-events:none}
+.copbar__body{position:absolute;inset:auto 0 0 0;height:62%;border-radius:8px 8px 3px 3px;
+  background:linear-gradient(180deg,#2b323e,#161b23);box-shadow:0 -2px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12)}
+.copbar i{position:absolute;bottom:28%;width:30%;height:62%;border-radius:5px 5px 2px 2px;z-index:2}
+.copbar__b{left:7%;background:linear-gradient(180deg,#9fd0ff,#1f6ddc);animation:copFlashB 1s steps(1) infinite}
+.copbar__r{right:7%;background:linear-gradient(180deg,#ffb3b3,#d2262a);animation:copFlashR 1s steps(1) infinite}
+@keyframes copFlashB{0%,24%{opacity:1;box-shadow:0 0 12px 3px rgba(60,140,255,.55)}25%,100%{opacity:.28;box-shadow:none}}
+@keyframes copFlashR{0%,49%{opacity:.28;box-shadow:none}50%,74%{opacity:1;box-shadow:0 0 12px 3px rgba(255,70,70,.55)}75%,100%{opacity:.28;box-shadow:none}}
+/* le balayage des gyrophares sur la chaussée */
+.road__tarmac{position:relative}
+.copwash{position:absolute;inset:74% 0 0 0;pointer-events:none;z-index:2;mix-blend-mode:screen}
+.copwash::before,.copwash::after{content:'';position:absolute;inset:0}
+.copwash::before{background:radial-gradient(46% 70% at 40% 108%,rgba(60,140,255,.22),transparent 70%);animation:copFlashB 1s steps(1) infinite}
+.copwash::after{background:radial-gradient(46% 70% at 60% 108%,rgba(255,70,70,.20),transparent 70%);animation:copFlashR 1s steps(1) infinite}
+/* les poursuivants : gyrophares sur le toit */
+.pcar .cop{position:absolute;left:50%;top:-4%;width:40%;height:9%;transform:translateX(-50%);z-index:4;pointer-events:none}
+.pcar .cop i{position:absolute;top:0;width:44%;height:100%;border-radius:4px 4px 2px 2px}
+.pcar .cop i:first-child{left:0;background:linear-gradient(180deg,#bfe0ff,#1f6ddc);animation:copFlashB .9s steps(1) infinite}
+.pcar .cop i:last-child{right:0;background:linear-gradient(180deg,#ffc9c9,#d2262a);animation:copFlashR .9s steps(1) infinite}
+@media (prefers-reduced-motion:reduce){.copbar i,.copwash::before,.copwash::after,.pcar .cop i{animation:none;opacity:.85}}

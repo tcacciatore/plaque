@@ -111,8 +111,9 @@ function spawn() {
   el.innerHTML = '<div class="car__ride">' +
                    (gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' : c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' :
                     c.tag ? '<span class="sport-tag sport-tag--trait">' + c.tag + '</span>' : '') +
-                   '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + (gold ? 'or' : P.pick(P.colors())) + '-front.webp">' +
-                   '<div class="car__shadow"></div>' + plateHTML(c) +
+                   '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + (gold ? 'or' : 'blanc') + '-front.webp">' +
+                   '<div class="car__shadow"></div>' +
+                   '<div class="cop"><i></i><i></i></div>' + plateHTML(c) +
                    '<div class="car__timer"><i></i></div>' +
                  '</div><div class="car__fx"></div><div class="car__pop"></div>';
   // la plaque est rivée au pare-chocs avant : elle tangue, grossit et s'éloigne avec la voiture
@@ -408,9 +409,8 @@ function start() {
   var two = Math.min(window.innerWidth, screen.width || 9999) < NARROW;   // petit écran : deux voies
   LANES = two ? LANES2 : LANES3; MY_LANE = two ? 0 : 1;
   $('pu-me-img').src = P.myCar().replace('.webp', '-front.webp');   // votre véhicule de rang, vu de face
-  R.roster.concat([TANK]).forEach(function (s) {      // préchargement du roster de la partie
-    P.colors().concat(['or']).forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '.webp'; });
-    P.colors().concat(['or']).forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '-front.webp'; });
+  R.roster.concat([TANK]).forEach(function (s) {      // les poursuivants sont blancs : la police
+    ['blanc', 'or'].forEach(function (c) { var im = new Image(); im.src = SPRITES + s + '-' + c + '-front.webp'; });
   });
   R.t0 = Date.now(); R.last = performance.now();
   $('pu-cars').innerHTML = '';
