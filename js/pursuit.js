@@ -128,8 +128,9 @@ function spawn() {
   renderTokens();
 }
 function readable(c) { return !c.gone && c.phase !== 'in'; }
-function placePlate(c) {                          // la plaque n'apparaît qu'une fois la voiture calée
-  c.pl.style.opacity = readable(c) ? '1' : '0';
+function placePlate(c) {                          // la plaque est là dès l'apparition, floue tant qu'on est trop loin
+  c.pl.style.opacity = '1';
+  c.pl.classList.toggle('plate--far', !readable(c));
   // la barre de temps : ce qu'il reste avant qu'elle charge
   var bar = c.el.querySelector('.car__timer');
   if (!bar) return;
