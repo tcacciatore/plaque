@@ -232,20 +232,20 @@ var BASE_COLORS = ['rouge', 'bleu', 'blanc', 'noir', 'vert', 'jaune', 'gris', 'o
    size : largeur affichée en Trafic et Poursuite, en fraction de la hauteur de scène ;
    width : largeur dans une place de Parking, en % ; sport : multiplicateur de points.          */
 var FLEET = {
-  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, width:  97, front: { y: 76.8, w: 46.5, ratio: 1.405 } },
-  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, width:  95, front: { y: 77.7, w: 43.3, ratio: 1.292 } },
-  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, width:  92, front: { y: 74.2, w: 46.8, ratio: 1.348 } },
-  monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, width:  92, front: { y: 81.7, w: 41.0, ratio: 1.340 } },
-  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, width:  97, front: { y: 76.1, w: 42.1, ratio: 1.381 } },
-  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, width:  82, front: { y: 80.3, w: 38.9, ratio: 1.200 } },
-  camper:    { name: 'Camping-car',  plateY: 73.1, plateW: 38.7, ratio: 1.312, size: 0.60, width:  80, front: { y: 77.3, w: 33.8, ratio: 1.371 } },
-  '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, width:  95, front: { y: 66.3, w: 39.0, ratio: 1.193 } },
-  camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, width:  76, front: { y: 67.8, w: 37.2, ratio: 1.534 } },
-  cabrio:    { name: 'Cabriolet',    plateY: 71.0, plateW: 41.7, ratio: 1.579, size: 0.76, width: 100, front: { y: 70.3, w: 42.3, ratio: 1.563 } },
-  ancienne:  { name: 'Ancienne',     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, width:  92, front: { y: 68.2, w: 45.6, ratio: 1.333 } },
-  coupe:     { name: 'Coupé',        plateY: 65.3, plateW: 41.0, ratio: 1.720, size: 0.78, width: 100, sport: 1.5, front: { y: 66.8, w: 41.3, ratio: 1.764 } },
-  supercar:  { name: 'Supercar',     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, width: 100, sport: 2, front: { y: 75.3, w: 38.5, ratio: 1.832 } },
-  citerne:   { name: 'Citerne',      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, width:  78, tank: true, front: { y: 72.6, w: 39.5, ratio: 1.490 } },
+  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, width:  97, front: { y: 78.7, w: 47.1, ratio: 1.388 } },
+  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, width:  95, front: { y: 79.2, w: 43.8, ratio: 1.295 } },
+  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, width:  92, front: { y: 76.1, w: 47.4, ratio: 1.336 } },
+  monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, width:  92, front: { y: 82.8, w: 40.9, ratio: 1.350 } },
+  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, width:  97, front: { y: 77.3, w: 42.0, ratio: 1.377 } },
+  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, width:  82, front: { y: 80.9, w: 38.8, ratio: 1.211 } },
+  camper:    { name: 'Camping-car',  plateY: 73.1, plateW: 38.7, ratio: 1.312, size: 0.60, width:  80, front: { y: 77.8, w: 33.7, ratio: 1.385 } },
+  '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, width:  95, front: { y: 67.4, w: 39.4, ratio: 1.196 } },
+  camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, width:  76, front: { y: 69.7, w: 37.1, ratio: 1.543 } },
+  cabrio:    { name: 'Cabriolet',    plateY: 71.0, plateW: 41.7, ratio: 1.579, size: 0.76, width: 100, front: { y: 72.0, w: 42.7, ratio: 1.569 } },
+  ancienne:  { name: 'Ancienne',     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, width:  92, front: { y: 69.9, w: 46.4, ratio: 1.323 } },
+  coupe:     { name: 'Coupé',        plateY: 65.3, plateW: 41.0, ratio: 1.720, size: 0.78, width: 100, sport: 1.5, front: { y: 68.7, w: 41.3, ratio: 1.734 } },
+  supercar:  { name: 'Supercar',     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, width: 100, sport: 2, front: { y: 77.3, w: 38.5, ratio: 1.776 } },
+  citerne:   { name: 'Citerne',      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, width:  78, tank: true, front: { y: 74.7, w: 39.4, ratio: 1.486 } },
 };
 var TANK = 'citerne';
 function sportBonus(shape) { return (FLEET[shape] && FLEET[shape].sport) || 1; }
