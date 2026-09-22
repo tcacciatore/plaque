@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   PLAQUE — moteur commun aux modes Trafic et Parking
+   PLAQUE — moteur commun aux modes Trafic et Poursuite
    dictionnaire, règle des lettres, tirage des plaques, question
    bonus, collection, records, partage, sons, explosion.
    ═══════════════════════════════════════════════════════════ */
@@ -9,7 +9,6 @@
 /* ─────────── réglages ─────────── */
 var MODES = {
   trafic:    { label: 'Trafic',    traffic: true },
-  parking:   { label: 'Parking',   parking: true },
   poursuite: { label: 'Poursuite', pursuit: true }
 };
 // la difficulté règle la richesse des paires tirées : n = mots courants disponibles
@@ -230,22 +229,22 @@ var BASE_COLORS = ['rouge', 'bleu', 'blanc', 'noir', 'vert', 'jaune', 'gris', 'o
 /* ═══════════ le parc : toutes les silhouettes rendues par build/render_cars.py ═══════════
    plateY / plateW : centre et largeur de l'emplacement de plaque sur le sprite, en % (layout.json) ;
    size : largeur affichée en Trafic et Poursuite, en fraction de la hauteur de scène ;
-   width : largeur dans une place de Parking, en % ; sport : multiplicateur de points.          */
+   sport : multiplicateur de points ; front : la plaque avant, vue de face.                     */
 var FLEET = {
-  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, width:  97, front: { y: 78.7, w: 47.1, ratio: 1.388 } },
-  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, width:  95, front: { y: 79.2, w: 43.8, ratio: 1.295 } },
-  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, width:  92, front: { y: 76.1, w: 47.4, ratio: 1.336 } },
-  monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, width:  92, front: { y: 82.8, w: 40.9, ratio: 1.350 } },
-  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, width:  97, front: { y: 77.3, w: 42.0, ratio: 1.377 } },
-  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, width:  82, front: { y: 80.9, w: 38.8, ratio: 1.211 } },
-  camper:    { name: 'Camping-car',  plateY: 73.1, plateW: 38.7, ratio: 1.312, size: 0.60, width:  80, front: { y: 77.8, w: 33.7, ratio: 1.385 } },
-  '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, width:  95, front: { y: 67.4, w: 39.4, ratio: 1.196 } },
-  camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, width:  76, front: { y: 69.7, w: 37.1, ratio: 1.543 } },
-  cabrio:    { name: 'Cabriolet',    plateY: 71.0, plateW: 41.7, ratio: 1.579, size: 0.76, width: 100, front: { y: 72.0, w: 42.7, ratio: 1.569 } },
-  ancienne:  { name: 'Ancienne',     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, width:  92, front: { y: 69.9, w: 46.4, ratio: 1.323 } },
-  coupe:     { name: 'Coupé',        plateY: 65.3, plateW: 41.0, ratio: 1.720, size: 0.78, width: 100, sport: 1.5, front: { y: 68.7, w: 41.3, ratio: 1.734 } },
-  supercar:  { name: 'Supercar',     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, width: 100, sport: 2, front: { y: 77.3, w: 38.5, ratio: 1.776 } },
-  citerne:   { name: 'Citerne',      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, width:  78, tank: true, front: { y: 74.7, w: 39.4, ratio: 1.486 } },
+  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, front: { y: 78.7, w: 47.1, ratio: 1.388 } },
+  suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, front: { y: 79.2, w: 43.8, ratio: 1.295 } },
+  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, front: { y: 76.1, w: 47.4, ratio: 1.336 } },
+  monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, front: { y: 82.8, w: 40.9, ratio: 1.350 } },
+  pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, front: { y: 77.3, w: 42.0, ratio: 1.377 } },
+  van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, front: { y: 80.9, w: 38.8, ratio: 1.211 } },
+  camper:    { name: 'Camping-car',  plateY: 73.1, plateW: 38.7, ratio: 1.312, size: 0.60, front: { y: 77.8, w: 33.7, ratio: 1.385 } },
+  '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, front: { y: 67.4, w: 39.4, ratio: 1.196 } },
+  camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, front: { y: 69.7, w: 37.1, ratio: 1.543 } },
+  cabrio:    { name: 'Cabriolet',    plateY: 71.0, plateW: 41.7, ratio: 1.579, size: 0.76, front: { y: 72.0, w: 42.7, ratio: 1.569 } },
+  ancienne:  { name: 'Ancienne',     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, front: { y: 69.9, w: 46.4, ratio: 1.323 } },
+  coupe:     { name: 'Coupé',        plateY: 65.3, plateW: 41.0, ratio: 1.720, size: 0.78, sport: 1.5, front: { y: 68.7, w: 41.3, ratio: 1.734 } },
+  supercar:  { name: 'Supercar',     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, sport: 2, front: { y: 77.3, w: 38.5, ratio: 1.776 } },
+  citerne:   { name: 'Citerne',      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, tank: true, front: { y: 74.7, w: 39.4, ratio: 1.486 } },
 };
 var TANK = 'citerne';
 function sportBonus(shape) { return (FLEET[shape] && FLEET[shape].sport) || 1; }
@@ -267,7 +266,7 @@ var TRAITS = {
   van:       { give: 5,          tag: '+5 s',             pursuitTag: '🔧 pare-chocs' },
   '4x4':     { hidden: true,     tag: 'paire cachée',     time: 1.3, cote: 1.5, pursuitTag: 'la paire rare' },
   camion:    { need: 2,          tag: '2 mots par paire', time: 2.0, cote: 2, pursuitTag: '2 mots' },
-  camper:    {                   tag: 'lent',             time: 2.0, cote: 0.5, noParking: true },
+  camper:    {                   tag: 'lent',             time: 2.0, cote: 0.5 },
   pickup:    { cargo: true },
   coupe:     { time: 0.9 },
   supercar:  { time: 0.75 }
@@ -285,7 +284,7 @@ function initCar(car, mode) {
   car.onlyRare = !!t.hidden && mode === 'poursuite';
   if (car.onlyRare && car.p1.n < car.p2.n) { var sw = car.p1; car.p1 = car.p2; car.p2 = sw; }
   car.tag = mode === 'poursuite' ? (t.pursuitTag || (t.noPursuit ? '' : t.tag))
-          : mode === 'parking' && t.noParking ? '' : t.tag;
+          : t.tag;
   if (t.cargo) {
     car.cargo = pick(mode === 'poursuite' ? ['x2', 'fever'] : ['time', 'joker', 'x2']);
     car.tag = CARGO[car.cargo];
@@ -322,12 +321,12 @@ function refuse(car, msg, el) {
 /* multiplicateur de la cote : sportive, caractère, chargement */
 function carCote(car, mode) {
   var t = trait(car.shape);
-  return sportBonus(car.shape) * (mode === 'parking' && t.noParking ? 1 : (t.cote || 1)) * (car.cargo === 'x2' ? 2 : 1);
+  return sportBonus(car.shape) * (t.cote || 1) * (car.cargo === 'x2' ? 2 : 1);
 }
 /* ce que le modèle a apporté, pour le message de fin de plaque */
 function traitLabel(car, mode) {
   var t = trait(car.shape), name = FLEET[car.shape].name, out = [];
-  var cote = mode === 'parking' && t.noParking ? 1 : (t.cote || 1);
+  var cote = t.cote || 1;
   if (cote !== 1) out.push(name.toLowerCase() + ' ×' + String(cote).replace('.', ','));
   if (t.give && mode !== 'poursuite') out.push('+' + t.give + ' s');
   if (car.cargo) out.push('benne : ' + CARGO[car.cargo]);
@@ -397,7 +396,7 @@ var BADGES = [
   { id: 'incendie', name: 'Incendiaire',    txt: '500 plaques lues',          stat: 'plates', goal: 500, icon: 'flame',   metal: 'or', tint: '#e03a1e' },
   { id: 'demineur', name: 'Démineur',       txt: '10 camions-citernes',       stat: 'tank',   goal: 10,  icon: 'barrel',  metal: 'argent', tint: '#ff9a3c' },
   { id: 'orfevre',  name: 'Orfèvre',        txt: '5 voitures dorées',         stat: 'gold',   goal: 5,   icon: 'gem',     metal: 'or', tint: '#ffcf3f' },
-  { id: 'aligneur', name: 'Aligneur',       txt: '25 alignements de couleur', stat: 'lines',  goal: 25,  icon: 'align',   metal: 'argent', tint: '#3ddc84' },
+  { id: 'fondeur',  name: 'Fondeur',        txt: '25 voitures dorées',        stat: 'gold',   goal: 25,  icon: 'gem',     metal: 'argent', tint: '#ffd76a' },
   { id: 'fievre',   name: 'Fiévreux',       txt: '10 fièvres déclenchées',    stat: 'fever',  goal: 10,  icon: 'thermo',  metal: 'bronze', tint: '#ff3c6e' },
   { id: 'marathon', name: 'Marathonien',    txt: '30 parties',                stat: 'games',  goal: 30,  icon: 'clock',   metal: 'bronze', tint: '#35c4d6' },
   { id: 'forcene',  name: 'Forcené',        txt: '100 parties',               stat: 'games',  goal: 100, icon: 'clock',   metal: 'or', tint: '#1fa3b8' },
@@ -483,7 +482,6 @@ function bumpStat(key, n, absolute) {
 var MISSION_TYPES = {
   plates:  { n: [8, 12, 20],   txt: function (n) { return 'Pulvériser ' + n + ' voitures'; } },
   sport:   { n: [2, 3, 4],     txt: function (n) { return 'Pulvériser ' + n + ' sportives'; } },
-  lines:   { n: [1, 2, 3],     txt: function (n) { return n + ' alignement' + (n > 1 ? 's' : '') + ' de couleur en Parking'; } },
   long:    { n: [9, 10, 11],   txt: function (n) { return 'Jouer un mot de ' + n + ' lettres ou plus'; } },
   rare:    { n: [2, 3, 5],     txt: function (n) { return 'Jouer ' + n + ' mots rares'; } },
   combo5:  { n: [1, 2, 3],     txt: function (n) { return 'Atteindre ×5 ' + (n > 1 ? n + ' fois' : 'une fois'); } },
@@ -506,6 +504,8 @@ function dayNum() {
 }
 function missions() {
   var day = dayNum(), saved = store.get('missions', null);
+  // une mission d'un ancien jeu de règles (mode retiré) est écartée : on retire la journée
+  if (saved && saved.list && saved.list.some(function (m) { return !MISSION_TYPES[m.type]; })) saved = null;
   if (saved && saved.day === day) return saved;
   var rng = mulberry32(day * 7919 + 17), keys = Object.keys(MISSION_TYPES), list = [];
   while (list.length < 3) {
@@ -537,7 +537,7 @@ function progress(type, n, absolute) {
 var session = {};
 function sessionStart() {
   session = { words: 0, bestWord: null, bestWordPts: 0, maxCombo: 1, bestPlate: null, bestPlatePts: 0,
-              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, lines: 0, newDeps: 0, newRank: null, missionsDone: [],
+              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, newDeps: 0, newRank: null, missionsDone: [],
               badges: [], missed: [], t0: Date.now() };
 }
 var track = {
@@ -568,7 +568,6 @@ var track = {
     if (opts && opts.sport) { session.sport++; progress('sport', 1); }
     if (opts && opts.gold)  { session.gold++;  progress('gold', 1); bumpStat('gold', 1); }
   },
-  line:  function () { session.lines++; progress('lines', 1); bumpStat('lines', 1); },
   miss:  function (car) { session.missed.push(car); adapt(-1); },     // une plaque partie sans être lue
   fever: function () { bumpStat('fever', 1); }
 };
@@ -723,7 +722,7 @@ function endGame() {
   animateRank(beforePts, beforeRank, career());
   if (!store.get('tuto', false)) store.set('tuto', true);
 
-  $('end-title').textContent = m.parking ? 'Parking — fin de service' : m.pursuit ? 'Fin de course' : 'Vous êtes arrivé';
+  $('end-title').textContent = m.pursuit ? 'Fin de course' : 'Vous êtes arrivé';
   $('end-score').textContent = '0'; $('end-score').dataset.val = '0';
   setTimeout(function () { tweenNumber($('end-score'), state.total, 1200); }, 250);
   if (isBest || rankOf(career()) > beforeRank) setTimeout(function () { confetti(isBest ? 90 : 60); }, 700);
@@ -739,7 +738,6 @@ function endGame() {
   if (s.rare) html += row('Vocabulaire', s.rare + ' mot' + (s.rare > 1 ? 's' : '') + ' rare' + (s.rare > 1 ? 's' : '') +
                           (s.expert ? ' dont ' + s.expert + ' d\'expert 🎓' : ''));
   html += row('Mots · plaques', s.words + ' · ' + s.plates + (s.sport ? ' (dont ' + s.sport + ' sportive' + (s.sport > 1 ? 's' : '') + ')' : ''));
-  if (s.lines) html += row('Alignements de couleur', s.lines);
   if (s.newDeps) html += row('🗺️ Nouveaux départements', s.newDeps + ' — collection ' + collection().length + '/101');
   s.missionsDone.forEach(function (lbl) { html += row('🎯 Mission accomplie', lbl); });
   if (s.newRank) html += row('🏅 Nouveau rang', '<b>' + s.newRank.name + '</b>' +
@@ -829,9 +827,6 @@ function shareText() {
     lines.push('🏁 PLAQUE — Poursuite  ·  ' + DIFF[state.diff].label);
     lines.push(done + ' voiture' + (done > 1 ? 's' : '') + ' dégommée' + (done > 1 ? 's' : '') + ' sur ' + h.length);
     for (var u = 0; u < Math.min(12, h.length); u++) bars += h[u].reached ? '💥' : '⬜';
-  } else if (m.parking) {
-    lines.push('💥 PLAQUE — Parking  ·  ' + DIFF[state.diff].label);
-    lines.push(done + ' voiture' + (done > 1 ? 's' : '') + ' pulvérisée' + (done > 1 ? 's' : '') + ' sur ' + h.length);
     for (var q = 0; q < h.length; q++) bars += h[q].reached ? '💥' : '⬜';
   } else {
     lines.push('🚦 PLAQUE — Trafic  ·  ' + DIFF[state.diff].label);
@@ -904,7 +899,7 @@ function renderCareer() {
   screen('screen-career');
 }
 
-/* ═══════════ explosion (Parking, Trafic) ═══════════
+/* ═══════════ explosion ═══════════
    Particules en CSS pur : flash, onde de choc, éclats, fumée, secousse du décor. */
 function explode(fx, shakeEl) {
   var html = '<div class="flash"></div><div class="ring"></div>';
@@ -939,13 +934,11 @@ function newGame() {
   ghostStart();
   guideStart();
   state.skill = 0;
-  if (MODES[state.mode].parking) window.PARKING.start();
-  else if (MODES[state.mode].pursuit) window.PURSUIT.start();
+  if (MODES[state.mode].pursuit) window.PURSUIT.start();
   else window.TRAFFIC.start();
 }
 function stopAll() {
   if (window.TRAFFIC) window.TRAFFIC.stop();
-  if (window.PARKING) window.PARKING.stop();
   if (window.PURSUIT) window.PURSUIT.stop();
 }
 function refreshHome() {
@@ -977,7 +970,7 @@ function refreshHome() {
     return '<li class="mission' + (mi.ok ? ' mission--ok' : '') + '"><span>' + missionLabel(mi) + '</span>' +
            '<b>' + (mi.ok ? '✓' : mi.done + '/' + mi.goal) + '</b></li>';
   }).join('');
-  $('btn-play').textContent = m.parking ? 'Entrer dans le parking' : m.pursuit ? 'Mettre les gaz' : 'Démarrer le moteur';
+  $('btn-play').textContent = m.pursuit ? 'Mettre les gaz' : 'Démarrer le moteur';
 }
 function segmented(id, key, after) {
   var box = $(id);
@@ -1104,7 +1097,7 @@ function applyFit() {
   if (scene.classList.contains('road')) {
     var ms = getComputedStyle(scene);
     scene.style.setProperty('--roadH', avail - parseFloat(ms.marginTop) - parseFloat(ms.marginBottom) + 'px');
-  } else {                                   // le parking : on le réduit à l'échelle
+  } else {                                   // toute autre scène : on la réduit à l'échelle
     scene.style.transform = '';
     var nat = scene.offsetHeight;
     var k = Math.min(1, avail / nat);
@@ -1128,7 +1121,7 @@ if (window.visualViewport) {
 window.addEventListener('resize', applyFit);
 window.addEventListener('orientationchange', function () { setTimeout(applyFit, 250); });
 
-/* ═══════════ passerelle pour les modes (js/traffic.js, js/parking.js) ═══════════ */
+/* ═══════════ passerelle pour les modes (js/traffic.js, js/pursuit.js) ═══════════ */
 window.PLAQUE = {
   $: $, norm: norm, matchPair: matchPair, screen: screen, sfx: sfx, store: store,
   shuffle: shuffle, pick: pick, rand: rand, row: row, explode: explode,

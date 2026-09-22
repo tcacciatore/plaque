@@ -21,7 +21,6 @@ fois lue. Le **numéro de département** rejoint votre collection à chaque plaq
 |---|---|
 | **Trafic** | Au volant sur trois voies (deux sur un écran de moins de 560 px, pour garder les plaques lisibles) : chaque voie a sa voiture, qui arrive à son heure (6 s d'écart en Normal, 8 en Facile, 4,5 en Expert) et reste 23 s devant vous (×1,25 en Facile, ×0,8 en Expert) ; les trois modèles sont toujours différents. Deux mots par voiture, un par paire. Une plaque lue fait **exploser** la voiture ; une plaque ratée la laisse filer, et la voie se réalimente après 5 à 7 s. La partie dure 2 minutes, mais chaque mot rallonge la partie de 1 s et la voiture visée de 3 s, et une plaque lue ajoute 2 s de plus (plafond 2 min 15). |
 | **Poursuite** | Vue à la troisième personne : votre véhicule de rang, **vu de face**, en fuite au premier plan ; les voitures arrivent de l'horizon **derrière lui** (elles aussi vues de face), se **calent** à distance fixe — plaque rivée à leur pare-chocs, floue tant qu'elles approchent, nette à portée — y restent 15 s (11 s au plus court, ×1,3 en Facile, ×0,75 en Expert), puis **chargent**. **Un seul mot**, sur l'une ou l'autre paire, dégomme une plaque (les deux paires dans un mot : ×2). Celles de votre voie sont des menaces à faire sauter avant qu'elles vous percutent ; il n'y a pas d'esquive, seulement les mots. Celles des voies voisines vous frôlent : des points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin. *In extremis* ×1,5, dernier pare-chocs ×2, fièvre ×2. |
-| **Parking** | Neuf places sur trois rangées, tous les modèles présents, trois couleurs par parking. Les deux mots d'une plaque et la voiture explose ; une autre vient se garer. Chaque place garde la couleur de la dernière voiture pulvérisée : trois places alignées de même couleur (ligne, colonne, diagonale) rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge de 1 s (+2 s par plaque lue et par alignement, plafond 2 min 15). |
 
 La saisie n'a pas de bouton : un mot se valide tout seul après une demi-seconde de pause de frappe
 — dès qu'il est dans le dictionnaire et va sur une plaque (Entrée ou espace
@@ -61,7 +60,7 @@ vitesse d'approche) :
 | utilitaire | la lire rend 5 s (Poursuite : répare un pare-chocs) | — | — |
 | 4×4 | deuxième paire cachée tant que la première n'est pas lue ; en Poursuite, les deux sont visibles mais seule la plus rare compte | ×1,3 | ×1,5 |
 | camion | deux mots par paire | ×2 | ×2 |
-| camping-car | lent (Trafic, Poursuite) | ×2 | ×0,5 |
+| camping-car | lent | ×2 | ×0,5 |
 | pick-up | sa benne porte un bonus : +8 s, une paire offerte ou cote ×2 (Poursuite : cote ×2 ou fièvre) | — | — |
 | coupé, supercar | — | ×0,9 / ×0,75 | — |
 | berline, break | neutres | — | — |
@@ -72,14 +71,13 @@ ne reçoit que des paires **riches** (≥ 900 mots, `PAIR_RULE_MIN`) : sa contra
 à la difficulté, inutile d'y ajouter une paire ingrate.
 
 La première voiture d'une partie est toujours neutre. Le roster en contient deux en Normal, une en Expert ; en Facile, les modèles à règle (citadine, cabriolet, ancienne, monospace, 4×4, camion) restent au garage.
-| voiture dorée | ×3 (une sur vingt-cinq) ; en Parking sa marque au sol est un joker de couleur |
+| voiture dorée | ×3 (une sur vingt-cinq) |
 | camion-citerne | (un sur quatorze) quand il explose, ses voisines explosent avec lui, pour la moitié de leur cote |
 | **fièvre** | à ×5, dix secondes pendant lesquelles un seul mot suffit à lire une plaque ; puis la série redescend à ×3 |
 | **rush** | les vingt dernières secondes, tout compte double, le ciel vire au rouge |
 
 En Trafic, les voitures restent 23 s au départ et 17 s en fin de partie (la rampe, modulée par la difficulté), et les
-coupés se multiplient passé la première minute. La première voiture (Trafic) et la première
-rangée (Parking) ont toujours des paires accessibles.
+coupés se multiplient passé la première minute. La première voiture (Trafic) ont toujours des paires accessibles.
 
 ### Carrière
 
@@ -117,11 +115,10 @@ fois plus souvent sur les plaques, et la grille se consulte depuis l'accueil.
 ## Structure
 
 ```
-index.html            écrans (accueil / trafic / poursuite / parking / fin / carrière / badges / collection)
+index.html            écrans (accueil / trafic / poursuite / fin / carrière / badges / collection)
 css/style.css
 js/game.js            moteur : dictionnaire, règle, tirage, carrière, missions, collection, partage
 js/traffic.js         mode Trafic : la scène et sa boucle
-js/parking.js         mode Parking : la grille 3×3 en flux, les explosions, les marques de couleur
 js/pursuit.js         mode Poursuite : la course, les menaces, les pare-chocs
 js/dict.js            113 558 mots + rareté, gzip + base64 (395 Ko)
 js/pairs.js           344 paires jouables + exemples de mots
@@ -131,9 +128,8 @@ build/build_data.py   régénère dict.js et pairs.js
 build/render_cars.py  régénère les sprites de voitures
 ```
 
-En Parking, `Faire remorquer` évacue la plaque la plus coriace contre 15 s de temps.
 
-### Les voitures des modes Trafic et Parking
+### Les voitures
 
 Ce sont des **sprites pré-rendus**, pas de la 3D temps réel : à l'exécution le jeu
 n'affiche qu'une balise `<img>`, sans filtre ni fusion, ce qui est moins coûteux à

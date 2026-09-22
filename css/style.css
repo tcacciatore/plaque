@@ -146,7 +146,7 @@ button.stat:hover{border-color:var(--accent)}
 .hud__v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
 .hud__v i{font-style:normal;color:var(--dim);font-size:13.5px}
 
-/* ───────── retour de saisie (Trafic, Parking) ───────── */
+/* ───────── retour de saisie ───────── */
 .hint-line{text-align:center;margin-top:14px}
 .feedback{min-height:24px;font-size:14px;margin:8px 2px 6px;transition:.15s}
 .feedback.ok{color:var(--ok)}
@@ -335,30 +335,7 @@ button.stat:hover{border-color:var(--accent)}
 }
 #tr-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,207,63,.12)}
 
-/* ───────── mode Parking ───────── */
-.lot{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
-  background:
-    linear-gradient(180deg,#333a43 0%,#262c34 22%,#1d222a 100%);
-  border:1px solid var(--line);border-radius:14px;
-  padding:14px 12px 16px;margin:12px 0 10px;
-  box-shadow:inset 0 14px 22px -14px rgba(0,0,0,.8);
-}
-.lot--shake{animation:lotShake .42s}
-@keyframes lotShake{
-  10%,90%{transform:translate(-2px,1px)}30%,70%{transform:translate(3px,-2px)}
-  50%{transform:translate(-3px,2px)}
-}
-.spot{
-  position:relative;aspect-ratio:1/.8;display:flex;align-items:flex-end;justify-content:center;
-  border-left:2px solid rgba(236,232,216,.20);border-right:2px solid rgba(236,232,216,.20);
-  border-top:2px solid rgba(236,232,216,.13);border-radius:2px;
-  background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 46%);
-  transition:background .4s;
-}
-.spot--boom{background:radial-gradient(60% 45% at 50% 74%,rgba(0,0,0,.62),transparent 72%)}
-.spot__car{position:relative;width:97%;transform-origin:50% 92%}
-.spot--boom .spot__car{animation:boom .6s cubic-bezier(.2,.75,.4,1) forwards}
+/* ───────── places et marques (hérité) ───────── */
 @keyframes boom{
   0%  {transform:none;filter:none}
   8%  {transform:translateY(-7%) scale(1.12);filter:brightness(6) saturate(.25)}
@@ -369,7 +346,6 @@ button.stat:hover{border-color:var(--accent)}
 .plate--park .plate__body{font-size:clamp(8.5px,2.4vw,15px)}
 .plate--park .plate__body{font-size:clamp(10px,2.9vw,16px)}
 
-.spot__fx{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5}
 .flash{
   position:absolute;left:50%;top:60%;width:10px;height:10px;transform:translate(-50%,-50%);
   border-radius:50%;animation:flashOut .5s ease-out forwards;
@@ -409,26 +385,16 @@ button.stat:hover{border-color:var(--accent)}
 .pk-tokens .tok{font-size:13px;padding:4px 9px;letter-spacing:.1em}
 .pk-tokens .tok--on{font-size:12px}
 .tok__sep{width:1px;height:20px;background:var(--line);display:inline-block;margin:0 2px}
-#pk-timebox{position:relative}
-#pk-timebox.low .hud__v{color:var(--ko)}
-#pk-form{display:flex;gap:8px}
-#pk-input{
-  flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:10px;
-  color:var(--txt);font-size:20px;padding:13px 16px;letter-spacing:.06em;outline:none;text-transform:lowercase;
-}
-#pk-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,207,63,.12)}
 
 /* ───────── coupé sport : vaut plus ───────── */
 .tok--sport{border-color:var(--accent);box-shadow:0 0 10px rgba(255,207,63,.22)}
 .tok--tag{font-size:11px;letter-spacing:0;padding:4px 8px;color:var(--accent);border-color:transparent;background:none;font-weight:700}
 .car--sport .plate--car{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 2px rgba(255,207,63,.55)}
-.spot__car--sport .plate--car{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 2px rgba(255,207,63,.55)}
 .sport-tag{
   position:absolute;left:50%;top:6%;transform:translateX(-50%);z-index:3;
   background:rgba(20,24,31,.85);border:1px solid var(--accent);color:var(--accent);
   font-size:11px;font-weight:700;border-radius:99px;padding:2px 8px;white-space:nowrap;
 }
-.spot__car{margin:0 auto}
 
 /* ───────── Trafic : trois voies qui roulent ───────── */
 /* séparations de voies : continues et discrètes, elles convergent vers le point de fuite
@@ -501,39 +467,28 @@ button.stat:hover{border-color:var(--accent)}
 .tokgroup.tok--target{border-color:var(--accent);background:rgba(255,207,63,.08)}
 .car{cursor:pointer}
 .car--target .plate--car{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
-.spot{cursor:pointer}
-.spot--target{background:linear-gradient(180deg,rgba(255,207,63,.14),transparent 55%);border-color:rgba(255,207,63,.55)}
-.spot--target .plate--car{box-shadow:0 2px 7px rgba(0,0,0,.7),0 0 0 3px var(--accent)}
 .feedback .mono{letter-spacing:.06em}
 
 /* alignement de couleur complété */
-.spot--line{animation:lineGlow 1.8s ease-out}
 @keyframes lineGlow{
   0%,60%{box-shadow:inset 0 0 0 3px var(--accent),0 0 22px rgba(255,207,63,.7);background:rgba(255,207,63,.22)}
   100%{box-shadow:none}
 }
 
-/* parking sur téléphone : trois colonnes serrées, la plaque va à l'essentiel */
+
 @media (max-width:520px){
   .plate--park{width:calc(var(--plateW,46%) * 2.05)}
   .plate--park .plate__eu,.plate--park .plate__dep{display:none}
   .plate--park .plate__body{font-size:11.5px;padding:3px 4px}
-  .lot{gap:5px;padding:10px 8px 12px}
   .sport-tag{font-size:9px;padding:1px 6px}
 }
 
-/* ───────── parking en flux : marques au sol, arrivées, remorquage ───────── */
-.spot__slot{position:relative;width:100%;display:flex;align-items:flex-end;justify-content:center}
-.spot__mark{position:absolute;inset:0;pointer-events:none;border-radius:2px;
-  box-shadow:inset 0 0 0 0 var(--tint,transparent);transition:box-shadow .35s}
-.spot__mark--on{box-shadow:inset 0 0 0 4px var(--tint),inset 0 0 26px -6px var(--tint)}
-.spot__car--in{animation:parkIn .7s cubic-bezier(.2,.75,.3,1)}
+
 @keyframes parkIn{
   0%  {transform:translateY(-22%) scale(.55);opacity:0}
   35% {opacity:1}
   100%{transform:none;opacity:1}
 }
-.spot__car--tow{animation:towOut .8s ease-in forwards}
 @keyframes towOut{to{transform:translateY(-40%) scale(.6);opacity:0}}
 .tokgroup--empty{opacity:.35;cursor:default}
 
@@ -746,7 +701,6 @@ h2{font-size:26px!important;letter-spacing:.04em;text-transform:uppercase}
 .modecard b{font-size:22px!important;letter-spacing:.04em;text-transform:uppercase}
 .modecard em{font-size:12px!important;line-height:1.35}
 .modecard--trafic{background:linear-gradient(160deg,#2a1d1a,#141826)!important}
-.modecard--parking{background:linear-gradient(160deg,#16213a,#121826)!important}
 .modecard.on{border-color:var(--accent)!important;box-shadow:0 0 0 1px var(--accent),0 12px 30px rgba(0,0,0,.45)}
 .modecard.on b{color:var(--accent)}
 
@@ -1011,7 +965,7 @@ body.fitted .hud--scene .hud__v{font-size:17px}
 @media (max-width:420px){.hud--scene .hud__item{padding:4px 6px}.hud--scene .hud__v{font-size:17px}.hud--scene .hud__k{font-size:9px;letter-spacing:.06em}}
 /* la route commence directement sous le titre de l'écran : plus de bandeau au-dessus */
 #screen-traffic .road,#screen-pursuit .road{margin-top:0}
-/* le parking : le HUD devient le panneau d'entrée, soudé au parking */
+
 .hud--lot{background:linear-gradient(180deg,#1f2733,#181e28);border:1px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0;
   padding:8px 10px 6px;gap:0;position:relative;z-index:2}
 .hud--lot .hud__item{background:none;border:0;border-radius:0;padding:2px 8px}
@@ -1097,7 +1051,6 @@ body.theme-miami .hud--lot::after{background:repeating-linear-gradient(90deg,#ff
 body.theme-miami .platefield:focus-within{box-shadow:0 0 0 3px rgba(255,79,163,.55),0 8px 24px rgba(0,0,0,.5)}
 body.theme-miami .rank,body.theme-miami .missions,body.theme-miami .stat{background:var(--bg2)}
 body.theme-miami .rank__fill{background:linear-gradient(90deg,#2ee6d6,#ff4fa3)}
-body.theme-miami .lot{background:linear-gradient(180deg,#2c2070 0%,#1d1450 22%,#150d3a 100%)}
 body.theme-miami .warp{background:repeating-conic-gradient(from 0deg at 50% 46%,transparent 0deg 5deg,rgba(255,79,163,.22) 5deg 6.2deg)}
 
 /* badges et médailles, version Miami : cartes violettes liseré rose, rayons roses, halo cyan */
@@ -1241,3 +1194,48 @@ body.theme-miami .road__tarmac{background:
   radial-gradient(30% 7% at 31% 76%,rgba(0,0,0,.2),transparent 70%),
   linear-gradient(90deg,rgba(0,0,0,.35) 0 5%,transparent 34% 66%,rgba(0,0,0,.35) 95%),
   linear-gradient(180deg,#221650 0%,#150d36 48%,#0c0722 100%)}
+
+/* ═══════════ marquage : traits discontinus, dans la perspective de la route ═══════════
+   Même projection que les balises (y = 46 + 54/z, échelle 1/z), mais sur les séparations
+   de voies : x = 50 ± 15/z. Les traits naissent à l'horizon et filent vers le bas.     */
+.road__dashes{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.dash{position:absolute;width:calc(var(--roadH) * .016);height:calc(var(--roadH) * .10);border-radius:1px;
+  background:linear-gradient(180deg,rgba(236,232,216,.62),rgba(214,208,188,.5));
+  transform:translate(-50%,-100%) scale(.167);opacity:0;
+  animation:dash-run-l 2.64s linear infinite;will-change:top,left,transform}
+.dash--r{animation-name:dash-run-r}
+@keyframes dash-run-l{
+  0%   {top:55%;   left:47.50%;transform:translate(-50%,-100%) scale(.167);opacity:0}
+  14%  {opacity:.9}
+  37.9%{top:59.5%; left:46.25%;transform:translate(-50%,-100%) scale(.25)}
+  56.8%{top:64%;   left:45.00%;transform:translate(-50%,-100%) scale(.333)}
+  72%  {top:70.55%;left:43.18%;transform:translate(-50%,-100%) scale(.455)}
+  83.3%{top:79.75%;left:40.63%;transform:translate(-50%,-100%) scale(.625)}
+  100% {top:91%;   left:37.50%;transform:translate(-50%,-100%) scale(.833);opacity:.9}
+}
+@keyframes dash-run-r{
+  0%   {top:55%;   left:52.50%;transform:translate(-50%,-100%) scale(.167);opacity:0}
+  14%  {opacity:.9}
+  37.9%{top:59.5%; left:53.75%;transform:translate(-50%,-100%) scale(.25)}
+  56.8%{top:64%;   left:55.00%;transform:translate(-50%,-100%) scale(.333)}
+  72%  {top:70.55%;left:56.82%;transform:translate(-50%,-100%) scale(.455)}
+  83.3%{top:79.75%;left:59.37%;transform:translate(-50%,-100%) scale(.625)}
+  100% {top:91%;   left:62.50%;transform:translate(-50%,-100%) scale(.833);opacity:.9}
+}
+/* deux voies : une seule ligne, au milieu */
+@keyframes dash-run-c{
+  0%   {top:55%;   left:50%;transform:translate(-50%,-100%) scale(.167);opacity:0}
+  14%  {opacity:.9}
+  37.9%{top:59.5%; left:50%;transform:translate(-50%,-100%) scale(.25)}
+  56.8%{top:64%;   left:50%;transform:translate(-50%,-100%) scale(.333)}
+  72%  {top:70.55%;left:50%;transform:translate(-50%,-100%) scale(.455)}
+  83.3%{top:79.75%;left:50%;transform:translate(-50%,-100%) scale(.625)}
+  100% {top:91%;   left:50%;transform:translate(-50%,-100%) scale(.833);opacity:.9}
+}
+.road--two .dash--r{display:none}
+.road--two .dash--l{animation-name:dash-run-c}
+/* en Poursuite la caméra regarde vers l'arrière : le marquage s'éloigne vers l'horizon */
+.road--pursuit .dash{animation-direction:reverse}
+/* l'accueil : marquage plus lent, comme les balises */
+.hero__road .dash{animation-duration:3.2s}
+body.theme-miami .dash{background:linear-gradient(180deg,rgba(255,79,163,.75),rgba(255,79,163,.45));box-shadow:0 0 6px rgba(255,79,163,.6)}

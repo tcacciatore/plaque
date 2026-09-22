@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;700&family=Monoton&display=swap">
-<link rel="stylesheet" href="css/style.css?v=108">
+<link rel="stylesheet" href="css/style.css?v=111">
 </head>
 <body>
 
@@ -64,10 +64,6 @@
           <img src="assets/cars/coupe-rouge.webp" alt="">
           <span><b>Trafic</b><em>au volant — trois voies, deux mots par voiture, 2 minutes</em><i class="modecard__best" data-best="trafic"></i></span>
         </button>
-        <button data-v="parking" class="modecard modecard--parking" role="radio">
-          <img src="assets/cars/van-bleu.webp" alt="">
-          <span><b>Parking</b><em>neuf places, les voitures se relaient — alignez les couleurs</em><i class="modecard__best" data-best="parking"></i></span>
-        </button>
         <button data-v="poursuite" class="modecard modecard--poursuite" role="radio">
           <img src="assets/cars/supercar-noir.webp" alt="">
           <span><b>Poursuite</b><em>en fuite — elles arrivent de derrière, un mot par plaque, trois pare-chocs, sans fin</em><i class="modecard__best" data-best="poursuite"></i></span>
@@ -121,8 +117,7 @@
         <li>Une plaque est <strong>lue</strong> quand ses deux paires ont chacune leur mot — et la voiture explose.</li>
         <li>En <strong>Trafic</strong>, vous êtes au volant : les voitures vous doublent sur trois voies (deux sur un petit écran), chacune à son heure, toujours de modèles différents, et restent 23 s devant vous — 17 s en fin de partie (plus en Facile, moins en Expert). Chaque mot trouvé rallonge la partie de 1 s et la voiture visée de 3 s ; une plaque lue ajoute 2 s de plus.</li>
         <li>En <strong>Poursuite</strong>, vous êtes en fuite, votre véhicule de rang vu de face au premier plan. Les voitures arrivent de l'horizon <strong>derrière vous</strong>, se <strong>calent</strong> à distance : leur plaque, d'abord floue parce qu'elles sont trop loin, devient nette à portée — y restent une quinzaine de secondes, puis <strong>chargent</strong> : celles de <strong>votre voie</strong> vous percutent si vous ne les avez pas lues, les autres vous doublent. Pas d'esquive, seulement les mots ; un seul mot, sur l'une ou l'autre paire, suffit. Trois pare-chocs, sans fin. Sur un petit écran, deux voies.</li>
-        <li>En <strong>Parking</strong>, neuf voitures sont garées sur trois rangées ; chaque voiture pulvérisée est remplacée. Chaque place <strong>garde la couleur</strong> de la dernière voiture qu'on y a fait sauter : trois places alignées de la même couleur — ligne, colonne ou diagonale — rapportent +300 (+500 en diagonale) et se remettent à zéro. Deux minutes, que chaque mot rallonge un peu.</li>
-        <li>Tapez un mot : il se valide tout seul après une demi-seconde de pause (Entrée ou espace pour aller plus vite). Dans les deux modes, n'importe quel mot va sur n'importe quelle plaque affichée : le jeu trouve la cible et vous dit laquelle. <strong>Touchez une voiture</strong> (ou ses jetons) pour la désigner : vos mots iront à elle en priorité. Un mot qui porte les deux paires lit la plaque d'un coup, en double. Les <strong>coupés</strong> valent ×1,5, les <strong>supercars</strong> ×2.</li>
+                <li>Tapez un mot : il se valide tout seul après une demi-seconde de pause (Entrée ou espace pour aller plus vite). Dans les deux modes, n'importe quel mot va sur n'importe quelle plaque affichée : le jeu trouve la cible et vous dit laquelle. <strong>Touchez une voiture</strong> (ou ses jetons) pour la désigner : vos mots iront à elle en priorité. Un mot qui porte les deux paires lit la plaque d'un coup, en double. Les <strong>coupés</strong> valent ×1,5, les <strong>supercars</strong> ×2.</li>
         <li>Chaque modèle a son <strong>caractère</strong>, affiché au-dessus de lui, et un temps de présence à sa mesure. <strong>Citadine</strong> : 5 lettres max, elle file vite. <strong>Cabriolet</strong> : 7 lettres au moins, cote ×1,5. <strong>Ancienne</strong> : mots rares ou peu courants seulement, cote ×2. <strong>Monospace</strong> : les deux mots ont la même initiale, cote ×1,5. <strong>Utilitaire</strong> : la lire rend 5 s (en Poursuite : répare un pare-chocs). <strong>4×4</strong> : sa deuxième paire est cachée tant que la première n'est pas lue (en Poursuite, où un mot suffit, seule sa paire la plus rare compte), cote ×1,5. <strong>Camion</strong> : deux mots par paire, il reste deux fois plus longtemps, cote ×2. <strong>Camping-car</strong> : lent, cote ×0,5. <strong>Pick-up</strong> : sa benne transporte un bonus (+8 s, une paire offerte ou cote ×2). Berline et break restent neutres — et en Facile, les modèles à règle restent au garage.</li>
         <li>Les <strong>trois chiffres</strong> d'une plaque sont sa <strong>cote</strong> : ce qu'elle rapporte une fois lue. Paires rares, cote élevée.</li>
         <li>Trois mots d'affilée sans faute font monter le <strong>multiplicateur</strong> — une erreur le remet à ×1. À <strong>×5</strong>, dix secondes de <strong>fièvre</strong> : un seul mot suffit à lire une plaque. Les <strong>mots rares</strong> rapportent un bonus.</li>
@@ -177,6 +172,14 @@
         <i class="post post--l" style="animation-delay:0s"></i><i class="post post--l" style="animation-delay:-.22s"></i><i class="post post--l" style="animation-delay:-.44s"></i><i class="post post--l" style="animation-delay:-.66s"></i><i class="post post--l" style="animation-delay:-.88s"></i><i class="post post--l" style="animation-delay:-1.1s"></i>
         <i class="post post--r" style="animation-delay:-.11s"></i><i class="post post--r" style="animation-delay:-.33s"></i><i class="post post--r" style="animation-delay:-.55s"></i><i class="post post--r" style="animation-delay:-.77s"></i><i class="post post--r" style="animation-delay:-.99s"></i><i class="post post--r" style="animation-delay:-1.21s"></i>
       </div>
+        <div class="road__dashes" aria-hidden="true">
+          <i class="dash dash--l" style="animation-delay:0.00s"></i><i class="dash dash--r" style="animation-delay:0.00s"></i>
+          <i class="dash dash--l" style="animation-delay:-0.44s"></i><i class="dash dash--r" style="animation-delay:-0.44s"></i>
+          <i class="dash dash--l" style="animation-delay:-0.88s"></i><i class="dash dash--r" style="animation-delay:-0.88s"></i>
+          <i class="dash dash--l" style="animation-delay:-1.32s"></i><i class="dash dash--r" style="animation-delay:-1.32s"></i>
+          <i class="dash dash--l" style="animation-delay:-1.76s"></i><i class="dash dash--r" style="animation-delay:-1.76s"></i>
+          <i class="dash dash--l" style="animation-delay:-2.20s"></i><i class="dash dash--r" style="animation-delay:-2.20s"></i>
+        </div>
       <div class="road__cars" id="pu-cars"></div>
       <!-- votre véhicule de rang, vu de face, en fuite : les autres arrivent de l'horizon derrière lui -->
       <div class="me" id="pu-me" aria-hidden="true">
@@ -201,27 +204,6 @@
     </form>
     <p class="feedback" id="pu-feedback">&nbsp;</p>
     <p class="hint-line"><button class="linkbtn" id="pu-quit">Se garer</button> · <button class="linkbtn linkbtn--exit" data-exit>Quitter</button></p>
-  </section>
-
-  <!-- ══════════ MODE PARKING ══════════ -->
-  <section id="screen-parking" class="screen">
-    <header class="hud hud--lot">
-      <div class="hud__item" id="pk-timebox"><span class="hud__k">Temps</span><span class="hud__v" id="pk-time">2:00</span><span class="hud__gain" id="pk-gain"></span></div>
-      <div class="hud__item hud__item--goal"><span class="hud__k">Score</span><span class="hud__v" id="pk-score">0</span><span class="ghost" id="pk-ghost"></span></div>
-      <div class="hud__item hud__item--mult"><span class="hud__k">Pulvérisées</span><span class="hud__v" id="pk-left">0</span></div>
-    </header>
-
-    <div class="lot" id="pk-lot"></div>
-    <div class="tr-pairs pk-tokens" id="pk-tokens"></div>
-
-    <div class="suggest suggest--off" id="pk-suggest"></div>
-    <form id="pk-form" class="platefield" autocomplete="off">
-      <span class="platefield__eu">F</span>
-      <input id="pk-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
-             autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot…" aria-label="Votre mot" enterkeyhint="go">
-    </form>
-    <p class="feedback" id="pk-feedback">&nbsp;</p>
-    <p class="hint-line"><button class="linkbtn" id="pk-skip">Faire remorquer la plus coriace (−15 s)</button> · <button class="linkbtn linkbtn--exit" data-exit>Quitter</button></p>
   </section>
 
   <!-- ══════════ CARRIÈRE ══════════ -->
@@ -266,6 +248,14 @@
       <div class="road__lane road__lane--l"></div>
       <div class="road__lane road__lane--r"></div>
       <div class="road__posts" id="tr-posts"></div>
+        <div class="road__dashes" aria-hidden="true">
+          <i class="dash dash--l" style="animation-delay:0.00s"></i><i class="dash dash--r" style="animation-delay:0.00s"></i>
+          <i class="dash dash--l" style="animation-delay:-0.44s"></i><i class="dash dash--r" style="animation-delay:-0.44s"></i>
+          <i class="dash dash--l" style="animation-delay:-0.88s"></i><i class="dash dash--r" style="animation-delay:-0.88s"></i>
+          <i class="dash dash--l" style="animation-delay:-1.32s"></i><i class="dash dash--r" style="animation-delay:-1.32s"></i>
+          <i class="dash dash--l" style="animation-delay:-1.76s"></i><i class="dash dash--r" style="animation-delay:-1.76s"></i>
+          <i class="dash dash--l" style="animation-delay:-2.20s"></i><i class="dash dash--r" style="animation-delay:-2.20s"></i>
+        </div>
       <div class="road__cars" id="tr-cars-layer"></div>
       <div class="road__glass"></div>
     </div>
@@ -284,12 +274,11 @@
 
 </div>
 
-<script src="js/pairs.js?v=108"></script>
-<script src="js/departements.js?v=108"></script>
-<script src="js/dict.js?v=108"></script>
-<script src="js/game.js?v=108"></script>
-<script src="js/traffic.js?v=108"></script>
-<script src="js/parking.js?v=108"></script>
-<script src="js/pursuit.js?v=108"></script>
+<script src="js/pairs.js?v=111"></script>
+<script src="js/departements.js?v=111"></script>
+<script src="js/dict.js?v=111"></script>
+<script src="js/game.js?v=111"></script>
+<script src="js/traffic.js?v=111"></script>
+<script src="js/pursuit.js?v=111"></script>
 </body>
 </html>
