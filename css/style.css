@@ -1176,3 +1176,55 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
 #pu-road .me .plate--me .plate__body{font-size:calc(var(--pw,120px) * .17);padding:1px 2px;letter-spacing:.06em;line-height:1.15}
 #pu-road .me .plate--me .plate__eu,#pu-road .me .plate--me .plate__dep{width:auto;min-width:12%;padding:2px 3px;justify-content:center}
 #pu-road .me .plate--me .plate__f,#pu-road .me .plate--me .plate__depnum{font-size:calc(var(--pw,120px) * .07);white-space:nowrap}
+
+/* ═══════════ le décor, dans le détail ═══════════
+   Tout est en dégradés statiques (aucun coût d'animation) : collines au loin, brume
+   chaude sur l'horizon, étoiles qui sortent avec le crépuscule, bas-côté de gravier,
+   traces de roulement et reflet du couchant sur l'asphalte, vignette douce.        */
+
+/* ligne d'horizon : collines lointaines, bosquets, brume qui mange leur base */
+.road__sky::before{content:'';position:absolute;left:-2%;right:-2%;bottom:0;height:26%;pointer-events:none;
+  background:
+    /* brume chaude, au ras de l'horizon */
+    linear-gradient(180deg,transparent 0 38%,rgba(214,168,124,.28) 78%,rgba(230,186,140,.5) 100%),
+    /* bosquets sombres, épars */
+    radial-gradient(9px 5px at 12% 100%,#1a2018 60%,transparent 62%),
+    radial-gradient(7px 4px at 16% 100%,#1a2018 60%,transparent 62%),
+    radial-gradient(11px 6px at 79% 100%,#1a2018 60%,transparent 62%),
+    radial-gradient(8px 5px at 86% 100%,#1a2018 60%,transparent 62%),
+    /* deux lignes de collines, la plus lointaine plus pâle */
+    radial-gradient(70% 90% at 22% 128%,#2e3444 58%,transparent 60%),
+    radial-gradient(52% 74% at 68% 126%,#333a4a 58%,transparent 60%),
+    radial-gradient(90% 78% at 48% 134%,#39404f 60%,transparent 62%);
+  opacity:.9}
+/* étoiles : invisibles de jour, elles sortent quand le soleil se couche (--dusk) */
+.road__posts::before{content:'';position:absolute;inset:0 0 56% 0;pointer-events:none;
+  opacity:calc(var(--dusk,0) * .85);transition:opacity 1s linear;
+  background:
+    radial-gradient(1.4px 1.4px at 12% 18%,#fff,transparent),radial-gradient(1.2px 1.2px at 26% 9%,#e8eeff,transparent),
+    radial-gradient(1.6px 1.6px at 38% 24%,#fff,transparent),radial-gradient(1.1px 1.1px at 52% 12%,#dbe6ff,transparent),
+    radial-gradient(1.5px 1.5px at 63% 27%,#fff,transparent),radial-gradient(1.2px 1.2px at 74% 8%,#eaf0ff,transparent),
+    radial-gradient(1.7px 1.7px at 85% 20%,#fff,transparent),radial-gradient(1.1px 1.1px at 92% 32%,#dfe8ff,transparent),
+    radial-gradient(1.3px 1.3px at 19% 34%,#f2f6ff,transparent),radial-gradient(1.2px 1.2px at 45% 38%,#e6edff,transparent),
+    radial-gradient(1.4px 1.4px at 58% 5%,#fff,transparent),radial-gradient(1px 1px at 31% 15%,#cfdcff,transparent)}
+/* bas-côté : herbe rase éclairée à l'horizon, puis gravier le long de la chaussée */
+.road__ground::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(196,168,116,.30) 0 3%,transparent 12%),
+    radial-gradient(120% 60% at 50% 0,rgba(150,140,96,.16) 0 40%,transparent 70%)}
+/* l'asphalte : traces de roulement, grain, et le couchant qui s'y reflète près de l'horizon */
+.road__tarmac::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,transparent 40%,rgba(0,0,0,.20) 44% 48%,transparent 52%,transparent 56%,rgba(0,0,0,.20) 58% 62%,transparent 66%),
+    repeating-linear-gradient(115deg,rgba(255,255,255,.012) 0 2px,transparent 2px 5px);
+  mask-image:linear-gradient(180deg,transparent 0 6%,#000 40%);-webkit-mask-image:linear-gradient(180deg,transparent 0 6%,#000 40%)}
+.road__tarmac::after{content:'';position:absolute;left:0;right:0;top:0;height:26%;pointer-events:none;
+  background:linear-gradient(180deg,rgba(224,166,104,.34),rgba(224,166,104,0))}
+/* vignette : les bords de la scène s'assombrissent, le regard va à la route */
+.road::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1100;
+  background:radial-gradient(130% 95% at 50% 48%,transparent 55%,rgba(0,0,0,.42) 100%)}
+.hero__road::after{display:none}
+/* Miami : collines et brume remplacées par la skyline, étoiles plus discrètes */
+body.theme-miami .road__ground::before{opacity:1}
+body.theme-miami .road__tarmac::after{background:linear-gradient(180deg,rgba(255,79,163,.22),transparent)}
+body.theme-miami .road::after{background:radial-gradient(130% 95% at 50% 48%,transparent 58%,rgba(9,4,26,.5) 100%)}
