@@ -457,6 +457,7 @@ function start() {
   P.screen('screen-traffic');
   P.fitViewport('screen-traffic', '.road', '.road, .tr-pairs, .suggest, #tr-form, .feedback, .hint-line');
   if (T.suggest) T.suggest();
+  setTimeout(P.refit, 60);                        // la barre de suggestions vient d'apparaître : on remesure
   $('tr-input').focus();
   loop();
   // les trois voies s'amorcent à des instants différents

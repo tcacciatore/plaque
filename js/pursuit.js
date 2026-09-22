@@ -420,6 +420,7 @@ function start() {
   P.screen('screen-pursuit');
   P.fitViewport('screen-pursuit', '.road', '.road, .tr-pairs, .suggest, #pu-form, .feedback, .hint-line');
   if (R.suggest) R.suggest();
+  setTimeout(P.refit, 60);                        // la barre de suggestions vient d'apparaître : on remesure
   measure();
   renderHud(); renderTokens();
   P.guideSay(1, 'Vous roulez plus vite que tout le monde. Les voitures arrivent de l\'horizon : <b>un mot</b> qui contient l\'une des deux paires, et la voiture explose. Celles de <b>votre voie</b> doivent sauter avant le capot.');

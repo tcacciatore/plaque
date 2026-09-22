@@ -1182,8 +1182,10 @@ function applyFit() {
     var st = getComputedStyle(el);
     used += r.height + parseFloat(st.marginTop) + parseFloat(st.marginBottom);
   });
-  var pad = 28;
-  var avail = Math.max(150, h - used - pad);
+  // la scène cède toute la place nécessaire : si elle refusait de descendre, c'est le
+  // champ de saisie, en bas, qui se retrouvait rogné hors de l'écran
+  var pad = 14;
+  var avail = Math.max(92, h - used - pad);
   if (scene.classList.contains('road')) {
     var ms = getComputedStyle(scene);
     scene.style.setProperty('--roadH', avail - parseFloat(ms.marginTop) - parseFloat(ms.marginBottom) + 'px');
@@ -1222,7 +1224,7 @@ window.PLAQUE = {
   TRAITS: TRAITS, trait: trait, carTime: carTime, initCar: initCar, canUse: canUse, hitPair: hitPair,
   wordRule: wordRule, carCote: carCote, traitLabel: traitLabel, refuse: refuse,
   tweenNumber: tweenNumber, bump: bump, floatPts: floatPts,
-  autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit, attachSuggest: attachSuggest,
+  autoSubmit: autoSubmit, fitViewport: fitViewport, unfit: unfit, attachSuggest: attachSuggest, refit: applyFit,
   myCar: function () { return rankSprite(RANKS[rankOf(career())]); },
   ghostSample: ghostSample, paintGhost: paintGhost,
   isWord:  function (w) { return DICT ? DICT.has(w) : false; },
