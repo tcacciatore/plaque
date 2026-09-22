@@ -10,8 +10,8 @@
 
 var P = null;                       // passerelle vers le moteur (window.PLAQUE)
 var GAME_TIME = 120;                // durée d'une partie, en secondes
-var CAR_TIME  = 18;                 // temps de présence d'une voiture au départ…
-var CAR_TIME_END = 12;              // …et en fin de partie (la rampe)
+var CAR_TIME  = 23;                 // temps de présence d'une voiture au départ…
+var CAR_TIME_END = 17;              // …et en fin de partie (la rampe)
 var CAR_TIME_DIFF = { facile: 1.25, normal: 1, expert: 0.8 };   // …modulé par la difficulté
 var RUSH      = 20;                 // les dernières secondes : tout compte double
 var FEVER     = 10;                 // durée de la fièvre déclenchée à ×5 : un mot suffit

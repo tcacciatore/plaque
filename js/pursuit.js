@@ -24,7 +24,7 @@ var Z_HOLD_MINE = 3.0, Z_HOLD_SIDE = 2.4;             // profondeur d'attente : 
 var V_IN = 5.0, V_RUSH = 2.2;                         // vitesses d'approche et de charge (z/s)
 var PLATE_K = 1.9;                                    // la plaque, posée sur la voiture, est grossie d'autant pour rester lisible
 function holdZ(lane) { return lane === MY_LANE ? Z_HOLD_MINE : Z_HOLD_SIDE; }
-var HOLD0 = 10, HOLD_MIN = 6;                         // temps d'attente au départ, puis au plus court (après 3 min)
+var HOLD0 = 15, HOLD_MIN = 11;                        // temps d'attente au départ, puis au plus court (après 3 min)
 var HOLD_DIFF = { facile: 1.3, normal: 1, expert: 0.75 };
 var V0 = 0.68, V_RAMP = 0.005, V_MAX = 1.7;          // vitesse affichée au compteur et kilométrage
 var SPAWN0 = 5.5, SPAWN_MIN = 3.4;                    // intervalle entre deux arrivées, au départ et au plus serré
@@ -131,9 +131,13 @@ function readable(c) { return !c.gone && c.phase !== 'in'; }
 function placePlate(c) {                          // la plaque est là dès l'apparition, floue tant qu'on est trop loin
   c.pl.style.opacity = '1';
   c.pl.classList.toggle('plate--far', !readable(c));
-  // la barre de temps : ce qu'il reste avant qu'elle charge
+  // la barre de temps : ce qu'il reste avant qu'elle charge, calée sous la plaque
   var bar = c.el.querySelector('.car__timer');
   if (!bar) return;
+  if (!c.barY) {                                  // mesurée sur la plaque rendue, pas estimée
+    var h = c.pl.offsetHeight;
+    if (h) { c.barY = h / 2 + Math.max(3, h * 0.28); bar.style.transform = 'translate(-50%,' + c.barY.toFixed(1) + 'px)'; }
+  }
   bar.style.opacity = c.phase === 'hold' ? '1' : '0';
   if (c.phase === 'hold') bar.firstChild.style.transform = 'scaleX(' + Math.max(0, Math.min(1, (c.until - played()) / c.hold)).toFixed(3) + ')';
 }

@@ -303,8 +303,8 @@ def scene_coupe(p, dists, mats):
     dists.append(shell); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 1.02, 1.00, -1.20)
     # l'avant : pare-brise couché, capot plongeant, façade basse
-    dists.append(rbox(shear_z(p - [0, 1.00, -1.12], 0.95, 0.0), [0.70, 0.14, 0.04], 0.03)); mats.append(MAT_TRIM)
-    dists.append(rbox(shear_z(p - [0, 1.00, -1.13], 0.95, 0.0), [0.64, 0.105, 0.05], 0.02)); mats.append(MAT_GLASS)
+    dists.append(rbox(shear_z(p - [0, 1.00, -1.26], 0.95, 0.0), [0.72, 0.155, 0.05], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 1.00, -1.29], 0.95, 0.0), [0.66, 0.12, 0.05], 0.02)); mats.append(MAT_GLASS)
     front_face(p, dists, mats, 0.95, 0.38, 0.70, -2.14, hw=0.24, hh=0.06, grille=0.30)
     # lunette très couchée + troisième feu stop
     dists.append(rbox(shear_z(p - [0, 1.00, 0.48], 0.95, 0.0), [0.68, 0.135, 0.04], 0.03)); mats.append(MAT_TRIM)
@@ -360,8 +360,8 @@ def scene_camper(p, dists, mats):
     dists.append(cell); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 1.12, 1.40, -1.75)
     # l'avant : pare-brise panoramique, casquette, façade
-    dists.append(rbox(shear_z(p - [0, 1.42, -1.96], 0.30, 0.0), [0.86, 0.34, 0.04], 0.03)); mats.append(MAT_TRIM)
-    dists.append(rbox(shear_z(p - [0, 1.42, -1.97], 0.30, 0.0), [0.80, 0.29, 0.05], 0.02)); mats.append(MAT_GLASS)
+    dists.append(rbox(shear_z(p - [0, 1.42, -1.96], -0.30, 0.0), [0.86, 0.34, 0.04], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 1.42, -1.98], -0.30, 0.0), [0.80, 0.29, 0.05], 0.02)); mats.append(MAT_GLASS)
     dists.append(rbox(p - [0, 1.84, -2.02], [0.90, 0.03, 0.10], 0.02)); mats.append(MAT_PAINT)      # casquette
     front_face(p, dists, mats, 1.02, 0.36, 0.84, -2.04, hw=0.18, hh=0.10, grille=0.34, style='van')
     # fenêtre haute, bande décorative, échelle à droite, lanterneau
@@ -471,8 +471,8 @@ def scene_supercar(p, dists, mats):
     dists.append(shell); mats.append(MAT_PAINT)
     mirrors(p, dists, mats, 1.06, 0.88, -1.30)
     # l'avant : pare-brise couché, capot plongeant, phares effilés, grande bouche
-    dists.append(rbox(shear_z(p - [0, 0.86, -1.22], 1.10, 0.0), [0.62, 0.12, 0.04], 0.03)); mats.append(MAT_TRIM)
-    dists.append(rbox(shear_z(p - [0, 0.86, -1.23], 1.10, 0.0), [0.56, 0.09, 0.05], 0.02)); mats.append(MAT_GLASS)
+    dists.append(rbox(shear_z(p - [0, 0.86, -1.36], 1.10, 0.0), [0.66, 0.14, 0.05], 0.03)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 0.86, -1.39], 1.10, 0.0), [0.60, 0.11, 0.05], 0.02)); mats.append(MAT_GLASS)
     front_face(p, dists, mats, 0.98, 0.30, 0.60, -2.18, hw=0.26, hh=0.045, grille=0.36, style='sport')
     dists.append(rbox(shear_z(p - [0, 0.86, 0.10], 1.10, 0.0), [0.60, 0.12, 0.04], 0.03)); mats.append(MAT_TRIM)
     dists.append(rbox(shear_z(p - [0, 0.86, 0.11], 1.10, 0.0), [0.54, 0.09, 0.05], 0.02)); mats.append(MAT_GLASS)
@@ -516,8 +516,8 @@ def scene_ancienne(p, dists, mats):
         dists.append(rbox(p - [sx * 0.82, 0.40, 0.0], [0.10, 0.02, 0.80], 0.015)); mats.append(MAT_TRIM)
     mirrors(p, dists, mats, 0.84, 1.10, -1.10)
     # l'avant : pare-brise presque droit, phares ronds chromés sur les ailes, calandre verticale
-    dists.append(rbox(shear_z(p - [0, 1.16, -1.22], 0.55, 0.0), [0.50, 0.19, 0.04], 0.10)); mats.append(MAT_TRIM)
-    dists.append(rbox(shear_z(p - [0, 1.16, -1.23], 0.55, 0.0), [0.45, 0.15, 0.05], 0.08)); mats.append(MAT_GLASS)
+    dists.append(rbox(shear_z(p - [0, 1.16, -1.22], -0.55, 0.0), [0.50, 0.20, 0.04], 0.10)); mats.append(MAT_TRIM)
+    dists.append(rbox(shear_z(p - [0, 1.16, -1.24], -0.55, 0.0), [0.45, 0.16, 0.05], 0.08)); mats.append(MAT_GLASS)
     for sx in (-1, 1):
         dists.append(cyl_z(p - [sx * 0.62, 0.94, -1.86], 0.08, 0.13, 0.02)); mats.append(MAT_CHROME)
         dists.append(cyl_z(p - [sx * 0.62, 0.94, -1.92], 0.03, 0.10, 0.03)); mats.append(MAT_HEAD)
@@ -614,11 +614,12 @@ def scene_car(p, S, dists, mats):
     dists.append(rbox(shear_z(p - [0, S['roof_y'] + S['roof_h'] - 0.05, gz + 0.02], S['glass_tilt'], 0.0),
                       [0.16, 0.012, 0.03], 0.005)); mats.append(MAT_LAMP)
     # l'avant : pare-brise (plus grand que la lunette), joint de capot, façade
-    gf = -0.20 - S['roof_len'] + 0.12
-    ws_p = shear_z(p - [0, S['roof_y'], gf], S['glass_tilt'], 0.0)
-    dists.append(rbox(ws_p, [S['roof_wid'] - 0.02, S['roof_h'] - 0.01, 0.045], 0.03)); mats.append(MAT_TRIM)
-    ws_g = shear_z(p - [0, S['roof_y'], gf - 0.012], S['glass_tilt'], 0.0)
-    dists.append(rbox(ws_g, [S['roof_wid'] - 0.08, S['roof_h'] - 0.055, 0.05], 0.02)); mats.append(MAT_GLASS)
+    # le pare-brise penche en arrière (sommet vers l'habitacle) : cisaillement inverse de la lunette
+    gf = -0.20 - S['roof_len'] + 0.06
+    ws_p = shear_z(p - [0, S['roof_y'], gf], -0.55 - S['glass_tilt'], 0.0)
+    dists.append(rbox(ws_p, [S['roof_wid'] - 0.01, S['roof_h'] + 0.02, 0.05], 0.03)); mats.append(MAT_TRIM)
+    ws_g = shear_z(p - [0, S['roof_y'], gf - 0.015], -0.55 - S['glass_tilt'], 0.0)
+    dists.append(rbox(ws_g, [S['roof_wid'] - 0.07, S['roof_h'] - 0.025, 0.05], 0.02)); mats.append(MAT_GLASS)
     dists.append(rbox(p - [0, S['body_y'] + S['body_h'] - 0.02, -S['len'] + 0.02],
                       [S['wid'] - 0.06, 0.012, 0.06], 0.008)); mats.append(MAT_TRIM)
     front_face(p, dists, mats, S['wid'], S['body_y'] - S['body_h'], S['body_y'] + 0.14, -S['len'] - 0.02)
@@ -780,8 +781,10 @@ FOCAL = 4.3
 
 def camera():
     cam, tgt = CAM, TGT
-    if VIEW == 'front':                          # devant la voiture, symétrique de la vue arrière
-        cam = CAM * np.array([1, 1, -1], dtype=np.float32); tgt = TGT * np.array([1, 1, -1], dtype=np.float32)
+    if VIEW == 'front':                          # devant la voiture, symétrique de la vue arrière,
+        cam = CAM * np.array([1, 1, -1], dtype=np.float32)   # mais un peu plus haut : le pare-brise se dégage
+        tgt = TGT * np.array([1, 1, -1], dtype=np.float32)
+        cam = cam + np.array([0, 0.10, 0], dtype=np.float32)
     fwd = tgt - cam; fwd /= np.linalg.norm(fwd)
     rgt = np.cross(fwd, [0, 1, 0]); rgt /= np.linalg.norm(rgt)
     up = np.cross(rgt, fwd)

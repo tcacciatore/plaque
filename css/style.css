@@ -1161,8 +1161,8 @@ body.theme-miami .speedo b{color:#2ee6d6;text-shadow:0 0 8px rgba(46,230,214,.85
 
 /* Poursuite : la barre de temps sous la plaque — ce qu'il reste avant la charge */
 .pcar .car__timer{top:var(--plateY,75%);width:var(--pw,180px);height:calc(var(--pw,180px) * .045);transition:opacity .3s;opacity:0;
-  /* sous la plaque, quelle que soit la hauteur de la voiture : l'écart se mesure sur la plaque, pas sur la carrosserie */
-  transform:translate(-50%,calc(var(--pw,180px) * .135))}
+  /* sous la plaque : l'écart est mesuré sur la plaque rendue (js/pursuit.js) */
+  transform:translate(-50%,calc(var(--pw,180px) * .16))}
 
 /* Poursuite : trop loin pour lire — la plaque est là, mais brouillée ; elle se fait nette à portée */
 .pcar .plate--pursuit{transition:opacity .3s,filter .45s ease-out}
