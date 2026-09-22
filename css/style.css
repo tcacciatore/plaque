@@ -1259,3 +1259,11 @@ body.theme-miami .road__tarmac{background:
 .career__h{font-size:16px;margin:4px 0 8px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
 body.theme-miami .grade__fill{background:linear-gradient(90deg,#2ee6d6,#ff4fa3)}
 body.theme-miami .grade__head b,body.theme-miami .grade__row--now b{color:#ff4fa3}
+
+/* la carte Poursuite : une voiture de police, gyrophares allumés */
+.modecard__pic{position:relative;display:block;align-self:flex-end;margin:2px -6px 0 0;line-height:0}
+.modecard__pic img{height:118px;width:auto;max-width:100%;object-fit:contain;margin:0}
+.modecard__pic .cop{position:absolute;left:50%;top:1%;width:38%;height:9%;transform:translateX(-50%);z-index:2;display:block}
+.modecard__pic .cop i{position:absolute;top:0;width:44%;height:100%;border-radius:4px 4px 2px 2px}
+.modecard__pic .cop i:first-child{left:0;background:linear-gradient(180deg,#bfe0ff,#1f6ddc);animation:copFlashB .9s steps(1) infinite}
+.modecard__pic .cop i:last-child{right:0;background:linear-gradient(180deg,#ffc9c9,#d2262a);animation:copFlashR .9s steps(1) infinite}
