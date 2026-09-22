@@ -196,6 +196,15 @@ toutes les silhouettes, dans `<forme>-<teinte>-front.webp`, avec l'emplacement d
 la plaque avant dans `layout.json` (`<forme>-front`) repris dans `FLEET[…].front`.
 La Poursuite n'utilise que ces vues : votre voiture comme celles qui vous rattrapent.
 
+## Le but du jeu : douze grades
+
+`GRADES` (`js/game.js`) trace la carrière : gardien de la paix → commissaire
+divisionnaire. Chaque grade exige des **points de carrière** et une **condition**
+(plaques lues, départements croisés, sportives, mots rares ou d'expert, voitures
+dorées) ; le dernier demande les 101 départements. L'accueil affiche le grade, la
+barre d'avancement et les deux conditions à remplir ; l'écran Carrière déroule
+l'échelle complète, la dotation (13 véhicules × 3 métaux) en dessous.
+
 ## Thème « Miami Vice »
 
 `?theme=miami` active un second habillage (mémorisé) : nuit bleu-violet, rose

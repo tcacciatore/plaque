@@ -1228,3 +1228,34 @@ body.theme-miami .road__tarmac{background:
 .pcar .cop i:first-child{left:0;background:linear-gradient(180deg,#bfe0ff,#1f6ddc);animation:copFlashB .9s steps(1) infinite}
 .pcar .cop i:last-child{right:0;background:linear-gradient(180deg,#ffc9c9,#d2262a);animation:copFlashR .9s steps(1) infinite}
 @media (prefers-reduced-motion:reduce){.copbar i,.copwash::before,.copwash::after,.pcar .cop i{animation:none;opacity:.85}}
+
+/* ═══════════ le but du jeu : la carte de grade ═══════════ */
+.grade{display:block;width:100%;text-align:left;background:linear-gradient(160deg,#1b2436,#141a26);
+  border:1px solid var(--line);border-radius:16px;padding:14px 16px 13px;margin:0 0 10px;cursor:pointer;color:var(--txt);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);transition:.15s}
+.grade:hover{border-color:var(--accent)}
+.grade__head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}
+.grade__k{flex:1 0 100%;font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim)}
+.grade__head b{font-family:var(--cond);font-size:23px;letter-spacing:.02em;color:var(--accent)}
+.grade__head i{font-style:normal;font-size:12px;color:var(--dim);margin-left:auto;font-variant-numeric:tabular-nums}
+.grade__bar{height:7px;background:#0d131c;border-radius:99px;overflow:hidden;margin:9px 0 8px;box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+.grade__fill{height:100%;background:linear-gradient(90deg,#3ddc84,var(--accent));transition:width .5s}
+.grade__next{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:12.5px;color:var(--dim)}
+.grade__next b{color:var(--txt)}
+.grade__next u{text-decoration:none;background:var(--bg3);border:1px solid var(--line);border-radius:99px;padding:2px 9px;
+  font-size:11.5px;font-variant-numeric:tabular-nums}
+.grade__next u.ok{border-color:var(--ok);color:var(--ok)}
+/* l'échelle complète, sur l'écran de carrière */
+.grades{display:grid;gap:6px;margin-bottom:18px}
+.grade__row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:var(--bg2);
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.grade__row b{font-size:14.5px}
+.grade__row span{font-size:12px;color:var(--dim);text-align:right}
+.grade__row i{font-style:normal;color:var(--accent)}
+.grade__row--got{opacity:.62}
+.grade__row--got b::after{content:' ✓';color:var(--ok)}
+.grade__row--now{border-color:var(--accent);background:linear-gradient(180deg,rgba(255,207,63,.10),transparent)}
+.grade__row--now b{color:var(--accent)}
+.career__h{font-size:16px;margin:4px 0 8px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+body.theme-miami .grade__fill{background:linear-gradient(90deg,#2ee6d6,#ff4fa3)}
+body.theme-miami .grade__head b,body.theme-miami .grade__row--now b{color:#ff4fa3}

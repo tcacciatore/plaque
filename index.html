@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;700&family=Monoton&display=swap">
-<link rel="stylesheet" href="css/style.css?v=114">
+<link rel="stylesheet" href="css/style.css?v=115">
 </head>
 <body>
 
@@ -85,6 +85,13 @@
 
     <button id="btn-play" class="btn btn--big" disabled>Chargement du dictionnaire…</button>
 
+    <button class="grade" id="btn-grade" type="button" title="Voir la carrière">
+      <div class="grade__head"><span class="grade__k">Objectif · commissaire divisionnaire</span>
+        <b id="grade-name">Gardien de la paix</b><i id="grade-step">Grade 1 / 12</i></div>
+      <div class="grade__bar"><div class="grade__fill" id="grade-bar"></div></div>
+      <div class="grade__next" id="grade-next"></div>
+    </button>
+
     <button class="rank" id="btn-career" type="button" title="Voir tous les rangs">
       <img class="rank__img" id="rank-img" src="assets/cars/citadine-bronze.webp" alt="">
       <div class="rank__body">
@@ -122,7 +129,8 @@
         <li>Les <strong>trois chiffres</strong> d'une plaque sont sa <strong>cote</strong> : ce qu'elle rapporte une fois lue. Paires rares, cote élevée.</li>
         <li>Trois mots d'affilée sans faute font monter le <strong>multiplicateur</strong> — une erreur le remet à ×1. À <strong>×5</strong>, dix secondes de <strong>fièvre</strong> : un seul mot suffit à lire une plaque. Les <strong>mots rares</strong> rapportent un bonus.</li>
         <li>Les <strong>vingt dernières secondes</strong>, tout compte double. Les voitures <strong>dorées</strong> valent ×3 (et leur marque au sol est un joker de couleur). Le <strong>camion-citerne</strong> souffle ses voisines quand il explose.</li>
-        <li>Chaque point marqué compte pour votre <strong>carrière</strong> : treize véhicules, chacun en bronze, argent puis or — de la citadine bronze à la supercar or. Certains rangs débloquent une teinte de carrosserie. Trois <strong>missions</strong> par jour, les mêmes pour tout le monde, et des <strong>badges</strong> à décrocher.</li>
+        <li>Le but du jeu : gravir les <strong>douze grades</strong> de la police, du gardien de la paix au <strong>commissaire divisionnaire</strong>. Chaque grade demande des points <em>et</em> une condition concrète — lire tant de plaques, croiser tant de départements, pulvériser tant de sportives. Votre grade et la prochaine promotion s'affichent à l'accueil.</li>
+        <li>Chaque point marqué compte aussi pour votre <strong>dotation</strong> : treize véhicules, chacun en bronze, argent puis or — de la citadine bronze à la supercar or. Certains rangs débloquent une teinte de carrosserie. Trois <strong>missions</strong> par jour, les mêmes pour tout le monde, et des <strong>badges</strong> à décrocher.</li>
         <li>Une partie par jour entretient votre <strong>série</strong> : chaque jour d'affilée ajoute 10 % aux points de carrière, jusqu'à +100 %.</li>
         <li>Chaque plaque entièrement lue ajoute son <strong>département</strong> à votre collection — les 101 sont à découvrir.</li>
       </ol>
@@ -264,11 +272,11 @@
 
 </div>
 
-<script src="js/pairs.js?v=114"></script>
-<script src="js/departements.js?v=114"></script>
-<script src="js/dict.js?v=114"></script>
-<script src="js/game.js?v=114"></script>
-<script src="js/traffic.js?v=114"></script>
-<script src="js/pursuit.js?v=114"></script>
+<script src="js/pairs.js?v=115"></script>
+<script src="js/departements.js?v=115"></script>
+<script src="js/dict.js?v=115"></script>
+<script src="js/game.js?v=115"></script>
+<script src="js/traffic.js?v=115"></script>
+<script src="js/pursuit.js?v=115"></script>
 </body>
 </html>

@@ -224,6 +224,46 @@ for (var vi = 0; vi < VEHICLES.length; vi++) {
   }
 }
 var CAREER = { mission: 400, dep: 100 };
+
+/* ═══════════ le but du jeu : douze grades, du gardien au commissaire divisionnaire ═══════════
+   Chaque grade demande des points de carrière ET une condition concrète : c'est elle qui
+   donne une direction (lire des plaques, parcourir la France, soigner son vocabulaire).
+   Le dernier grade se mérite en ayant croisé les 101 départements.                       */
+var GRADES = [
+  { name: 'Gardien de la paix',    pts: 0 },
+  { name: 'Gardien principal',     pts: 1200,   stat: 'plates',  goal: 20,  txt: '20 plaques lues' },
+  { name: 'Brigadier',             pts: 4000,   stat: 'deps',    goal: 12,  txt: '12 départements croisés' },
+  { name: 'Brigadier-chef',        pts: 8200,   stat: 'sport',   goal: 10,  txt: '10 sportives pulvérisées' },
+  { name: 'Major',                 pts: 14000,  stat: 'plates',  goal: 100, txt: '100 plaques lues' },
+  { name: 'Lieutenant',            pts: 22000,  stat: 'rare',    goal: 40,  txt: '40 mots rares' },
+  { name: 'Lieutenant principal',  pts: 32000,  stat: 'deps',    goal: 35,  txt: '35 départements croisés' },
+  { name: 'Capitaine',             pts: 45000,  stat: 'gold',    goal: 8,   txt: '8 voitures dorées' },
+  { name: 'Commandant',            pts: 62000,  stat: 'plates',  goal: 300, txt: '300 plaques lues' },
+  { name: 'Commandant divisionnaire', pts: 85000, stat: 'expert', goal: 25, txt: '25 mots d\'expert' },
+  { name: 'Commissaire',           pts: 115000, stat: 'deps',    goal: 70,  txt: '70 départements croisés' },
+  { name: 'Commissaire divisionnaire', pts: 150000, stat: 'deps', goal: 101, txt: 'les 101 départements' }
+];
+/* un grade est acquis quand ses points ET sa condition le sont — et tous ceux d'avant */
+function gradeOf(pts, s) {
+  var g = 0;
+  for (var i = 1; i < GRADES.length; i++) {
+    var G = GRADES[i];
+    if (pts < G.pts || (G.stat && (s[G.stat] || 0) < G.goal)) break;
+    g = i;
+  }
+  return g;
+}
+function gradeState() {
+  var pts = career(), s = stats(), i = gradeOf(pts, s), next = GRADES[i + 1];
+  var out = { i: i, cur: GRADES[i], next: next, pts: pts };
+  if (next) {
+    out.ptsLeft = Math.max(0, next.pts - pts);
+    out.done = next.stat ? Math.min(next.goal, s[next.stat] || 0) : 0;
+    out.goal = next.goal || 0;
+    out.part = Math.min(1, pts / next.pts) * 0.5 + (next.stat ? Math.min(1, out.done / next.goal) * 0.5 : 0.5);
+  } else { out.part = 1; }
+  return out;
+}
 var BASE_COLORS = ['rouge', 'bleu', 'blanc', 'noir', 'vert', 'jaune', 'gris', 'orange'];
 
 /* ═══════════ le parc : toutes les silhouettes rendues par build/render_cars.py ═══════════
@@ -355,9 +395,10 @@ function rankOf(pts) {
   return r;
 }
 function addCareer(n) {
-  var before = rankOf(career()), after = career() + n;
+  var before = rankOf(career()), gradeBefore = gradeOf(career(), stats()), after = career() + n;
   store.set('career', after);
   if (rankOf(after) > before) session.newRank = RANKS[rankOf(after)];
+  if (gradeOf(after, stats()) > gradeBefore) session.newGrade = GRADES[gradeOf(after, stats())];
 }
 function colors() {
   var r = rankOf(career()), out = BASE_COLORS.slice();
@@ -537,7 +578,7 @@ function progress(type, n, absolute) {
 var session = {};
 function sessionStart() {
   session = { words: 0, bestWord: null, bestWordPts: 0, maxCombo: 1, bestPlate: null, bestPlatePts: 0,
-              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, newDeps: 0, newRank: null, missionsDone: [],
+              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, newDeps: 0, newRank: null, newGrade: null, missionsDone: [],
               badges: [], missed: [], t0: Date.now() };
 }
 var track = {
@@ -565,7 +606,7 @@ var track = {
     }
     if (pts > session.bestPlatePts) { session.bestPlatePts = pts; session.bestPlate = label; }
     progress('plates', 1);
-    if (opts && opts.sport) { session.sport++; progress('sport', 1); }
+    if (opts && opts.sport) { session.sport++; progress('sport', 1); bumpStat('sport', 1); }
     if (opts && opts.gold)  { session.gold++;  progress('gold', 1); bumpStat('gold', 1); }
   },
   miss:  function (car) { session.missed.push(car); adapt(-1); },     // une plaque partie sans être lue
@@ -740,6 +781,7 @@ function endGame() {
   html += row('Mots · plaques', s.words + ' · ' + s.plates + (s.sport ? ' (dont ' + s.sport + ' sportive' + (s.sport > 1 ? 's' : '') + ')' : ''));
   if (s.newDeps) html += row('🗺️ Nouveaux départements', s.newDeps + ' — collection ' + collection().length + '/101');
   s.missionsDone.forEach(function (lbl) { html += row('🎯 Mission accomplie', lbl); });
+  if (s.newGrade) html += row('🎖️ Promotion', '<b>' + s.newGrade.name + '</b>');
   if (s.newRank) html += row('🏅 Nouveau rang', '<b>' + s.newRank.name + '</b>' +
                              (s.newRank.unlock ? ' — teinte <b>' + s.newRank.unlock + '</b> débloquée' : ''));
   html += row('🔥 Série de jours', st.n + ' jour' + (st.n > 1 ? 's' : '') +
@@ -884,7 +926,14 @@ function renderCareer() {
   var pts = career(), r = rankOf(pts);
   $('career-intro').innerHTML = '<b>' + pts + '</b> points de carrière — chaque point marqué en partie compte, ' +
     'les missions en rapportent ' + CAREER.mission + ', un nouveau département ' + CAREER.dep + '.';
-  var html = '';
+  var G = gradeState(), s = stats();
+  var html = '<div class="grades">' + GRADES.map(function (g, i) {
+    var cls = i < G.i ? 'got' : i === G.i ? 'now' : 'todo';
+    var cond = i === 0 ? 'point de départ'
+             : g.pts + ' pts' + (g.stat ? ' · ' + g.txt : '');
+    var prog = (i > G.i && g.stat) ? ' <i>(' + Math.min(g.goal, s[g.stat] || 0) + '/' + g.goal + ')</i>' : '';
+    return '<div class="grade__row grade__row--' + cls + '"><b>' + (i + 1) + '. ' + g.name + '</b><span>' + cond + prog + '</span></div>';
+  }).join('') + '</div><h3 class="career__h">Votre dotation</h3>';
   VEHICLES.forEach(function (v, vi) {
     html += '<div class="career__row"><h3>' + v.name + (v.unlock ? ' <i>débloque la teinte ' + v.unlock + '</i>' : '') + '</h3><div class="career__metals">';
     METALS.forEach(function (m, mi) {
@@ -957,6 +1006,15 @@ function refreshHome() {
   $('rank-img').src = rankSprite(rk);
   $('rank-img').className = 'rank__img rank__img--' + rk.metal;
   $('hero-car').src = rankSprite(rk);                       // votre voiture roule sur la route de l'accueil
+  var G = gradeState();                                     // le but du jeu : gravir les douze grades
+  $('grade-name').textContent = G.cur.name;
+  $('grade-step').textContent = 'Grade ' + (G.i + 1) + ' / ' + GRADES.length;
+  $('grade-bar').style.width = Math.round(G.part * 100) + '%';
+  $('grade-next').innerHTML = G.next
+    ? '<span>Pour passer <b>' + G.next.name + '</b></span>' +
+      '<u' + (G.ptsLeft ? '' : ' class="ok"') + '>' + Math.min(G.pts, G.next.pts) + ' / ' + G.next.pts + ' pts</u>' +
+      (G.next.stat ? '<u' + (G.done >= G.goal ? ' class="ok"' : '') + '>' + G.next.txt + ' (' + G.done + '/' + G.goal + ')</u>' : '')
+    : '<span>Carrière accomplie — vous êtes <b>commissaire divisionnaire</b>.</span>';
   Array.prototype.forEach.call(document.querySelectorAll('.modecard__best'), function (el) {
     var best = store.get('best.' + el.dataset.best + '.' + state.diff, 0);
     el.textContent = best ? 'Record : ' + best : 'Jamais joué';
@@ -1191,6 +1249,7 @@ document.addEventListener('DOMContentLoaded', function () {
   $('btn-share').addEventListener('click', copyShare);
   $('btn-collection').addEventListener('click', renderCollection);
   $('btn-career').addEventListener('click', renderCareer);
+  $('btn-grade').addEventListener('click', renderCareer);
   $('btn-badges').addEventListener('click', renderBadges);
   $('btn-badges-back').addEventListener('click', window.PLAQUE.goHome);
   $('badges-list').addEventListener('click', function (e) {
