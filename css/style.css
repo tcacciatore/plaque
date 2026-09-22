@@ -570,8 +570,11 @@ body.fitted .hud__item{padding:4px 8px}
 body.fitted .hud__v{font-size:16px}
 body.fitted .ghost{display:none}
 body.fitted .road{flex:0 0 auto;margin:8px 0 6px}
-body.fitted .tr-pairs,body.fitted .pk-tokens{margin:0 0 6px;min-height:0}
-body.fitted #tr-form,body.fitted #pk-form{flex:0 0 auto}
+body.fitted .tr-pairs{margin:0 0 6px;min-height:0}
+/* rien ne s'écrase quand la place manque : seule la scène se réduit */
+body.fitted .tr-pairs,body.fitted .suggest,body.fitted #tr-form,body.fitted #pu-form,
+body.fitted .feedback,body.fitted .hint-line{flex:0 0 auto}
+.platefield{flex:0 0 auto}
 body.fitted .feedback{margin:4px 2px 0;min-height:20px;font-size:13px}
 body.fitted .hint-line{margin-top:4px;font-size:13px}
 body.fitted .soundbtn{display:none}
