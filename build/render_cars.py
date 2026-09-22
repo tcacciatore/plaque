@@ -27,7 +27,7 @@ from PIL import Image
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'assets/cars'
 W, H = 560, 380          # cadre de rendu
 OUT_W = 520              # largeur du sprite livré, après recadrage
-SS = 3                   # supersampling (rendu à SS×, réduit ensuite)
+SS = int(os.environ.get('SS', 3))   # supersampling (rendu à SS×, réduit ensuite) ; SS=1 pour un calcul rapide de layout
 RW, RH = W * SS, H * SS
 MAX_STEPS, MAX_DIST, EPS = 110, 40.0, 0.0012
 
