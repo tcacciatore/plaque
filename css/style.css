@@ -433,7 +433,8 @@ button.stat:hover{border-color:var(--accent)}
 /* ───────── Trafic : trois voies qui roulent ───────── */
 /* séparations de voies : continues et discrètes, elles convergent vers le point de fuite
    (voies à −30 / 0 / +30 % au premier plan → séparations à ±15 %) */
-.road__lane{position:absolute;inset:46% 0 0 0;background:rgba(8,10,14,.42)}
+/* pas de ligne sur la chaussée : ni marquage peint, ni joint — le bitume est nu */
+.road__lane{display:none}
 .road__lane--l{clip-path:polygon(49.75% 0,50.05% 0,34.6% 100%,33.8% 100%)}
 .road__lane--r{clip-path:polygon(49.95% 0,50.25% 0,66.2% 100%,65.4% 100%)}
 /* deux voies : une seule séparation, au centre, et des voitures plus larges */
@@ -1072,7 +1073,6 @@ body.theme-miami .road__ground::before{content:'';position:absolute;inset:0;
   mask-image:linear-gradient(180deg,rgba(0,0,0,.25),#000 40%);-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.25),#000 40%)}
 body.theme-miami .road__tarmac{background:linear-gradient(180deg,#221650 0%,#150d36 48%,#0c0722 100%)}
 body.theme-miami .road__edge{background:#2ee6d6;box-shadow:0 0 6px #2ee6d6}
-body.theme-miami .road__lane{background:rgba(255,79,163,.55)}
 body.theme-miami .post{background:linear-gradient(180deg,#ff4fa3 0 28%,#4a3a8a 28% 100%);box-shadow:0 0 8px rgba(255,79,163,.9)}
 body.theme-miami .road.rush .road__sky{background:linear-gradient(180deg,#3a0a2e 0%,#8a1560 46%,#ff2d7a 84%,#ff8a5c 100%)}
 /* cartes de mode en blanc cassé, texte sombre */
@@ -1237,7 +1237,6 @@ body.theme-miami .road__ground::before{opacity:1}
 body.theme-miami .road__tarmac::after{background:linear-gradient(180deg,rgba(255,79,163,.22),transparent)}
 body.theme-miami .road::after{background:radial-gradient(130% 95% at 50% 48%,transparent 58%,rgba(9,4,26,.5) 100%)}
 
-body.theme-miami .road__lane{background:rgba(255,79,163,.5)}
 body.theme-miami .road__tarmac{background:
   radial-gradient(30% 7% at 31% 76%,rgba(0,0,0,.2),transparent 70%),
   linear-gradient(90deg,rgba(0,0,0,.35) 0 5%,transparent 34% 66%,rgba(0,0,0,.35) 95%),
