@@ -1199,10 +1199,10 @@ body.theme-miami .road__tarmac{background:
    Même projection que les balises (y = 46 + 54/z, échelle 1/z), mais sur les séparations
    de voies : x = 50 ± 15/z. Les traits naissent à l'horizon et filent vers le bas.     */
 .road__dashes{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
-.dash{position:absolute;width:calc(var(--roadH) * .016);height:calc(var(--roadH) * .10);border-radius:1px;
-  background:linear-gradient(180deg,rgba(236,232,216,.62),rgba(214,208,188,.5));
+.dash{position:absolute;width:calc(var(--roadH) * .022);height:calc(var(--roadH) * .13);border-radius:2px;
+  background:linear-gradient(180deg,rgba(236,231,214,.62),rgba(216,210,190,.5));
   transform:translate(-50%,-100%) scale(.167);opacity:0;
-  animation:dash-run-l 2.64s linear infinite;will-change:top,left,transform}
+  animation:dash-run-l 2.6s linear infinite;will-change:top,left,transform}
 .dash--r{animation-name:dash-run-r}
 @keyframes dash-run-l{
   0%   {top:55%;   left:47.50%;transform:translate(-50%,-100%) scale(.167);opacity:0}
