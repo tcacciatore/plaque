@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   PLAQUE — mode Trafic
+   PLAQUE — mode Chasse
    Au volant sur trois voies : chaque voie a sa voiture, qui arrive
    à son heure, reste devant vous un moment, puis s'éloigne ou
    explose. Trois modèles toujours différents. Deux mots par plaque,

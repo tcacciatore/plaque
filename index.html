@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;700&family=Monoton&display=swap">
-<link rel="stylesheet" href="css/style.css?v=116">
+<link rel="stylesheet" href="css/style.css?v=118">
 </head>
 <body>
 
@@ -61,13 +61,13 @@
     <div class="modes-wrap">
       <div class="modes" id="opt-mode" role="radiogroup" aria-label="Mode de jeu">
         <button data-v="trafic" class="on modecard modecard--trafic" role="radio">
-          <img src="assets/cars/coupe-rouge.webp" alt="">
-          <span><b>Trafic</b><em>au volant — trois voies, deux mots par voiture, 2 minutes</em><i class="modecard__best" data-best="trafic"></i></span>
+          <span class="modecard__pic"><img src="assets/cars/berline-blanc.webp" alt="">
+            <i class="cop"><i></i><i></i></i></span>
+          <span><b>Chasse</b><em>au volant de la police — trois voies, deux mots par voiture, 2 minutes</em><i class="modecard__best" data-best="trafic"></i></span>
         </button>
         <button data-v="poursuite" class="modecard modecard--poursuite" role="radio">
-          <span class="modecard__pic"><img src="assets/cars/berline-blanc-front.webp" alt="">
-            <i class="cop"><i></i><i></i></i></span>
-          <span><b>Poursuite</b><em>en fuite — elles arrivent de derrière, un mot par plaque, trois pare-chocs, sans fin</em><i class="modecard__best" data-best="poursuite"></i></span>
+          <span class="modecard__pic"><img src="assets/cars/coupe-rouge-front.webp" alt=""></span>
+          <span><b>Poursuite</b><em>en fuite au volant d'une civile — la police arrive de derrière, un mot par plaque, trois pare-chocs</em><i class="modecard__best" data-best="poursuite"></i></span>
         </button>
       </div>
       <div class="modes__dots" id="modes-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
@@ -87,7 +87,7 @@
     <button id="btn-play" class="btn btn--big" disabled>Chargement du dictionnaire…</button>
 
     <button class="grade" id="btn-grade" type="button" title="Voir la carrière">
-      <div class="grade__head"><span class="grade__k">Objectif · commissaire divisionnaire</span>
+      <div class="grade__head"><span class="grade__k">Carrière</span>
         <b id="grade-name">Gardien de la paix</b><i id="grade-step">Grade 1 / 12</i></div>
       <div class="grade__bar"><div class="grade__fill" id="grade-bar"></div></div>
       <div class="grade__next" id="grade-next"></div>
@@ -123,7 +123,7 @@
         <li>Chaque plaque porte <strong>deux paires de lettres</strong>. Tapez des mots qui contiennent les deux lettres d'une paire, <strong>dans l'ordre</strong>, où que ce soit dans le mot.<br>
         <span class="ex"><b>PL</b>·123·<b>MT</b> → <b>P</b>o<b>L</b>ogne, <b>M</b>a<b>T</b>raque, <b>PL</b>ongeon, <b>P</b>a<b>L</b>udisme, ex<b>pL</b>oser</span></li>
         <li>Une plaque est <strong>lue</strong> quand ses deux paires ont chacune leur mot — et la voiture explose.</li>
-        <li>En <strong>Trafic</strong>, vous êtes au volant d'une <strong>voiture de police</strong> — sa rampe clignote au bas de l'écran : les voitures vous doublent sur trois voies (deux sur un petit écran), chacune à son heure, toujours de modèles différents, et restent 23 s devant vous — 17 s en fin de partie (plus en Facile, moins en Expert). Chaque mot trouvé rallonge la partie de 1 s et la voiture visée de 3 s ; une plaque lue ajoute 2 s de plus.</li>
+        <li>En <strong>Chasse</strong>, vous êtes au volant d'une <strong>voiture de police</strong> — sa rampe clignote au bas de l'écran : les voitures vous doublent sur trois voies (deux sur un petit écran), chacune à son heure, toujours de modèles différents, et restent 23 s devant vous — 17 s en fin de partie (plus en Facile, moins en Expert). Chaque mot trouvé rallonge la partie de 1 s et la voiture visée de 3 s ; une plaque lue ajoute 2 s de plus.</li>
         <li>En <strong>Poursuite</strong>, vous êtes en fuite, votre véhicule de rang vu de face au premier plan. Les <strong>voitures de police</strong> arrivent de l'horizon <strong>derrière vous</strong>, se <strong>calent</strong> à distance : leur plaque, d'abord floue parce qu'elles sont trop loin, devient nette à portée — y restent une quinzaine de secondes, puis <strong>chargent</strong> : celles de <strong>votre voie</strong> vous percutent si vous ne les avez pas lues, les autres vous doublent. Pas d'esquive, seulement les mots ; un seul mot, sur l'une ou l'autre paire, suffit. Trois pare-chocs, sans fin. Sur un petit écran, deux voies.</li>
                 <li>Tapez un mot : il se valide tout seul après une demi-seconde de pause (Entrée ou espace pour aller plus vite). Dans les deux modes, n'importe quel mot va sur n'importe quelle plaque affichée : le jeu trouve la cible et vous dit laquelle. <strong>Touchez une voiture</strong> (ou ses jetons) pour la désigner : vos mots iront à elle en priorité. Un mot qui porte les deux paires lit la plaque d'un coup, en double. Les <strong>coupés</strong> valent ×1,5, les <strong>supercars</strong> ×2.</li>
         <li>Chaque modèle a son <strong>caractère</strong>, affiché au-dessus de lui, et un temps de présence à sa mesure. <strong>Citadine</strong> : 5 lettres max, elle file vite. <strong>Cabriolet</strong> : 7 lettres au moins, cote ×1,5. <strong>Ancienne</strong> : mots rares ou peu courants seulement, cote ×2. <strong>Monospace</strong> : les deux mots ont la même initiale, cote ×1,5. <strong>Utilitaire</strong> : la lire rend 5 s (en Poursuite : répare un pare-chocs). <strong>4×4</strong> : sa deuxième paire est cachée tant que la première n'est pas lue (en Poursuite, où un mot suffit, seule sa paire la plus rare compte), cote ×1,5. <strong>Camion</strong> : deux mots par paire, il reste deux fois plus longtemps, cote ×2. <strong>Camping-car</strong> : lent, cote ×0,5. <strong>Pick-up</strong> : sa benne transporte un bonus (+8 s, une paire offerte ou cote ×2). Berline et break restent neutres — et en Facile, les modèles à règle restent au garage.</li>
@@ -273,11 +273,11 @@
 
 </div>
 
-<script src="js/pairs.js?v=116"></script>
-<script src="js/departements.js?v=116"></script>
-<script src="js/dict.js?v=116"></script>
-<script src="js/game.js?v=116"></script>
-<script src="js/traffic.js?v=116"></script>
-<script src="js/pursuit.js?v=116"></script>
+<script src="js/pairs.js?v=118"></script>
+<script src="js/departements.js?v=118"></script>
+<script src="js/dict.js?v=118"></script>
+<script src="js/game.js?v=118"></script>
+<script src="js/traffic.js?v=118"></script>
+<script src="js/pursuit.js?v=118"></script>
 </body>
 </html>

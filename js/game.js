@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   PLAQUE — moteur commun aux modes Trafic et Poursuite
+   PLAQUE — moteur commun aux modes Chasse et Poursuite
    dictionnaire, règle des lettres, tirage des plaques, question
    bonus, collection, records, partage, sons, explosion.
    ═══════════════════════════════════════════════════════════ */
@@ -8,7 +8,7 @@
 
 /* ─────────── réglages ─────────── */
 var MODES = {
-  trafic:    { label: 'Trafic',    traffic: true },
+  trafic:    { label: 'Chasse',    traffic: true },      // l'identifiant reste 'trafic' : les records et fantômes sont conservés
   poursuite: { label: 'Poursuite', pursuit: true }
 };
 // la difficulté règle la richesse des paires tirées : n = mots courants disponibles
@@ -229,7 +229,8 @@ var CAREER = { mission: 400, dep: 100 };
    Chaque grade demande des points de carrière ET une condition concrète : c'est elle qui
    donne une direction (lire des plaques, parcourir la France, soigner son vocabulaire).
    Le dernier grade se mérite en ayant croisé les 101 départements.                       */
-var GRADES = [
+var LADDERS = {};
+LADDERS.trafic = { key: 'police', label: 'Carrière de police', goal: 'commissaire divisionnaire', list: [
   { name: 'Gardien de la paix',    pts: 0 },
   { name: 'Gardien principal',     pts: 1200,   stat: 'plates',  goal: 20,  txt: '20 plaques lues' },
   { name: 'Brigadier',             pts: 4000,   stat: 'deps',    goal: 12,  txt: '12 départements croisés' },
@@ -242,20 +243,36 @@ var GRADES = [
   { name: 'Commandant divisionnaire', pts: 85000, stat: 'expert', goal: 25, txt: '25 mots d\'expert' },
   { name: 'Commissaire',           pts: 115000, stat: 'deps',    goal: 70,  txt: '70 départements croisés' },
   { name: 'Commissaire divisionnaire', pts: 150000, stat: 'deps', goal: 101, txt: 'les 101 départements' }
-];
+]};
+/* l'autre versant : en Poursuite vous êtes le fuyard, et vous montez dans le grand banditisme */
+LADDERS.poursuite = { key: 'fuite', label: 'Carrière de fugitif', goal: 'insaisissable', list: [
+  { name: 'Conducteur discret',    pts: 0 },
+  { name: 'Chauffard',             pts: 1000,   stat: 'plates',  goal: 20,  txt: '20 patrouilles semées' },
+  { name: 'Grillé au radar',       pts: 3500,   stat: 'km',      goal: 3,   txt: '3 km en une cavale' },
+  { name: 'Fuyard',                pts: 7000,   stat: 'fever',   goal: 5,   txt: '5 fièvres déclenchées' },
+  { name: 'Semeur de patrouilles', pts: 12000,  stat: 'plates',  goal: 80,  txt: '80 patrouilles semées' },
+  { name: 'Fugitif',               pts: 19000,  stat: 'km',      goal: 6,   txt: '6 km en une cavale' },
+  { name: 'Cavale confirmée',      pts: 28000,  stat: 'rare',    goal: 40,  txt: '40 mots rares' },
+  { name: 'Ennemi public nº 10',   pts: 40000,  stat: 'gold',    goal: 8,   txt: '8 voitures dorées' },
+  { name: 'Ennemi public nº 5',    pts: 55000,  stat: 'plates',  goal: 250, txt: '250 patrouilles semées' },
+  { name: 'Ennemi public nº 2',    pts: 75000,  stat: 'km',      goal: 12,  txt: '12 km en une cavale' },
+  { name: 'Ennemi public nº 1',    pts: 100000, stat: 'expert',  goal: 25,  txt: '25 mots d\'expert' },
+  { name: 'Insaisissable',         pts: 135000, stat: 'km',      goal: 20,  txt: '20 km en une cavale' }
+]};
+function ladder(mode) { return LADDERS[mode || state.mode] || LADDERS.trafic; }
 /* un grade est acquis quand ses points ET sa condition le sont — et tous ceux d'avant */
-function gradeOf(pts, s) {
-  var g = 0;
-  for (var i = 1; i < GRADES.length; i++) {
-    var G = GRADES[i];
+function gradeOf(pts, s, L) {
+  var list = (L || ladder()).list, g = 0;
+  for (var i = 1; i < list.length; i++) {
+    var G = list[i];
     if (pts < G.pts || (G.stat && (s[G.stat] || 0) < G.goal)) break;
     g = i;
   }
   return g;
 }
-function gradeState() {
-  var pts = career(), s = stats(), i = gradeOf(pts, s), next = GRADES[i + 1];
-  var out = { i: i, cur: GRADES[i], next: next, pts: pts };
+function gradeState(mode) {
+  var L = ladder(mode), pts = careerOf(L.key), s = stats(), i = gradeOf(pts, s, L), next = L.list[i + 1];
+  var out = { i: i, cur: L.list[i], next: next, pts: pts, L: L, n: L.list.length, goalTxt: L.goal };
   if (next) {
     out.ptsLeft = Math.max(0, next.pts - pts);
     out.done = next.stat ? Math.min(next.goal, s[next.stat] || 0) : 0;
@@ -268,7 +285,7 @@ var BASE_COLORS = ['rouge', 'bleu', 'blanc', 'noir', 'vert', 'jaune', 'gris', 'o
 
 /* ═══════════ le parc : toutes les silhouettes rendues par build/render_cars.py ═══════════
    plateY / plateW : centre et largeur de l'emplacement de plaque sur le sprite, en % (layout.json) ;
-   size : largeur affichée en Trafic et Poursuite, en fraction de la hauteur de scène ;
+   size : largeur affichée en Chasse et Poursuite, en fraction de la hauteur de scène ;
    sport : multiplicateur de points ; front : la plaque avant, vue de face.                     */
 var FLEET = {
   berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, front: { y: 78.7, w: 47.1, ratio: 1.388 } },
@@ -295,7 +312,7 @@ function sportTag(shape) { return '🏎️ ×' + String(sportBonus(shape)).repla
    proportionné : une citadine « 5 lettres max » file vite, un camion « deux mots par
    paire » reste deux fois plus longtemps. La berline et le break restent neutres.
    rule : contrainte sur les mots ; cote : multiplicateur de la cote ; time : facteur
-   de temps (Trafic : présence, Poursuite : vitesse d'approche) ; give : secondes rendues
+   de temps (Chasse : présence, Poursuite : vitesse d'approche) ; give : secondes rendues
    quand la plaque est lue ; hidden : deuxième paire cachée tant que la première n'est
    pas lue ; need : mots nécessaires par paire ; cargo : un bonus tiré au sort.         */
 var TRAITS = {
@@ -388,17 +405,26 @@ function fleetRoster() {
   return shuffle(neutral).slice(0, nNeutral).concat(shuffle(regular).slice(0, 5 - nNeutral)).concat(sports);
 }
 
-function career() { return store.get('career', 0); }
+/* deux cagnottes : les points gagnés en Chasse font le policier, ceux de Poursuite le fugitif.
+   La dotation (le véhicule) se mérite avec le total des deux.                                */
+function careerOf(key) {
+  var v = store.get('career.' + key, null);
+  if (v === null) { v = key === 'police' ? store.get('career', 0) : 0; store.set('career.' + key, v); }
+  return v;
+}
+function career() { return careerOf('police') + careerOf('fuite'); }
 function rankOf(pts) {
   var r = 0;
   for (var i = 0; i < RANKS.length; i++) if (pts >= RANKS[i].pts) r = i;
   return r;
 }
 function addCareer(n) {
-  var before = rankOf(career()), gradeBefore = gradeOf(career(), stats()), after = career() + n;
-  store.set('career', after);
-  if (rankOf(after) > before) session.newRank = RANKS[rankOf(after)];
-  if (gradeOf(after, stats()) > gradeBefore) session.newGrade = GRADES[gradeOf(after, stats())];
+  var L = ladder(), key = L.key;
+  var before = rankOf(career()), gradeBefore = gradeOf(careerOf(key), stats(), L);
+  store.set('career.' + key, careerOf(key) + n);
+  if (rankOf(career()) > before) session.newRank = RANKS[rankOf(career())];
+  var g = gradeOf(careerOf(key), stats(), L);
+  if (g > gradeBefore) session.newGrade = L.list[g];
 }
 function colors() {
   var r = rankOf(career()), out = BASE_COLORS.slice();
@@ -610,7 +636,8 @@ var track = {
     if (opts && opts.gold)  { session.gold++;  progress('gold', 1); bumpStat('gold', 1); }
   },
   miss:  function (car) { session.missed.push(car); adapt(-1); },     // une plaque partie sans être lue
-  fever: function () { bumpStat('fever', 1); }
+  fever: function () { bumpStat('fever', 1); },
+  km:    function (km) { bumpStat('km', Math.floor(km), true); }
 };
 
 /* ═══════════ le « juice » : compteurs qui défilent, score qui réagit ═══════════ */
@@ -871,7 +898,7 @@ function shareText() {
     for (var u = 0; u < Math.min(12, h.length); u++) bars += h[u].reached ? '💥' : '⬜';
     for (var q = 0; q < h.length; q++) bars += h[q].reached ? '💥' : '⬜';
   } else {
-    lines.push('🚦 PLAQUE — Trafic  ·  ' + DIFF[state.diff].label);
+    lines.push('🚦 PLAQUE — Chasse  ·  ' + DIFF[state.diff].label);
     lines.push(done + ' voiture' + (done > 1 ? 's' : '') + ' pulvérisée' + (done > 1 ? 's' : '') +
                ' sur ' + h.length + ' croisée' + (h.length > 1 ? 's' : ''));
     for (var t = 0; t < Math.min(12, h.length); t++) bars += h[t].reached ? '💥' : '⬜';
@@ -926,14 +953,18 @@ function renderCareer() {
   var pts = career(), r = rankOf(pts);
   $('career-intro').innerHTML = '<b>' + pts + '</b> points de carrière — chaque point marqué en partie compte, ' +
     'les missions en rapportent ' + CAREER.mission + ', un nouveau département ' + CAREER.dep + '.';
-  var G = gradeState(), s = stats();
-  var html = '<div class="grades">' + GRADES.map(function (g, i) {
-    var cls = i < G.i ? 'got' : i === G.i ? 'now' : 'todo';
-    var cond = i === 0 ? 'point de départ'
-             : g.pts + ' pts' + (g.stat ? ' · ' + g.txt : '');
-    var prog = (i > G.i && g.stat) ? ' <i>(' + Math.min(g.goal, s[g.stat] || 0) + '/' + g.goal + ')</i>' : '';
-    return '<div class="grade__row grade__row--' + cls + '"><b>' + (i + 1) + '. ' + g.name + '</b><span>' + cond + prog + '</span></div>';
-  }).join('') + '</div><h3 class="career__h">Votre dotation</h3>';
+  var s = stats(), html = '';
+  ['trafic', 'poursuite'].forEach(function (mode) {           // les deux versants : police et fugitif
+    var G = gradeState(mode);
+    html += '<h3 class="career__h">' + G.L.label + ' <i>' + careerOf(G.L.key) + ' pts</i></h3><div class="grades">' +
+      G.L.list.map(function (g, i) {
+        var cls = i < G.i ? 'got' : i === G.i ? 'now' : 'todo';
+        var cond = i === 0 ? 'point de départ' : g.pts + ' pts' + (g.stat ? ' · ' + g.txt : '');
+        var prog = (i > G.i && g.stat) ? ' <i>(' + Math.min(g.goal, s[g.stat] || 0) + '/' + g.goal + ')</i>' : '';
+        return '<div class="grade__row grade__row--' + cls + '"><b>' + (i + 1) + '. ' + g.name + '</b><span>' + cond + prog + '</span></div>';
+      }).join('') + '</div>';
+  });
+  html += '<h3 class="career__h">Votre dotation</h3>';
   VEHICLES.forEach(function (v, vi) {
     html += '<div class="career__row"><h3>' + v.name + (v.unlock ? ' <i>débloque la teinte ' + v.unlock + '</i>' : '') + '</h3><div class="career__metals">';
     METALS.forEach(function (m, mi) {
@@ -1006,15 +1037,16 @@ function refreshHome() {
   $('rank-img').src = rankSprite(rk);
   $('rank-img').className = 'rank__img rank__img--' + rk.metal;
   $('hero-car').src = rankSprite(rk);                       // votre voiture roule sur la route de l'accueil
-  var G = gradeState();                                     // le but du jeu : gravir les douze grades
+  var G = gradeState();                                     // le but du jeu : gravir les douze grades du mode choisi
   $('grade-name').textContent = G.cur.name;
-  $('grade-step').textContent = 'Grade ' + (G.i + 1) + ' / ' + GRADES.length;
+  document.querySelector('.grade__k').textContent = G.L.label + ' · ' + G.goalTxt;
+  $('grade-step').textContent = 'Grade ' + (G.i + 1) + ' / ' + G.n;
   $('grade-bar').style.width = Math.round(G.part * 100) + '%';
   $('grade-next').innerHTML = G.next
     ? '<span>Pour passer <b>' + G.next.name + '</b></span>' +
       '<u' + (G.ptsLeft ? '' : ' class="ok"') + '>' + Math.min(G.pts, G.next.pts) + ' / ' + G.next.pts + ' pts</u>' +
       (G.next.stat ? '<u' + (G.done >= G.goal ? ' class="ok"' : '') + '>' + G.next.txt + ' (' + G.done + '/' + G.goal + ')</u>' : '')
-    : '<span>Carrière accomplie — vous êtes <b>commissaire divisionnaire</b>.</span>';
+    : '<span>Carrière accomplie — vous êtes <b>' + G.goalTxt + '</b>.</span>';
   Array.prototype.forEach.call(document.querySelectorAll('.modecard__best'), function (el) {
     var best = store.get('best.' + el.dataset.best + '.' + state.diff, 0);
     el.textContent = best ? 'Record : ' + best : 'Jamais joué';

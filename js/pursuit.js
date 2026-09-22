@@ -41,7 +41,7 @@ var R = { running: false, cars: [], lives: LIVES, score: 0, km: 0, done: 0, dodg
           invulnUntil: 0, history: [], sceneW: 0, sceneH: 0 };
 var $ = function (id) { return document.getElementById(id); };
 
-/* ─────────── projection : la même que la route du Trafic ─────────── */
+/* ─────────── projection : la même que la route de la Chasse ─────────── */
 function project(lane, z) {
   return { x: 50 + LANES[lane] / z, y: 46 + 48 / z, s: 1 / z };   // x, y en % de la scène ; y = bas de la voiture
 }
@@ -432,6 +432,7 @@ function finish() {
   R.running = false;
   cancelAnimationFrame(R.raf);
   R.cars.slice().forEach(function (c) { removeCar(c, 'pcar--pass'); });
+  P.track.km(R.km);                                 // le record de distance d'une cavale
   P.state.history = R.history;
   P.finishGame(
     P.row('Distance', R.km.toFixed(1) + ' km') +

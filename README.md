@@ -205,6 +205,17 @@ dorées) ; le dernier demande les 101 départements. L'accueil affiche le grade,
 barre d'avancement et les deux conditions à remplir ; l'écran Carrière déroule
 l'échelle complète, la dotation (13 véhicules × 3 métaux) en dessous.
 
+## Le but du jeu : deux carrières de douze grades
+
+`LADDERS` (`js/game.js`) : en **Chasse** on gravit la police (gardien de la paix →
+commissaire divisionnaire), en **Poursuite** le grand banditisme (conducteur
+discret → insaisissable). Chaque versant a sa cagnotte de points (`career.police`,
+`career.fuite`) et chaque grade exige des points **et** une condition (plaques ou
+patrouilles, départements, sportives, mots rares ou d'expert, dorées, distance
+d'une cavale). L'accueil affiche le grade du mode choisi et ce qu'il reste à faire ;
+l'écran Carrière déroule les deux échelles, la dotation (13 véhicules × 3 métaux,
+gagnée sur le total des deux cagnottes) en dessous.
+
 ## Thème « Miami Vice »
 
 `?theme=miami` active un second habillage (mémorisé) : nuit bleu-violet, rose
