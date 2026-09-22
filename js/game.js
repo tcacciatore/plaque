@@ -13,15 +13,15 @@ var MODES = {
 };
 // la difficulté règle la richesse des paires tirées : n = mots courants disponibles
 var DIFF = {
-  facile: { nMin: 1200, nMax: 4200, label: 'Facile' },
-  normal: { nMin: 400,  nMax: 1250, label: 'Normal' },
-  expert: { nMin: 150,  nMax: 480,  label: 'Expert' }
+  facile: { nMin: 900,  nMax: 3400, label: 'Facile' },
+  normal: { nMin: 300,  nMax: 950,  label: 'Normal' },
+  expert: { nMin: 150,  nMax: 380,  label: 'Expert' }
 };
 // plancher absolu : sous ce nombre de mots courants, une paire est trop ingrate pour le jeu
 var PAIR_FLOOR = 150;
 // un modèle qui impose une règle (5 lettres max, mots rares, même initiale…) exige une
 // paire riche : sinon la contrainte croisée rend la plaque impossible à lire
-var PAIR_RULE_MIN = 900;
+var PAIR_RULE_MIN = 700;
 
 var state = { mode: 'trafic', diff: 'normal', total: 0, history: [], rng: Math.random, usedPairs: {} };
 

@@ -10,25 +10,25 @@
 
 var P = null;                       // passerelle vers le moteur (window.PLAQUE)
 var GAME_TIME = 120;                // durée d'une partie, en secondes
-var CAR_TIME  = 23;                 // temps de présence d'une voiture au départ…
-var CAR_TIME_END = 17;              // …et en fin de partie (la rampe)
-var CAR_TIME_DIFF = { facile: 1.25, normal: 1, expert: 0.8 };   // …modulé par la difficulté
+var CAR_TIME  = 19;                 // temps de présence d'une voiture au départ…
+var CAR_TIME_END = 12;              // …et en fin de partie (la rampe)
+var CAR_TIME_DIFF = { facile: 1.3, normal: 1, expert: 0.75 };   // …modulé par la difficulté
 var RUSH      = 20;                 // les dernières secondes : tout compte double
 var FEVER     = 10;                 // durée de la fièvre déclenchée à ×5 : un mot suffit
 var GOLD_ODDS = 25, GOLD_MULT = 3;  // voiture dorée : une sur 25, ×3
 var TANK_ODDS = 14;                 // camion-citerne : un sur 14, explosion en chaîne
 var WORD_TIME = 1;                  // secondes de partie gagnées par mot valide
 var PLATE_TIME = 2;                 // secondes de partie gagnées en plus par plaque lue
-var CAR_BONUS = 3;                  // secondes rendues à la voiture visée par mot valide
+var CAR_BONUS = 2;                  // secondes rendues à la voiture visée par mot valide
 // rythme d'arrivée selon la difficulté : écart minimal entre deux apparitions,
 // toutes voies confondues, puis délai avant qu'une voie libre se réalimente (ms)
 var PACE = {
-  facile: { gap: 8000, min: 6500, max: 8500 },
-  normal: { gap: 6000, min: 5000, max: 7000 },
-  expert: { gap: 4500, min: 3500, max: 5500 }
+  facile: { gap: 7000, min: 6000, max: 8000 },
+  normal: { gap: 5000, min: 4200, max: 6000 },
+  expert: { gap: 3600, min: 3000, max: 4600 }
 };
 var SPAWN_GAP = 5500, GAP_MIN = 4500, GAP_MAX = 6500;   // réglés au démarrage d'après PACE
-var TIME_CAP  = 135;                // la partie ne dépasse jamais 2 min 15
+var TIME_CAP  = 128;                // la partie ne dépasse guère 2 min 08
 var LANES3    = [-30, 0, 30];       // décalage de chaque voie, en % de la largeur de scène
 var LANES2    = [-25, 25];          // sur petit écran : deux voies plus écartées, voitures plus grandes
 var NARROW    = 700;                // largeur d'écran sous laquelle on passe à deux voies

@@ -19,8 +19,8 @@ fois lue. Le **numéro de département** rejoint votre collection à chaque plaq
 
 | Mode | Boucle |
 |---|---|
-| **Trafic** | Au volant sur trois voies (deux sur un écran de moins de 560 px, pour garder les plaques lisibles) : chaque voie a sa voiture, qui arrive à son heure (6 s d'écart en Normal, 8 en Facile, 4,5 en Expert) et reste 23 s devant vous (×1,25 en Facile, ×0,8 en Expert) ; les trois modèles sont toujours différents. Deux mots par voiture, un par paire. Une plaque lue fait **exploser** la voiture ; une plaque ratée la laisse filer, et la voie se réalimente après 5 à 7 s. La partie dure 2 minutes, mais chaque mot rallonge la partie de 1 s et la voiture visée de 3 s, et une plaque lue ajoute 2 s de plus (plafond 2 min 15). |
-| **Poursuite** | Vue à la troisième personne : votre véhicule de rang, **vu de face**, en fuite au premier plan ; les **voitures de police** arrivent de l'horizon **derrière lui** (elles aussi vues de face), se **calent** à distance fixe — plaque rivée à leur pare-chocs, floue tant qu'elles approchent, nette à portée — y restent 15 s (11 s au plus court, ×1,3 en Facile, ×0,75 en Expert), puis **chargent**. **Un seul mot**, sur l'une ou l'autre paire, dégomme une plaque (les deux paires dans un mot : ×2). Celles de votre voie sont des menaces à faire sauter avant qu'elles vous percutent ; il n'y a pas d'esquive, seulement les mots. Celles des voies voisines vous frôlent : des points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin. *In extremis* ×1,5, dernier pare-chocs ×2, fièvre ×2. |
+| **Trafic** | Au volant sur trois voies (deux sur un écran de moins de 560 px, pour garder les plaques lisibles) : chaque voie a sa voiture, qui arrive à son heure (5 s d'écart en Normal, 7 en Facile, 3,6 en Expert) et reste 19 s devant vous (×1,25 en Facile, ×0,8 en Expert) ; les trois modèles sont toujours différents. Deux mots par voiture, un par paire. Une plaque lue fait **exploser** la voiture ; une plaque ratée la laisse filer, et la voie se réalimente après 4,2 à 6 s. La partie dure 2 minutes, mais chaque mot rallonge la partie de 1 s et la voiture visée de 2 s, et une plaque lue ajoute 2 s de plus (plafond 2 min 15). |
+| **Poursuite** | Vue à la troisième personne : votre véhicule de rang, **vu de face**, en fuite au premier plan ; les **voitures de police** arrivent de l'horizon **derrière lui** (elles aussi vues de face), se **calent** à distance fixe — plaque rivée à leur pare-chocs, floue tant qu'elles approchent, nette à portée — y restent 12 s (7,5 s au plus court, ×1,3 en Facile, ×0,75 en Expert), puis **chargent**. **Un seul mot**, sur l'une ou l'autre paire, dégomme une plaque (les deux paires dans un mot : ×2). Celles de votre voie sont des menaces à faire sauter avant qu'elles vous percutent ; il n'y a pas d'esquive, seulement les mots. Celles des voies voisines vous frôlent : des points à prendre. Trois pare-chocs, la vitesse qui monte, sans fin. *In extremis* ×1,5, dernier pare-chocs ×2, fièvre ×2. |
 
 La saisie n'a pas de bouton : un mot se valide tout seul après une demi-seconde de pause de frappe
 — dès qu'il est dans le dictionnaire et va sur une plaque (Entrée ou espace
@@ -76,7 +76,7 @@ La première voiture d'une partie est toujours neutre. Le roster en contient deu
 | **fièvre** | à ×5, dix secondes pendant lesquelles un seul mot suffit à lire une plaque ; puis la série redescend à ×3 |
 | **rush** | les vingt dernières secondes, tout compte double, le ciel vire au rouge |
 
-En Trafic, les voitures restent 23 s au départ et 17 s en fin de partie (la rampe, modulée par la difficulté), et les
+En Chasse, les voitures restent 19 s au départ et 12 s en fin de partie (la rampe, modulée par la difficulté), et les
 coupés se multiplient passé la première minute. La première voiture (Trafic) ont toujours des paires accessibles.
 
 ### Carrière
