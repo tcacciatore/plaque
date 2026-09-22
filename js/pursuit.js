@@ -11,7 +11,7 @@
 
 var P = null;
 var LIVES = 3;
-var LANES3 = [-50, 0, 50], LANES2 = [0, 50];        // trois voies bien écartées ; deux sur un petit écran (la vôtre et une de dépassement)
+var LANES3 = [-62, 0, 62], LANES2 = [0, 62];        // trois voies bien écartées ; deux sur un petit écran (la vôtre et une de dépassement)
 var LANES = LANES3, MY_LANE = 1;
 var NARROW = 700;
 var HERO_Z = 1.15, HERO_K = 0.55;                    // votre voiture : bas dans le cadre, réduite juste assez pour
@@ -20,7 +20,7 @@ var Z_FAR = 10, Z_HIT = HERO_Z + 0.55, Z_PASS = 1.0;  // l'impact au contact de 
 /* Une voiture arrive vite de l'horizon, se cale derrière vous à Z_HOLD — plaque nette, taille
    fixe, un emplacement par voie — y reste HOLD secondes, puis fonce : sur vous si elle est
    sur votre voie, sinon elle vous double. Pas de zoom pendant la lecture.                  */
-var Z_HOLD_MINE = 3.0, Z_HOLD_SIDE = 2.4;             // profondeur d'attente : derrière vous sur votre voie ; sur les côtés, un peu plus près, aux bords
+var Z_HOLD_MINE = 3.0, Z_HOLD_SIDE = 2.7;             // profondeur d'attente : derrière vous sur votre voie ; sur les côtés, un peu plus près, aux bords
 var V_IN = 5.0, V_RUSH = 2.2;                         // vitesses d'approche et de charge (z/s)
 var PLATE_K = 1.9;                                    // la plaque, posée sur la voiture, est grossie d'autant pour rester lisible
 function holdZ(lane) { return lane === MY_LANE ? Z_HOLD_MINE : Z_HOLD_SIDE; }

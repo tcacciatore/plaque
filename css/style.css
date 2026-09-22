@@ -254,7 +254,7 @@ button.stat:hover{border-color:var(--accent)}
    s'arrête à l'horizon (48,4 %) au lieu de décoller.                     */
 .road__cars{position:absolute;inset:0}
 .car{
-  position:absolute;left:calc(50% + var(--lane,0%));bottom:6%;
+  position:absolute;left:calc(50% + var(--lane,0%));bottom:12%;   /* la place du bas revient à votre voiture de police */
   width:min(calc(var(--roadH) * var(--w,.74)), 30%);
   transform:translate(-50%,0) scale(1);transform-origin:50% 100%;
   will-change:transform,opacity;
@@ -1200,7 +1200,15 @@ body.theme-miami .road__tarmac{background:
    Trafic : vous êtes au volant d'une voiture de police — sa rampe de gyrophares entre
    dans le bas du cadre et ses éclats bleu-rouge balaient la route.
    Poursuite : ce sont les voitures de police qui vous rattrapent, gyrophares allumés. */
-.copbar{position:absolute;left:50%;bottom:1.5%;width:min(24%,160px);height:4.4%;transform:translateX(-50%);z-index:1150;pointer-events:none}
+/* votre voiture de police, vue de dos, au premier plan — cadrée juste sous le capot arrière */
+.copcar{position:absolute;left:50%;bottom:-32%;width:min(48%,calc(var(--roadH) * .66));transform:translateX(-50%);
+  z-index:1150;pointer-events:none}
+.copcar__body{display:block;width:100%;height:auto;filter:drop-shadow(0 -6px 22px rgba(0,0,0,.55));
+  animation:rumble .16s ease-in-out infinite alternate}
+/* bande bleue de flanc, sous les vitres */
+.copcar__stripe{position:absolute;left:6%;right:6%;top:46%;height:5%;background:linear-gradient(180deg,#2f6fd8,#1b4fa8);
+  opacity:.9;border-radius:2px;box-shadow:0 1px 0 rgba(255,255,255,.25)}
+.copbar{position:absolute;left:50%;top:1%;width:26%;height:5.5%;transform:translateX(-50%);z-index:2;pointer-events:none}
 .copbar__body{position:absolute;inset:auto 0 0 0;height:62%;border-radius:8px 8px 3px 3px;
   background:linear-gradient(180deg,#2b323e,#161b23);box-shadow:0 -2px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12)}
 .copbar i{position:absolute;bottom:28%;width:30%;height:62%;border-radius:5px 5px 2px 2px;z-index:2}
