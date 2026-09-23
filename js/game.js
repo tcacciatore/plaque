@@ -1249,10 +1249,73 @@ function attachSuggest(input, form, box, pairsFn) {
     var b = e.target.closest('button.sug'); if (!b) return;
     e.preventDefault();                                   // le champ garde le focus, le clavier reste ouvert
     input.value = b.textContent;
+    input.dispatchEvent(new Event('input', { bubbles: true }));   // le surlignage suit le mot proposé
     form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     render();
   });
   return render;
+}
+
+/* ═══════════ le champ allume la paire, lettre par lettre ═══════════
+   Deux lettres dans l'ordre, quelque part dans le mot : tant qu'on tape à l'aveugle,
+   la règle du jeu reste une idée. Un calque posé sur le champ reprend le texte lettre
+   pour lettre et surligne les deux qui comptent, dès l'instant où elles sont là. Si le
+   mot tient aussi au dictionnaire, la plaque passe au vert : il partira tout seul.   */
+function normMap(s) {                 // normalise en gardant, pour chaque lettre, sa place dans le texte tapé
+  var out = '', map = [];
+  for (var i = 0; i < s.length; i++) {
+    var c = norm(s[i]);
+    for (var k = 0; k < c.length; k++) { out += c[k]; map.push(i); }
+  }
+  return { w: out, map: map };
+}
+function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function attachLive(input, pairsFn) {
+  var field = input.closest('.platefield');
+  var ghost = field.querySelector('.platefield__ghost');
+  var last = '';
+  function render() {
+    var raw = input.value, nm = normMap(raw), pairs = pairsFn(), hit = null;
+    for (var i = 0; i < pairs.length && !hit; i++) {
+      var m = matchPair(nm.w, pairs[i]);
+      if (m) hit = { a: nm.map[m[0]], b: nm.map[m[1]], p: pairs[i] };
+    }
+    var html = '', open = false;               // deux lettres côte à côte ne font qu'un seul surlignage
+    for (var j = 0; j < raw.length; j++) {
+      var lit = !!hit && (j === hit.a || j === hit.b);
+      if (lit && !open) { html += '<b>'; open = true; }
+      if (!lit && open) { html += '</b>'; open = false; }
+      html += escHtml(raw[j]);
+    }
+    if (open) html += '</b>';
+    ghost.innerHTML = html;
+    field.classList.toggle('platefield--ready', !!hit && nm.w.length >= 3 && !!DICT && DICT.has(nm.w));
+    var key = hit ? hit.p + ':' + hit.a + '-' + hit.b : '';
+    if (key && key !== last) { ghost.classList.remove('pop'); void ghost.offsetWidth; ghost.classList.add('pop'); }
+    last = key;
+    sync();
+    requestAnimationFrame(sync);      // le champ ajuste son propre défilement après coup
+  }
+  function sync() { ghost.scrollLeft = input.scrollLeft; }
+  input.addEventListener('input', render);
+  input.addEventListener('scroll', sync);
+  return render;
+}
+/* le mot est passé : on vide le champ et tout ce qui l'écoute se remet à zéro */
+function clearInput(input) {
+  input.value = '';
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+}
+/* le mot est refusé : la plaque le dit, et le texte reste — une faute de frappe se
+   corrige, elle ne se retape pas. `whole` : le mot entier est à revoir, on le sélectionne. */
+function refuseInput(input, whole) {
+  var field = input.closest('.platefield');
+  field.classList.remove('shake');
+  void field.offsetWidth;
+  field.classList.add('shake', 'platefield--ko');
+  setTimeout(function () { field.classList.remove('shake'); }, 320);
+  setTimeout(function () { field.classList.remove('platefield--ko'); }, 900);
+  if (whole) { try { input.select(); } catch (e) {} }
 }
 
 /* ═══════════ mise en page au viewport visible ═══════════
@@ -1318,6 +1381,7 @@ window.PLAQUE = {
   shuffle: shuffle, pick: pick, rand: rand, row: row, explode: explode,
   collection: collection, collect: collect, finishGame: finishGame,
   TINTS: TINTS, garage: garage, garageCount: garageCount, GARAGE_N: GARAGE_N,
+  attachLive: attachLive, clearInput: clearInput, refuseInput: refuseInput,
   DIFF: DIFF, MODES: MODES, state: state, newPlate: newPlate, endGame: endGame,
   track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore, guideSay: guideSay,
   FLEET: FLEET, TANK: TANK, fleetRoster: fleetRoster, sportBonus: sportBonus, sportTag: sportTag,

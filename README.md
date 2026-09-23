@@ -15,6 +15,23 @@ de lettres**. Il faut taper des mots contenant les deux lettres d'une paire,
 Les trois chiffres du milieu sont la **cote** de la plaque, ce qu'elle rapporte une
 fois lue. Le **numéro de département** rejoint votre collection à chaque plaque lue.
 
+### Le champ de saisie
+
+Le champ est une plaque vierge, et il **allume la paire lettre par lettre** : dès que
+les deux lettres d'une paire en jeu sont là, dans l'ordre, elles passent au marqueur.
+Si le mot tient aussi au dictionnaire, la plaque passe au **vert** — il partira tout
+seul. Refusé, elle passe au **rouge** et **le mot reste** : une faute de frappe se
+corrige d'un retour arrière, un mot entier à revoir arrive sélectionné, la frappe
+suivante l'efface. Le champ n'est vidé que lorsque le mot est pris.
+
+Techniquement, un calque (`.platefield__ghost`) reprend le texte du champ lettre pour
+lettre et l'entoure de `<b>` aux deux positions que rend `matchPair()` ; le `<input>`
+passe en `color:transparent` et ne garde que son curseur. `normMap()` conserve la place
+d'origine de chaque lettre, si bien que les accents et les ligatures restent alignés.
+Le marqueur reste une boîte **en ligne** — en `inline-block` il prendrait toute la
+hauteur de la ligne — et sa pulsation joue sur l'ombre, jamais sur la géométrie : rien
+ne doit décaler les glyphes, le curseur du champ est dessous.
+
 ## Les trois modes
 
 | Mode | Boucle |

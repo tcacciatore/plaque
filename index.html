@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;700&family=Monoton&display=swap">
-<link rel="stylesheet" href="css/style.css?v=123">
+<link rel="stylesheet" href="css/style.css?v=124">
 </head>
 <body>
 
@@ -207,8 +207,11 @@
     <div class="suggest suggest--off" id="pu-suggest"></div>
     <form id="pu-form" class="platefield" autocomplete="off">
       <span class="platefield__eu">F</span>
-      <input id="pu-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
-             autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot…" aria-label="Votre mot" enterkeyhint="go">
+      <span class="platefield__box">
+        <span class="platefield__ghost" id="pu-live" aria-hidden="true"></span>
+        <input id="pu-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
+               autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot…" aria-label="Votre mot" enterkeyhint="go">
+      </span>
     </form>
     <p class="feedback" id="pu-feedback">&nbsp;</p>
     <p class="hint-line"><button class="linkbtn" id="pu-quit">Se garer</button> · <button class="linkbtn linkbtn--exit" data-exit>Quitter</button></p>
@@ -280,8 +283,11 @@
     <div class="suggest suggest--off" id="tr-suggest"></div>
     <form id="tr-form" class="platefield" autocomplete="off">
       <span class="platefield__eu">F</span>
-      <input id="tr-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
-             autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot…" aria-label="Votre mot" enterkeyhint="go">
+      <span class="platefield__box">
+        <span class="platefield__ghost" id="tr-live" aria-hidden="true"></span>
+        <input id="tr-input" type="text" inputmode="text" autocomplete="off" autocorrect="off"
+               autocapitalize="off" spellcheck="false" maxlength="24" placeholder="un mot…" aria-label="Votre mot" enterkeyhint="go">
+      </span>
     </form>
     <p class="feedback" id="tr-feedback">&nbsp;</p>
     <p class="hint-line"><button class="linkbtn" id="tr-quit">Se garer</button> · <button class="linkbtn linkbtn--exit" data-exit>Quitter</button></p>
@@ -289,11 +295,11 @@
 
 </div>
 
-<script src="js/pairs.js?v=123"></script>
-<script src="js/departements.js?v=123"></script>
-<script src="js/dict.js?v=123"></script>
-<script src="js/game.js?v=123"></script>
-<script src="js/traffic.js?v=123"></script>
-<script src="js/pursuit.js?v=123"></script>
+<script src="js/pairs.js?v=124"></script>
+<script src="js/departements.js?v=124"></script>
+<script src="js/dict.js?v=124"></script>
+<script src="js/game.js?v=124"></script>
+<script src="js/traffic.js?v=124"></script>
+<script src="js/pursuit.js?v=124"></script>
 </body>
 </html>

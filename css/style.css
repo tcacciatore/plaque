@@ -273,7 +273,7 @@ button.stat:hover{border-color:var(--accent)}
 .road__sky::after{background:linear-gradient(180deg,#04070e 0%,#0b1020 60%,#2a1a24 100%);mix-blend-mode:multiply;opacity:calc(var(--dusk,0)*.85)}
 .road__ground::after{background:#05070a;opacity:calc(var(--dusk,0)*.45)}
 .road__ground{position:absolute;inset:46% 0 0 0;
-  background:linear-gradient(180deg,#3a3b2c 0%,#252c1e 12%,#1a2118 40%,#111610 100%);
+  background:linear-gradient(180deg,#414428 0%,#252d16 12%,#18200e 40%,#0c1108 100%);
   box-shadow:inset 0 7px 16px -7px rgba(196,160,124,.5)}
 .road__tarmac{position:absolute;inset:46% 0 0 0;
   background:
@@ -283,7 +283,7 @@ button.stat:hover{border-color:var(--accent)}
     radial-gradient(16% 4% at 54% 63%,rgba(0,0,0,.11),transparent 70%),
     /* bombement : la chaussée est plus claire en son milieu, ses rives plongent dans l'ombre */
     linear-gradient(90deg,rgba(0,0,0,.30) 0 5%,rgba(0,0,0,.10) 18%,transparent 34% 66%,rgba(0,0,0,.10) 82%,rgba(0,0,0,.30) 95%),
-    linear-gradient(180deg,#3d444e 0%,#282e35 48%,#1c2027 100%);
+    linear-gradient(180deg,#5a626d 0%,#3f464f 48%,#2c313a 100%);
   clip-path:polygon(46.2% 0,53.8% 0,150% 100%,-50% 100%)}
 .road__edge{position:absolute;inset:46% 0 0 0;
   background:linear-gradient(180deg,rgba(222,216,196,.5) 0 12%,rgba(236,232,216,.66) 45%,rgba(214,206,184,.6) 100%)}
@@ -295,8 +295,9 @@ button.stat:hover{border-color:var(--accent)}
              radial-gradient(125% 92% at 50% 42%,transparent 52%,rgba(0,0,0,.6) 100%)}
 
 /* ───────── mode Trafic : les voitures ─────────
-   Au sol à 94 % ; en s'éloignant elle suit la même projection et
-   s'arrête à l'horizon (48,4 %) au lieu de décoller.                     */
+   Base au sol à 12 % du bas ; en s'éloignant elle suit la projection de la route
+   — sol y = 46 % + 42 %/z depuis le haut, échelle = 1/z —, donc elle remonte de
+   exactement 42 %·(1 − échelle) et se pose sur l'horizon sans jamais le dépasser. */
 .road__cars{position:absolute;inset:0}
 .car{
   position:absolute;left:calc(50% + var(--lane,0%));bottom:12%;   /* la place du bas revient à votre voiture de police */
@@ -319,11 +320,11 @@ button.stat:hover{border-color:var(--accent)}
 .car--away{animation:recede 2.1s linear forwards}
 @keyframes recede{
   0%  {left:calc(50% + var(--lane,0%));        transform:translate(-50%,0) scale(1);opacity:1}
-  20% {left:calc(50% + var(--lane,0%) * .410); transform:translate(-50%,calc(var(--roadH) * -0.283)) scale(.410);opacity:1}
-  40% {left:calc(50% + var(--lane,0%) * .186); transform:translate(-50%,calc(var(--roadH) * -0.391)) scale(.186);opacity:1}
-  60% {left:calc(50% + var(--lane,0%) * .106); transform:translate(-50%,calc(var(--roadH) * -0.429)) scale(.106);opacity:.9}
-  80% {left:calc(50% + var(--lane,0%) * .070); transform:translate(-50%,calc(var(--roadH) * -0.446)) scale(.070);opacity:.5}
-  100%{left:calc(50% + var(--lane,0%) * .050); transform:translate(-50%,calc(var(--roadH) * -0.456)) scale(.050);opacity:0}
+  20% {left:calc(50% + var(--lane,0%) * .410); transform:translate(-50%,calc(var(--roadH) * -0.248)) scale(.410);opacity:1}
+  40% {left:calc(50% + var(--lane,0%) * .186); transform:translate(-50%,calc(var(--roadH) * -0.342)) scale(.186);opacity:1}
+  60% {left:calc(50% + var(--lane,0%) * .106); transform:translate(-50%,calc(var(--roadH) * -0.375)) scale(.106);opacity:.9}
+  80% {left:calc(50% + var(--lane,0%) * .070); transform:translate(-50%,calc(var(--roadH) * -0.391)) scale(.070);opacity:.55}
+  100%{left:calc(50% + var(--lane,0%) * .050); transform:translate(-50%,calc(var(--roadH) * -0.399)) scale(.050);opacity:0}
 }
 .car--done .car__body{filter:drop-shadow(0 0 16px rgba(61,220,132,.8))}
 
@@ -767,14 +768,44 @@ h2{font-size:26px!important;letter-spacing:.04em;text-transform:uppercase}
 .platefield:focus-within{box-shadow:0 0 0 3px rgba(255,207,63,.45),0 8px 24px rgba(0,0,0,.5)}
 .platefield__eu{flex:0 0 40px;background:var(--plate-blue);color:#fff;display:flex;align-items:flex-end;justify-content:center;
   padding-bottom:6px;font-family:var(--cond);font-weight:800;font-size:16px}
+.platefield__box{position:relative;flex:1;display:flex;min-width:0}
 .platefield input,#tr-input,#pk-input{
-  flex:1;background:transparent;border:0;border-radius:0;color:#111;font-family:var(--cond);font-weight:800;
+  flex:1;min-width:0;background:transparent;border:0;border-radius:0;color:transparent;caret-color:#111;
+  font-family:var(--cond);font-weight:800;
   font-size:30px;letter-spacing:.06em;padding:8px 14px;outline:none;text-transform:uppercase;box-shadow:none;
 }
 .platefield input::placeholder{color:#9aa3b0;font-weight:600;letter-spacing:.02em;text-transform:none}
 .platefield input:focus{box-shadow:none;border:0}
 body.fitted .platefield input{font-size:24px;padding:6px 12px}
 body.fitted .platefield__eu{flex-basis:32px}
+
+/* ── le calque qui surligne la paire : mêmes métriques que le champ, au pixel près ── */
+.platefield__ghost{
+  position:absolute;left:0;top:0;right:0;bottom:0;z-index:2;pointer-events:none;overflow:hidden;
+  white-space:pre;color:#111;font-family:var(--cond);font-weight:800;
+  font-size:30px;letter-spacing:.06em;padding:8px 14px;text-transform:uppercase;
+}
+body.fitted .platefield__ghost{font-size:24px;padding:6px 12px}
+/* le marqueur reste une boîte en ligne : son fond épouse la hauteur des lettres.
+   En inline-block il prendrait toute la hauteur de la ligne et ressemblerait à une
+   barre mal calée. La pulsation se joue donc sur l'ombre, jamais sur la géométrie :
+   rien ne doit décaler les glyphes, le curseur du champ est dessous.               */
+.platefield__ghost b{
+  --lit:rgba(255,207,63,.95);
+  color:#14181f;background:var(--lit);border-radius:3px;box-shadow:0 0 0 2px var(--lit);
+}
+.platefield__ghost.pop b{animation:litpop .3s cubic-bezier(.2,.9,.3,1)}
+@keyframes litpop{
+  0%  {box-shadow:0 0 0 2px var(--lit)}
+  40% {box-shadow:0 0 0 7px var(--lit)}
+  100%{box-shadow:0 0 0 2px var(--lit)}
+}
+/* le mot porte une paire ET tient au dictionnaire : il part au prochain souffle */
+.platefield.platefield--ready{box-shadow:0 0 0 3px rgba(61,220,132,.65),0 8px 24px rgba(0,0,0,.5)}
+.platefield--ready .platefield__ghost b{--lit:rgba(61,220,132,.95);color:#0c2114}
+/* refusé : la plaque elle-même le dit, on n'a plus à descendre lire la ligne du dessous */
+.platefield.platefield--ko{box-shadow:0 0 0 3px rgba(255,107,107,.7),0 8px 24px rgba(0,0,0,.5)}
+.platefield--ko .platefield__ghost b{--lit:rgba(255,107,107,.95);color:#2b0707}
 
 /* ── entrée en cascade des blocs de l'accueil ── */
 #screen-home.active > *{animation:cascade .5s ease both}
@@ -1097,6 +1128,11 @@ body.theme-miami .hud--scene .hud__item{border-color:rgba(46,230,214,.35);backgr
 body.theme-miami .hud--lot{background:linear-gradient(180deg,#241a5e,#1b1247)}
 body.theme-miami .hud--lot::after{background:repeating-linear-gradient(90deg,#ff4fa3 0 14px,transparent 14px 24px)}
 body.theme-miami .platefield:focus-within{box-shadow:0 0 0 3px rgba(255,79,163,.55),0 8px 24px rgba(0,0,0,.5)}
+body.theme-miami .platefield__ghost b{--lit:rgba(255,79,163,.92);color:#2a0419}
+body.theme-miami .platefield.platefield--ready{box-shadow:0 0 0 3px rgba(43,229,201,.7),0 8px 24px rgba(0,0,0,.5)}
+body.theme-miami .platefield--ready .platefield__ghost b{--lit:rgba(43,229,201,.95);color:#052420}
+body.theme-miami .platefield.platefield--ko{box-shadow:0 0 0 3px rgba(255,107,107,.75),0 8px 24px rgba(0,0,0,.5)}
+body.theme-miami .platefield--ko .platefield__ghost b{--lit:rgba(255,107,107,.95);color:#2b0707}
 body.theme-miami .rank,body.theme-miami .missions,body.theme-miami .stat{background:var(--bg2)}
 body.theme-miami .rank__fill{background:linear-gradient(90deg,#2ee6d6,#ff4fa3)}
 body.theme-miami .warp{background:repeating-conic-gradient(from 0deg at 50% 46%,transparent 0deg 5deg,rgba(255,79,163,.22) 5deg 6.2deg)}
@@ -1264,8 +1300,9 @@ body.theme-miami .road__tarmac{background:
 .copbar__r{right:7%;background:linear-gradient(180deg,#ffb3b3,#d2262a);animation:copFlashR 1s steps(1) infinite}
 @keyframes copFlashB{0%,24%{opacity:1;box-shadow:0 0 12px 3px rgba(60,140,255,.55)}25%,100%{opacity:.28;box-shadow:none}}
 @keyframes copFlashR{0%,49%{opacity:.28;box-shadow:none}50%,74%{opacity:1;box-shadow:0 0 12px 3px rgba(255,70,70,.55)}75%,100%{opacity:.28;box-shadow:none}}
-/* le balayage des gyrophares sur la chaussée */
-.road__tarmac{position:relative}
+/* le balayage des gyrophares sur la chaussée — .copwash est un frère de .road__tarmac,
+   il se cale sur .road : surtout ne pas repasser la chaussée en position:relative, elle
+   perdrait la hauteur que lui donne son inset et disparaîtrait sous le bas-côté. */
 .copwash{position:absolute;inset:74% 0 0 0;pointer-events:none;z-index:2;mix-blend-mode:screen}
 .copwash::before,.copwash::after{content:'';position:absolute;inset:0}
 .copwash::before{background:radial-gradient(46% 70% at 40% 108%,rgba(60,140,255,.22),transparent 70%);animation:copFlashB 1s steps(1) infinite}

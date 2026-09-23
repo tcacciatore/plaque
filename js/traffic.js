@@ -215,6 +215,7 @@ function livePairs() {                           // les paires encore à lire, p
 }
 function renderPairs() {
   if (T.suggest) T.suggest();
+  if (T.live) T.live();                            // les paires ont changé : le surlignage suit
   var alive = T.lanes.filter(function (c) { return c && !c.gone; });
   var box = $('tr-pairs');
   if (!alive.length) { box.innerHTML = '<span class="tok tok--wait">…</span>'; return; }
@@ -256,18 +257,18 @@ function submit(e) {
   e.preventDefault();
   if (!T.running) return;
   var inp = $('tr-input'), w = P.norm(inp.value.trim());
-  inp.value = '';
   if (!w) return;
   var alive = T.lanes.filter(function (c) { return c && !c.gone; });
   if (!alive.length) { feedback('Attendez la prochaine voiture…', 'ko'); return; }
   if (T.combo < MULT_MAX) T.feverArmed = true;
 
-  function reject(msg) {
+  // le mot refusé reste dans le champ : une faute de frappe se corrige d'un retour
+  // arrière, un mot entier à revoir arrive sélectionné — la frappe suivante l'efface.
+  function reject(msg, whole) {
     feedback(msg, 'ko');
     T.combo = 1;
     P.sfx.ko();
-    inp.classList.add('shake');
-    setTimeout(function () { inp.classList.remove('shake'); }, 320);
+    P.refuseInput(inp, whole);
     renderHud();
   }
   if (w.length < 3) return reject('Trop court — 3 lettres minimum.');
@@ -289,9 +290,10 @@ function submit(e) {
     if (ruleMsg) P.refuse(ruleCar, ruleMsg, ruleCar.el);
     return reject(ruleMsg ? '<b>' + w.toUpperCase() + '</b> — ' + ruleMsg
                 : used ? '<b>' + w.toUpperCase() + '</b> — déjà joué sur une de ces voitures.'
-                       : '<b>' + w.toUpperCase() + '</b> ne va sur aucune des trois plaques.');
+                       : '<b>' + w.toUpperCase() + '</b> ne va sur aucune des trois plaques.', true);
   }
   if (!P.isWord(w)) return reject('<b>' + w.toUpperCase() + '</b> — inconnu du dictionnaire.');
+  P.clearInput(inp);                               // le mot est pris : le champ repart à zéro
 
   var car = best.c, hit = best.h1 || best.h2;
   var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
@@ -452,7 +454,7 @@ function start() {
   $('tr-cars-layer').innerHTML = '';
   T.roster = P.fleetRoster();
   preloadCars(T.roster);
-  $('tr-input').value = '';
+  P.clearInput($('tr-input'));
   feedback('&nbsp;', '');
   renderHud(); renderPairs();
   P.screen('screen-traffic');
@@ -491,6 +493,7 @@ window.TRAFFIC = { start: start, stop: stop, submit: submit };
 document.addEventListener('DOMContentLoaded', function () {
   $('tr-form').addEventListener('submit', submit);
   T.suggest = window.PLAQUE.attachSuggest($('tr-input'), $('tr-form'), $('tr-suggest'), livePairs);
+  T.live = window.PLAQUE.attachLive($('tr-input'), livePairs);
   window.PLAQUE.autoSubmit($('tr-input'), $('tr-form'), function (w) {
     return T.lanes.some(function (c) {
       return c && !c.gone && w !== c.got1 && w !== c.got2 &&

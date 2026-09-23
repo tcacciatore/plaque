@@ -168,6 +168,7 @@ function livePairs() {                           // les paires lisibles, rétro 
 }
 function renderTokens() {
   if (R.suggest) R.suggest();
+  if (R.live) R.live();                            // les paires ont changé : le surlignage suit
   var box = $('pu-pairs');
   var vis = R.cars.filter(readable).sort(function (a, b) { return a.lane - b.lane; });
   if (!vis.length) { box.innerHTML = '<span class="tok tok--wait">…</span>'; return; }
@@ -208,13 +209,14 @@ function submit(e) {
   e.preventDefault();
   if (!R.running) return;
   var inp = $('pu-input'), w = P.norm(inp.value.trim());
-  inp.value = '';
   if (!w) return;
   var alive = R.cars.filter(readable);
   if (!alive.length) { feedback('Rien à lire encore…', 'ko'); return; }
-  function reject(msg) {
+  // le mot refusé reste dans le champ : une faute de frappe se corrige d'un retour
+  // arrière, un mot entier à revoir arrive sélectionné — la frappe suivante l'efface.
+  function reject(msg, whole) {
     feedback(msg, 'ko'); R.combo = 1; R.feverArmed = true; P.sfx.ko();
-    inp.classList.add('shake'); setTimeout(function () { inp.classList.remove('shake'); }, 320); renderHud();
+    P.refuseInput(inp, whole); renderHud();
   }
   if (w.length < 3) return reject('Trop court — 3 lettres minimum.');
 
@@ -234,8 +236,9 @@ function submit(e) {
   });
   if (ruleMsg && !best) P.refuse(ruleCar, ruleMsg, ruleCar.el);
   if (!best) return reject(ruleMsg ? '<b>' + w.toUpperCase() + '</b> — ' + ruleMsg
-                         : used ? '<b>' + w.toUpperCase() + '</b> — déjà joué.' : '<b>' + w.toUpperCase() + '</b> ne va sur aucune plaque en vue.');
+                         : used ? '<b>' + w.toUpperCase() + '</b> — déjà joué.' : '<b>' + w.toUpperCase() + '</b> ne va sur aucune plaque en vue.', true);
   if (!P.isWord(w)) return reject('<b>' + w.toUpperCase() + '</b> — inconnu du dictionnaire.');
+  P.clearInput(inp);                               // le mot est pris : le champ repart à zéro
 
   var c = best.c, hit = best.h1 || best.h2;
   var ws = P.wordScore(w, hit), tier = ws.tier, rare = ws.rare;
@@ -415,7 +418,7 @@ function start() {
   });
   R.t0 = Date.now(); R.last = performance.now();
   $('pu-cars').innerHTML = '';
-  $('pu-input').value = '';
+  P.clearInput($('pu-input'));
   $('pu-road').classList.remove('rush', 'fever');
   feedback('&nbsp;', '');
   P.screen('screen-pursuit');
@@ -450,6 +453,7 @@ window.PURSUIT = { start: start, stop: stop, measure: measure };
 document.addEventListener('DOMContentLoaded', function () {
   $('pu-form').addEventListener('submit', submit);
   R.suggest = window.PLAQUE.attachSuggest($('pu-input'), $('pu-form'), $('pu-suggest'), livePairs);
+  R.live = window.PLAQUE.attachLive($('pu-input'), livePairs);
   window.PLAQUE.autoSubmit($('pu-input'), $('pu-form'), function (w) {
     return R.cars.some(function (c) {
       return readable(c) && w !== c.got1 && w !== c.got2 &&
