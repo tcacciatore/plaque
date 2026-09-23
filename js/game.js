@@ -223,7 +223,7 @@ for (var vi = 0; vi < VEHICLES.length; vi++) {
     });
   }
 }
-var CAREER = { mission: 400, dep: 100 };
+var CAREER = { mission: 400, dep: 100, car: 150 };
 
 /* ═══════════ le but du jeu : douze grades, du gardien au commissaire divisionnaire ═══════════
    Chaque grade demande des points de carrière ET une condition concrète : c'est elle qui
@@ -288,9 +288,9 @@ var BASE_COLORS = ['rouge', 'bleu', 'blanc', 'noir', 'vert', 'jaune', 'gris', 'o
    size : largeur affichée en Chasse et Poursuite, en fraction de la hauteur de scène ;
    sport : multiplicateur de points ; front : la plaque avant, vue de face.                     */
 var FLEET = {
-  berline:   { name: 'Berline',      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, front: { y: 78.7, w: 47.1, ratio: 1.388 } },
+  berline:   { name: 'Berline', fem: true,      plateY: 73.7, plateW: 45.1, ratio: 1.429, size: 0.74, front: { y: 78.7, w: 47.1, ratio: 1.388 } },
   suv:       { name: 'Break',        plateY: 75.2, plateW: 43.0, ratio: 1.281, size: 0.70, front: { y: 79.2, w: 43.8, ratio: 1.295 } },
-  citadine:  { name: 'Citadine',     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, front: { y: 76.1, w: 47.4, ratio: 1.336 } },
+  citadine:  { name: 'Citadine', fem: true,     plateY: 71.7, plateW: 46.5, ratio: 1.335, size: 0.66, front: { y: 76.1, w: 47.4, ratio: 1.336 } },
   monospace: { name: 'Monospace',    plateY: 78.8, plateW: 44.3, ratio: 1.208, size: 0.70, front: { y: 82.8, w: 40.9, ratio: 1.350 } },
   pickup:    { name: 'Pick-up',      plateY: 59.2, plateW: 41.3, ratio: 1.382, size: 0.72, front: { y: 77.3, w: 42.0, ratio: 1.377 } },
   van:       { name: 'Utilitaire',   plateY: 71.7, plateW: 42.6, ratio: 1.107, size: 0.62, front: { y: 80.9, w: 38.8, ratio: 1.211 } },
@@ -298,10 +298,10 @@ var FLEET = {
   '4x4':     { name: '4×4',          plateY: 71.9, plateW: 39.5, ratio: 1.208, size: 0.70, front: { y: 67.4, w: 39.4, ratio: 1.196 } },
   camion:    { name: 'Camion',       plateY: 78.2, plateW: 38.0, ratio: 1.316, size: 0.56, front: { y: 69.7, w: 37.1, ratio: 1.543 } },
   cabrio:    { name: 'Cabriolet',    plateY: 71.0, plateW: 41.7, ratio: 1.579, size: 0.76, front: { y: 72.0, w: 42.7, ratio: 1.569 } },
-  ancienne:  { name: 'Ancienne',     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, front: { y: 69.9, w: 46.4, ratio: 1.323 } },
+  ancienne:  { name: 'Ancienne', fem: true,     plateY: 68.1, plateW: 46.4, ratio: 1.317, size: 0.68, front: { y: 69.9, w: 46.4, ratio: 1.323 } },
   coupe:     { name: 'Coupé',        plateY: 65.3, plateW: 41.0, ratio: 1.720, size: 0.78, sport: 1.5, front: { y: 68.7, w: 41.3, ratio: 1.734 } },
-  supercar:  { name: 'Supercar',     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, sport: 2, front: { y: 77.3, w: 38.5, ratio: 1.776 } },
-  citerne:   { name: 'Citerne',      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, tank: true, front: { y: 74.7, w: 39.4, ratio: 1.486 } },
+  supercar:  { name: 'Supercar', fem: true,     plateY: 64.5, plateW: 38.2, ratio: 2.003, size: 0.80, sport: 2, front: { y: 77.3, w: 38.5, ratio: 1.776 } },
+  citerne:   { name: 'Citerne', fem: true,      plateY: 76.4, plateW: 42.0, ratio: 1.177, size: 0.56, tank: true, front: { y: 74.7, w: 39.4, ratio: 1.486 } },
 };
 var TANK = 'citerne';
 function sportBonus(shape) { return (FLEET[shape] && FLEET[shape].sport) || 1; }
@@ -433,6 +433,50 @@ function colors() {
 }
 function rankSprite(rank) { return 'assets/cars/' + rank.vehicle.id + '-' + rank.metal + '.webp'; }
 
+/* ═══════════ le garage : votre tableau de chasse ═══════════
+   Quatorze silhouettes, douze teintes : cent soixante-huit voitures à rapporter.
+   Une plaque entièrement lue met le modèle ET sa teinte au garage, avec le jour de
+   la prise, le nombre de fois qu'elle est tombée et la meilleure cote qu'elle a
+   rendue. Trois teintes ne sortent qu'une fois le rang qui les débloque atteint :
+   ce sont les pièces rares, avec la dorée — une voiture sur vingt-cinq.          */
+var TINTS = [
+  { id: 'rouge',  name: 'Rouge',  m: 'rouge',  f: 'rouge',    hex: '#bf352f' },
+  { id: 'bleu',   name: 'Bleu',   m: 'bleu',   f: 'bleue',    hex: '#3565bf' },
+  { id: 'blanc',  name: 'Blanc',  m: 'blanc',  f: 'blanche',  hex: '#f1f2f3' },
+  { id: 'noir',   name: 'Noir',   m: 'noir',   f: 'noire',    hex: '#292c32' },
+  { id: 'vert',   name: 'Vert',   m: 'vert',   f: 'verte',    hex: '#358e69' },
+  { id: 'jaune',  name: 'Jaune',  m: 'jaune',  f: 'jaune',    hex: '#e2bf30' },
+  { id: 'gris',   name: 'Gris',   m: 'gris',   f: 'grise',    hex: '#8e939b' },
+  { id: 'orange', name: 'Orange', m: 'orange', f: 'orange',   hex: '#e1812d' },
+  { id: 'violet', name: 'Violet', m: 'violet', f: 'violette', hex: '#9555c2' },
+  { id: 'chrome', name: 'Chrome', m: 'chrome', f: 'chrome',   hex: '#eff1f6' },
+  { id: 'nacre',  name: 'Nacre',  m: 'nacré',  f: 'nacrée',   hex: '#f6eaf1' },
+  { id: 'or',     name: 'Or',     m: 'doré',   f: 'dorée',    hex: '#edbf45' }
+];
+var GARAGE_N = Object.keys(FLEET).length * TINTS.length;
+function tintOf(id) { for (var i = 0; i < TINTS.length; i++) if (TINTS[i].id === id) return TINTS[i]; return null; }
+function tintRank(id) {                              // le rang qui débloque la teinte, ou null
+  for (var i = 0; i < RANKS.length; i++) if (RANKS[i].unlock === id) return RANKS[i];
+  return null;
+}
+function garage() { return store.get('garage', {}); }
+function garageCount() { return Object.keys(garage()).length; }
+/* une voiture rentre au garage : vrai la première fois seulement */
+function garageAdd(shape, tint, pts) {
+  if (!shape || !tint || !FLEET[shape] || !tintOf(tint)) return false;
+  var g = garage(), k = shape + '-' + tint, e = g[k], fresh = !e;
+  if (fresh) e = g[k] = { n: 0, d: dayNum(), p: 0 };
+  e.n++;
+  if (pts > e.p) e.p = pts;
+  store.set('garage', g);
+  return fresh;
+}
+/* une berline noire, un coupé noir : la teinte s'accorde avec la silhouette */
+function carName(shape, tint) {
+  var t = tintOf(tint);
+  return FLEET[shape].name + ' ' + (t ? (FLEET[shape].fem ? t.f : t.m) : tint);
+}
+
 /* ═══════════ série de jours : une partie par jour l'entretient ═══════════
    Le bonus de carrière grimpe de 10 % par jour de série, jusqu'à +100 %.        */
 function streak() { return store.get('streak', { last: 0, n: 0 }); }
@@ -467,6 +511,9 @@ var BADGES = [
   { id: 'fievre',   name: 'Fiévreux',       txt: '10 fièvres déclenchées',    stat: 'fever',  goal: 10,  icon: 'thermo',  metal: 'bronze', tint: '#ff3c6e' },
   { id: 'marathon', name: 'Marathonien',    txt: '30 parties',                stat: 'games',  goal: 30,  icon: 'clock',   metal: 'bronze', tint: '#35c4d6' },
   { id: 'forcene',  name: 'Forcené',        txt: '100 parties',               stat: 'games',  goal: 100, icon: 'clock',   metal: 'or', tint: '#1fa3b8' },
+  { id: 'garagiste', name: 'Garagiste',      txt: '30 voitures au garage',      stat: 'garage', goal: 30,  icon: 'key',     metal: 'bronze', tint: '#7ad1ff' },
+  { id: 'collec',   name: 'Collectionneur', txt: '90 voitures au garage',      stat: 'garage', goal: 90,  icon: 'key',     metal: 'argent', tint: '#4aa8e0' },
+  { id: 'parc',     name: 'Parc complet',   txt: 'les 168 voitures',           stat: 'garage', goal: 168, icon: 'trophy',  metal: 'or', tint: '#ffcf3f' },
   { id: 'carto',    name: 'Cartographe',    txt: '50 départements',           stat: 'deps',   goal: 50,  icon: 'map',     metal: 'argent', tint: '#2e86de' },
   { id: 'tour',     name: 'Tour de France', txt: 'les 101 départements',      stat: 'deps',   goal: 101, icon: 'trophy',  metal: 'or', tint: '#ffb13d' },
   { id: 'assidu',   name: 'Assidu',         txt: '7 jours d\'affilée',        stat: 'streak', goal: 7,   icon: 'calendar', metal: 'bronze', tint: '#ff8a3c' },
@@ -484,7 +531,8 @@ var ICONS = {
   clock:    '<circle cx="12" cy="13" r="8"/><path d="M12 8v5l3 2M9 3h6"/>',
   map:      '<path d="M12 2l8 5v10l-8 5-8-5V7zM12 7l4 2.5v5L12 17l-4-2.5v-5z"/>',
   trophy:   '<path d="M7 4h10v5a5 5 0 0 1-10 0zM5 5H3v2a4 4 0 0 0 4 3M19 5h2v2a4 4 0 0 1-4 3M9 21h6M12 14v7"/>',
-  calendar: '<path d="M4 6h16v14H4zM4 11h16M8 3v5M16 3v5M8 15h2M12 15h2"/>'
+  calendar: '<path d="M4 6h16v14H4zM4 11h16M8 3v5M16 3v5M8 15h2M12 15h2"/>',
+  key:      '<circle cx="8" cy="9" r="4.5"/><path d="M11 12l9 9M17 18l2.5-2.5M14.5 15.5L17 13"/>'
 };
 /* une médaille en trois dimensions : face bombée aux reflets métalliques, tranche
    épaisse, dos gravé. Verrouillée : grise. En grand, elle tourne sur elle-même. */
@@ -604,7 +652,7 @@ function progress(type, n, absolute) {
 var session = {};
 function sessionStart() {
   session = { words: 0, bestWord: null, bestWordPts: 0, maxCombo: 1, bestPlate: null, bestPlatePts: 0,
-              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, newDeps: 0, newRank: null, newGrade: null, missionsDone: [],
+              plates: 0, sport: 0, rare: 0, expert: 0, gold: 0, newDeps: 0, newCars: [], newRank: null, newGrade: null, missionsDone: [],
               badges: [], missed: [], t0: Date.now() };
 }
 var track = {
@@ -632,6 +680,13 @@ var track = {
     }
     if (pts > session.bestPlatePts) { session.bestPlatePts = pts; session.bestPlate = label; }
     progress('plates', 1);
+    if (opts && opts.shape && garageAdd(opts.shape, opts.color, pts)) {
+      var nom = carName(opts.shape, opts.color);
+      session.newCars.push(nom);
+      addCareer(CAREER.car);
+      bumpStat('garage', garageCount(), true);
+      toast('🔑 <b>' + nom + '</b> entre au garage — ' + garageCount() + '/' + GARAGE_N + ' · +' + CAREER.car + ' pts');
+    }
     if (opts && opts.sport) { session.sport++; progress('sport', 1); bumpStat('sport', 1); }
     if (opts && opts.gold)  { session.gold++;  progress('gold', 1); bumpStat('gold', 1); }
   },
@@ -807,6 +862,7 @@ function endGame() {
                           (s.expert ? ' dont ' + s.expert + ' d\'expert 🎓' : ''));
   html += row('Mots · plaques', s.words + ' · ' + s.plates + (s.sport ? ' (dont ' + s.sport + ' sportive' + (s.sport > 1 ? 's' : '') + ')' : ''));
   if (s.newDeps) html += row('🗺️ Nouveaux départements', s.newDeps + ' — collection ' + collection().length + '/101');
+  if (s.newCars.length) html += row('🔑 Nouvelles au garage', '<b>' + s.newCars.join('</b>, <b>') + '</b> — ' + garageCount() + '/' + GARAGE_N);
   s.missionsDone.forEach(function (lbl) { html += row('🎯 Mission accomplie', lbl); });
   if (s.newGrade) html += row('🎖️ Promotion', '<b>' + s.newGrade.name + '</b>');
   if (s.newRank) html += row('🏅 Nouveau rang', '<b>' + s.newRank.name + '</b>' +
@@ -904,7 +960,7 @@ function shareText() {
     for (var t = 0; t < Math.min(12, h.length); t++) bars += h[t].reached ? '💥' : '⬜';
   }
   lines.push(state.total + ' pts · ' + words + ' mot' + (words > 1 ? 's' : '') + (bars ? '  ' + bars : ''));
-  lines.push('🗺️ ' + collection().length + '/101 départements');
+  lines.push('🗺️ ' + collection().length + '/101 départements · 🔑 ' + garageCount() + '/' + GARAGE_N + ' au garage');
   return lines.join('\n');
 }
 function copyShare() {
@@ -946,6 +1002,43 @@ function renderCollection() {
   });
   $('collec-grid').innerHTML = html;
   screen('screen-collection');
+}
+
+/* ═══════════ écran garage : quatorze modèles, douze teintes ═══════════
+   Une case pleine montre la voiture telle que vous l'avez prise ; une case vide
+   n'affiche qu'un emplacement et la pastille de sa teinte — rien n'est téléchargé
+   tant que la voiture n'est pas au garage. Les teintes que votre rang n'a pas
+   encore débloquées portent un cadenas et disent à quel rang elles sortent.      */
+function renderGarage() {
+  var g = garage(), have = garageCount(), open = colors();
+  $('garage-intro').innerHTML = '<b>' + have + '</b> voiture' + (have > 1 ? 's' : '') + ' sur ' + GARAGE_N +
+    ' — chaque plaque entièrement lue met le modèle <i>et sa teinte</i> au tableau de chasse';
+  $('garage-fill').style.width = (have / GARAGE_N * 100) + '%';
+  var html = '';
+  Object.keys(FLEET).forEach(function (shape) {
+    var n = 0;
+    TINTS.forEach(function (t) { if (g[shape + '-' + t.id]) n++; });
+    html += '<div class="gar"><h3>' + FLEET[shape].name +
+            (FLEET[shape].sport ? ' 🏎️' : '') + (FLEET[shape].tank ? ' ⚠' : '') +
+            ' <i>' + n + '/' + TINTS.length + '</i></h3><div class="gar__row">';
+    TINTS.forEach(function (t) {
+      var e = g[shape + '-' + t.id], rk = tintRank(t.id);
+      var locked = !e && rk && open.indexOf(t.id) === -1;
+      var tip = e ? carName(shape, t.id) + ' — ' + e.n + ' prise' + (e.n > 1 ? 's' : '') +
+                    ', meilleure cote ' + e.p + ', depuis le ' + new Date(e.d * 86400000).toLocaleDateString('fr-FR')
+              : locked ? 'Teinte débloquée au rang ' + rk.name
+              : carName(shape, t.id) + ' — jamais prise';
+      html += '<div class="gcar' + (e ? ' gcar--on' : locked ? ' gcar--lock' : '') +
+              '" style="--t:' + t.hex + '" title="' + tip + '">' +
+              (e ? '<img src="assets/cars/' + shape + '-' + t.id + '.webp" loading="lazy" alt="">'
+                 : '<i class="gcar__slot">' + (locked ? '🔒' : '') + '</i>') +
+              '<span>' + t.name + '</span>' +
+              (e && e.n > 1 ? '<u>×' + e.n + '</u>' : '') + '</div>';
+    });
+    html += '</div></div>';
+  });
+  $('garage-grid').innerHTML = html;
+  screen('screen-garage');
 }
 
 /* ═══════════ écran carrière : les 27 rangs ═══════════ */
@@ -1056,6 +1149,12 @@ function refreshHome() {
   $('rank-bar').style.width = next ? Math.round((pts - rk.pts) / (next.pts - rk.pts) * 100) + '%' : '100%';
   $('rank-xp').textContent = next ? pts + ' / ' + next.pts + ' pts' : pts + ' pts';
   $('rank-next').textContent = next ? 'Prochain : ' + next.name : 'Rang maximal';
+  var gn = garageCount(), last = Object.keys(garage()).slice(-5);
+  $('garage-count').textContent = gn + ' / ' + GARAGE_N;
+  $('garage-home-bar').style.width = Math.round(gn / GARAGE_N * 100) + '%';
+  $('garage-row').innerHTML = last.length
+    ? last.map(function (k) { return '<img src="assets/cars/' + k + '.webp" alt="">'; }).join('')
+    : '<span>Lisez une plaque en entier : la voiture entre au garage.</span>';
   $('missions').innerHTML = missions().list.map(function (mi) {
     return '<li class="mission' + (mi.ok ? ' mission--ok' : '') + '"><span>' + missionLabel(mi) + '</span>' +
            '<b>' + (mi.ok ? '✓' : mi.done + '/' + mi.goal) + '</b></li>';
@@ -1218,6 +1317,7 @@ window.PLAQUE = {
   $: $, norm: norm, matchPair: matchPair, screen: screen, sfx: sfx, store: store,
   shuffle: shuffle, pick: pick, rand: rand, row: row, explode: explode,
   collection: collection, collect: collect, finishGame: finishGame,
+  TINTS: TINTS, garage: garage, garageCount: garageCount, GARAGE_N: GARAGE_N,
   DIFF: DIFF, MODES: MODES, state: state, newPlate: newPlate, endGame: endGame,
   track: track, colors: colors, plateValue: plateValue, toast: toast, wordScore: wordScore, guideSay: guideSay,
   FLEET: FLEET, TANK: TANK, fleetRoster: fleetRoster, sportBonus: sportBonus, sportTag: sportTag,
@@ -1282,6 +1382,7 @@ document.addEventListener('DOMContentLoaded', function () {
   $('btn-again').addEventListener('click', newGame);
   $('btn-share').addEventListener('click', copyShare);
   $('btn-collection').addEventListener('click', renderCollection);
+  $('btn-garage').addEventListener('click', renderGarage);
   $('btn-career').addEventListener('click', renderCareer);
   $('btn-grade').addEventListener('click', renderCareer);
   $('btn-badges').addEventListener('click', renderBadges);
@@ -1302,6 +1403,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   $('btn-career-back').addEventListener('click', window.PLAQUE.goHome);
   $('btn-collection-back').addEventListener('click', window.PLAQUE.goHome);
+  $('btn-garage-back').addEventListener('click', window.PLAQUE.goHome);
   $('btn-home').addEventListener('click', window.PLAQUE.goHome);
 
   // quitter une partie en cours : un premier clic demande confirmation, un second quitte

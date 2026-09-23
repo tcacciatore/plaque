@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;700&family=Monoton&display=swap">
-<link rel="stylesheet" href="css/style.css?v=122">
+<link rel="stylesheet" href="css/style.css?v=123">
 </head>
 <body>
 
@@ -101,6 +101,12 @@
         <div class="rank__foot"><i id="rank-xp">0 pts</i><i id="rank-next">Prochain : Citadine argent</i></div>
       </div>
     </button>
+    <button class="garcard" id="btn-garage" type="button" title="Voir le garage">
+      <div class="garcard__head"><span class="garcard__k">Garage</span><b id="garage-count">0 / 168</b></div>
+      <div class="garcard__bar"><div class="garcard__fill" id="garage-home-bar"></div></div>
+      <div class="garcard__row" id="garage-row"></div>
+    </button>
+
     <div class="missions">
       <h3>Missions du jour</h3>
       <ul id="missions"></ul>
@@ -131,6 +137,7 @@
         <li>Trois mots d'affilée sans faute font monter le <strong>multiplicateur</strong> — une erreur le remet à ×1. À <strong>×5</strong>, dix secondes de <strong>fièvre</strong> : un seul mot suffit à lire une plaque. Les <strong>mots rares</strong> rapportent un bonus.</li>
         <li>Les <strong>vingt dernières secondes</strong>, tout compte double. Les voitures <strong>dorées</strong> valent ×3 (et leur marque au sol est un joker de couleur). Le <strong>camion-citerne</strong> souffle ses voisines quand il explose.</li>
         <li>Le but du jeu : gravir les <strong>douze grades</strong> de la police, du gardien de la paix au <strong>commissaire divisionnaire</strong>. Chaque grade demande des points <em>et</em> une condition concrète — lire tant de plaques, croiser tant de départements, pulvériser tant de sportives. Votre grade et la prochaine promotion s'affichent à l'accueil.</li>
+        <li>Chaque plaque lue en entier met la voiture au <strong>garage</strong> : son modèle <em>et sa teinte</em>. Quatorze silhouettes, douze teintes — <strong>168 voitures</strong> à rapporter, chacune une seule fois. Les <strong>dorées</strong> tombent une fois sur vingt-cinq, le <strong>camion-citerne doré</strong> une fois sur trois cent cinquante, et trois teintes — violet, chrome, nacre — n'apparaissent qu'une fois le rang qui les débloque atteint. Une voiture inédite vaut 150 points de carrière. En Poursuite, la police roule en blanc : les autres teintes se chassent en Chasse.</li>
         <li>Chaque point marqué compte aussi pour votre <strong>dotation</strong> : treize véhicules, chacun en bronze, argent puis or — de la citadine bronze à la supercar or. Certains rangs débloquent une teinte de carrosserie. Trois <strong>missions</strong> par jour, les mêmes pour tout le monde, et des <strong>badges</strong> à décrocher.</li>
         <li>Une partie par jour entretient votre <strong>série</strong> : chaque jour d'affilée ajoute 10 % aux points de carrière, jusqu'à +100 %.</li>
         <li>Chaque plaque entièrement lue ajoute son <strong>département</strong> à votre collection — les 101 sont à découvrir.</li>
@@ -232,6 +239,15 @@
     <button id="btn-collection-back" class="btn btn--big">Retour</button>
   </section>
 
+  <!-- ══════════ GARAGE ══════════ -->
+  <section id="screen-garage" class="screen">
+    <h2>Garage</h2>
+    <p class="collec__intro" id="garage-intro"></p>
+    <div class="collec__bar"><div class="collec__fill" id="garage-fill"></div></div>
+    <div id="garage-grid"></div>
+    <button id="btn-garage-back" class="btn btn--big">Retour</button>
+  </section>
+
   <!-- ══════════ MODE TRAFIC ══════════ -->
   <section id="screen-traffic" class="screen">
     <div class="road">
@@ -273,11 +289,11 @@
 
 </div>
 
-<script src="js/pairs.js?v=122"></script>
-<script src="js/departements.js?v=122"></script>
-<script src="js/dict.js?v=122"></script>
-<script src="js/game.js?v=122"></script>
-<script src="js/traffic.js?v=122"></script>
-<script src="js/pursuit.js?v=122"></script>
+<script src="js/pairs.js?v=123"></script>
+<script src="js/departements.js?v=123"></script>
+<script src="js/dict.js?v=123"></script>
+<script src="js/game.js?v=123"></script>
+<script src="js/traffic.js?v=123"></script>
+<script src="js/pursuit.js?v=123"></script>
 </body>
 </html>

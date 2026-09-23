@@ -112,12 +112,30 @@ Chaque plaque entièrement lue ajoute son département à la collection (101 au
 total, +100 points de carrière par nouveau). Les départements manquants sortent deux
 fois plus souvent sur les plaques, et la grille se consulte depuis l'accueil.
 
+### Garage
+
+Le tableau de chasse : **quatorze silhouettes × douze teintes = 168 voitures**. Une
+plaque entièrement lue met la voiture au garage — son modèle *et sa teinte* —, avec le
+jour de la première prise, le nombre de fois qu'elle est tombée et la meilleure cote
+qu'elle a rendue (`plaque.garage`, clés `<shape>-<tint>`). Une voiture inédite vaut
+**150 points de carrière**.
+
+Rareté, du plus courant au plus rare : les huit teintes de base sortent à chaque partie ;
+**violet**, **chrome** et **nacre** n'apparaissent qu'une fois le rang qui les débloque
+atteint (berline bronze, pick-up bronze, coupé bronze) ; **or** tombe une fois sur 25 ;
+le **camion-citerne doré** une fois sur 350. En Poursuite la police roule en blanc : les
+autres teintes se chassent en Chasse.
+
+Trois badges jalonnent le remplissage — Garagiste (30), Collectionneur (90), Parc
+complet (168). L'écran ne télécharge que les sprites des voitures possédées : une case
+vide n'est qu'un emplacement et la pastille de sa teinte.
+
 ## Structure
 
 ```
-index.html            écrans (accueil / trafic / poursuite / fin / carrière / badges / collection)
+index.html            écrans (accueil / chasse / poursuite / fin / carrière / badges / collection / garage)
 css/style.css
-js/game.js            moteur : dictionnaire, règle, tirage, carrière, missions, collection, partage
+js/game.js            moteur : dictionnaire, règle, tirage, carrière, missions, collection, garage, partage
 js/traffic.js         mode Trafic : la scène et sa boucle
 js/pursuit.js         mode Poursuite : la course, les menaces, les pare-chocs
 js/dict.js            113 558 mots + rareté, gzip + base64 (395 Ko)

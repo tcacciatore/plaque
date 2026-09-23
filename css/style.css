@@ -206,6 +206,51 @@ button.stat:hover{border-color:var(--accent)}
 }
 #btn-collection-back{margin-top:8px}
 
+/* ───────── le garage : tableau de chasse ─────────
+   Une case pleine porte la photo de la voiture prise, avec un halo de sa teinte ;
+   une case vide n'est qu'un emplacement et la pastille de la couleur qui manque. */
+.garcard{
+  display:block;width:100%;text-align:left;cursor:pointer;color:var(--txt);
+  background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:10px 12px;margin:10px 0;
+}
+.garcard__head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.garcard__k{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim)}
+.garcard__head b{font-size:15px;font-variant-numeric:tabular-nums}
+.garcard__bar{height:6px;background:var(--bg);border-radius:99px;overflow:hidden;margin:7px 0 6px}
+.garcard__fill{height:100%;background:linear-gradient(90deg,var(--ok),var(--accent));transition:width .4s}
+.garcard__row{display:flex;gap:8px;align-items:center;min-height:30px;overflow:hidden}
+.garcard__row img{height:30px;width:auto;flex:0 0 auto}
+.garcard__row span{font-size:11.5px;color:var(--dim)}
+
+.gar{margin-bottom:14px}
+.gar h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin-bottom:6px;display:flex;justify-content:space-between}
+.gar h3 i{font-style:normal;color:#5c6879}
+.gar__row{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+@media(min-width:560px){.gar__row{grid-template-columns:repeat(12,1fr)}}
+.gcar{
+  position:relative;display:flex;flex-direction:column;justify-content:flex-end;
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:5px 3px 4px;text-align:center;overflow:hidden;
+}
+.gcar img{width:100%;height:auto;display:block;margin-bottom:3px}
+.gcar__slot{
+  display:block;height:28px;margin-bottom:3px;border-radius:6px;position:relative;
+  background:var(--bg);border:1px dashed var(--line);font-size:12px;line-height:28px;font-style:normal;
+}
+.gcar__slot::after{
+  content:'';position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;
+  border-radius:50%;background:var(--t);opacity:.45;
+}
+.gcar--lock .gcar__slot::after{display:none}
+.gcar span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#5c6879}
+.gcar u{position:absolute;top:3px;right:4px;font-size:9px;text-decoration:none;color:var(--dim);font-variant-numeric:tabular-nums;background:rgba(10,13,18,.72);padding:0 3px;border-radius:4px;line-height:1.4}
+.gcar--on{border-color:rgba(61,220,132,.45)}
+.gcar--on::before{content:'';position:absolute;inset:0;border-radius:9px;box-shadow:inset 0 0 16px -5px var(--t);pointer-events:none}
+.gcar--on span{color:var(--txt)}
+.gcar--lock{opacity:.5}
+#btn-garage-back{margin-top:8px}
+
 /* ───────── mode Trafic : la route ─────────
    Perspective unique : point de fuite (50 %, 46 %), sol y = 46 + K/z,
    écart latéral x = 50 ± 38/z, taille = 1/z. Bandes et voitures partagent

@@ -94,10 +94,10 @@ function spawn() {
   if (lane == null) return;
 
   var shape = pickShape(), plate = P.newPlate(R.cars.length === 0 && R.done === 0, shape);
-  var gold = shape !== TANK && P.rand(GOLD_ODDS) === 0;
+  var gold = P.rand(GOLD_ODDS) === 0;             // la citerne aussi peut être dorée : la pièce la plus rare du garage
   var c = {
     p1: plate.p1, p2: plate.p2, dep: plate.dep, value: plate.value, num: String(plate.value).padStart(3, '0'),
-    shape: shape, lane: lane, z: Z_FAR, gold: gold, tank: shape === TANK, phase: 'in',
+    shape: shape, lane: lane, z: Z_FAR, gold: gold, tank: shape === TANK, color: gold ? 'or' : 'blanc', phase: 'in',
     hold: Math.max(HOLD_MIN, HOLD0 - t / 180 * (HOLD0 - HOLD_MIN)) * (HOLD_DIFF[P.state.diff] || 1) * (0.9 + Math.random() * 0.2),
     got1: null, got2: null, words: 0, pts: 0, gone: false, born: Date.now()
   };
@@ -109,9 +109,10 @@ function spawn() {
                  (gold ? ' car--gold' : '') + (c.tank ? ' car--tank' : '');
   el.style.width = (FLEET[shape].size * R.sceneH) + 'px';
   el.innerHTML = '<div class="car__ride">' +
-                   (gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' : c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' :
+                   (gold && c.tank ? '<span class="sport-tag sport-tag--gold">✨ ⚠ citerne ×3</span>' :
+                    gold ? '<span class="sport-tag sport-tag--gold">✨ ×3</span>' : c.tank ? '<span class="sport-tag sport-tag--tank">⚠ citerne</span>' :
                     c.tag ? '<span class="sport-tag sport-tag--trait">' + c.tag + '</span>' : '') +
-                   '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + (gold ? 'or' : 'blanc') + '-front.webp">' +
+                   '<img class="car__body" alt="" draggable="false" src="' + SPRITES + shape + '-' + c.color + '-front.webp">' +
                    '<div class="car__shadow"></div>' +
                    '<div class="cop"><i></i><i></i></div>' + plateHTML(c) +
                    '<div class="car__timer"><i></i></div>' +
@@ -267,7 +268,7 @@ function submit(e) {
   var extra = '';
   if (P.trait(c.shape).give && R.lives < LIVES) { R.lives++; extra = ' · 🔧 <b>pare-chocs réparé</b>'; }
   if (c.cargo === 'fever' && !inFever()) { startFever(); extra += ' · 🔥 la benne était pleine de fièvre'; }
-  P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, tank: c.tank, dep: c.dep.num, depName: c.dep.nom });
+  P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, c.pts, { sport: sport, gold: c.gold, tank: c.tank, dep: c.dep.num, depName: c.dep.nom, shape: c.shape, color: c.color });
   pop(c, (extremis ? 'IN EXTREMIS ' : 'COTE ') + '+' + bonus, 'win');
   P.floatPts(inp, '+' + (pts + bonus), 'float--win');
   P.bump($('pu-score').parentNode.parentNode, 'bump--big');
@@ -305,7 +306,7 @@ function chain(tank) {
       if (c.gone || Math.abs(c.z - tank.z) > 3.5) return;
       var b = Math.round(c.value * 0.5 * multiplier());
       c.pts += b; R.score += b; R.done++; hit++;
-      P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, b, { dep: c.dep.num, depName: c.dep.nom });
+      P.track.plate(c.p1.p + '·' + c.num + '·' + c.p2.p, b, { dep: c.dep.num, depName: c.dep.nom, shape: c.shape, color: c.color });
       pop(c, 'SOUFFLÉE +' + b, 'win');
       explodeCar(c);
     });
